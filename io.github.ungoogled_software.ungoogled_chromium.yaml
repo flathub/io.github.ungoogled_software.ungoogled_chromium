@@ -170,6 +170,8 @@ modules:
 
   - name: chromium
     buildsystem: simple
+    build-options:
+      prepend-ld-library-path: /app/lib/sdk/rust-nightly/lib
     build-commands:
       - /app/ugc/src/utils/prune_binaries.py ./ /app/ugc/src/pruning.list
       - /app/ugc/src/utils/patches.py apply ./ /app/ugc/src/patches
