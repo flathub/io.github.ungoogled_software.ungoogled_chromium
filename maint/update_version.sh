@@ -42,6 +42,16 @@ ugc_commit=$(git ls-remote --tags "${ugc_url:?}" "refs/tags/${ugc_tag:?}" | cut 
 echo "UGC tag: ${ugc_tag:?}"
 echo "UGC commit: ${ugc_commit:?}"
 
+# Get the Rust Nightly version
+rust_nightly_version=$(curl -L -s -f "https://static.rust-lang.org/dist/channel-rust-nightly.toml" | grep -oP 'date = "(.*?)"' | cut -d'"' -f2)
+echo "Rust Nightly version: ${rust_nightly_version:?}"
+url_aarch64="https://static.rust-lang.org/dist/${rust_nightly_version:?}/rust-nightly-aarch64-unknown-linux-gnu.tar.xz"
+sha256_aarch64=$(curl -L -s -f "${url_aarch64:?}.sha256" | cut -d' ' -f1)
+url_x86_64="https://static.rust-lang.org/dist/${rust_nightly_version:?}/rust-nightly-x86_64-unknown-linux-gnu.tar.xz"
+sha256_x86_64=$(curl -L -s -f "${url_x86_64:?}.sha256" | cut -d' ' -f1)
+url_src="https://static.rust-lang.org/dist/${rust_nightly_version:?}/rust-src-nightly.tar.xz"
+sha256_src=$(curl -L -s -f "${url_src:?}.sha256" | cut -d' ' -f1)
+
 # Update the Chromium version
 jq --arg clang_version "${clang_version}" \
    --arg clang_tarball_url "${clang_tarball_url}" \
@@ -58,6 +68,19 @@ jq --arg ugc_tag "${ugc_tag}" \
    --arg ugc_commit "${ugc_commit}" \
    '.[0] |= (.tag = $ugc_tag | .commit = $ugc_commit)' sources/ugc.json > sources/ugc.json.tmp
 mv sources/ugc.json.tmp sources/ugc.json
+
+# Update the Rust Nightly version
+jq --arg rust_nightly_version "${rust_nightly_version}" \
+   --arg url_aarch64 "${url_aarch64}" \
+   --arg sha256_aarch64 "${sha256_aarch64}" \
+   --arg url_x86_64 "${url_x86_64}" \
+   --arg sha256_x86_64 "${sha256_x86_64}" \
+   --arg url_src "${url_src}" \
+   --arg sha256_src "${sha256_src}" \
+   '.[0] |= (.url = $url_aarch64 | .sha256 = $sha256_aarch64) |
+    .[1] |= (.url = $url_x86_64 | .sha256 = $sha256_x86_64) |
+    .[2] |= (.url = $url_src | .sha256 = $sha256_src)' sources/rust-nightly.json > sources/rust-nightly.json.tmp
+mv sources/rust-nightly.json.tmp sources/rust-nightly.json
 
 # Pull changes from the org.chromium.Chromium remote
 git remote add org.chromium.Chromium https://github.com/flathub/org.chromium.chromium 2>/dev/null || true
@@ -76,7 +99,11 @@ for commit in ${commits_to_consider}; do
 done
 
 # Create a new commit and push the changes
-git add sources/chromium.json sources/ugc.json maint/.org.chromium.Chromium.last_checked_commit
+git add \
+    sources/chromium.json \
+    sources/ugc.json \
+    sources/rust-nightly.json \
+    maint/.org.chromium.Chromium.last_checked_commit
 git commit -s -m "Update Ungoogled Chromium to ${ugc_version:?}"
 git push origin "update-ugc-${ugc_version:?}"
 

@@ -1,0 +1,26 @@
+[
+  {
+    "type": "archive",
+    "only-arches": [
+      "aarch64"
+    ],
+    "dest": "rust",
+    "url": "https://static.rust-lang.org/dist/2024-05-14/rust-nightly-aarch64-unknown-linux-gnu.tar.xz",
+    "sha256": "0cbbcbc542c9e7073813d92e02c35c8c503829d65e59c235c641bf9ac989b98f"
+  },
+  {
+    "type": "archive",
+    "only-arches": [
+      "x86_64"
+    ],
+    "dest": "rust",
+    "url": "https://static.rust-lang.org/dist/2024-05-14/rust-nightly-x86_64-unknown-linux-gnu.tar.xz",
+    "sha256": "d2cf0e8c9741080b348422678f1669d7cdd9d60daa46959d0f90a36dfb88cd3b"
+  },
+  {
+    "type": "archive",
+    "dest": "rust-src",
+    "url": "https://static.rust-lang.org/dist/2024-05-14/rust-src-nightly.tar.xz",
+    "sha256": "827393c706c85065f8cc25b15c3fc66b00a4fbac14dd004bb7158b4db04cf8f3"
+  }
+]
