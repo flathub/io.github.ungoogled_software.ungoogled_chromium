@@ -59,8 +59,24 @@ jq --arg ugc_tag "${ugc_tag}" \
    '.[0] |= (.tag = $ugc_tag | .commit = $ugc_commit)' sources/ugc.json > sources/ugc.json.tmp
 mv sources/ugc.json.tmp sources/ugc.json
 
+# Pull changes from the org.chromium.Chromium remote
+git remote add org.chromium.Chromium https://github.com/flathub/org.chromium.chromium 2>/dev/null || true
+git fetch org.chromium.Chromium master
+last_checked_commit=$(cat maint/.org.chromium.Chromium.last_checked_commit)
+commits_to_consider=$(git log --pretty='%ae %h %s' --no-merges "${last_checked_commit:?}..org.chromium.Chromium/master" | grep -v '^sysadmin@flathub.org ')
+for commit in ${commits_to_consider}; do
+    commit_hash=$(printf '%s\n' "${commit}" | awk '{print $2}')
+    commit_subject=$(printf '%s\n' "${commit}" | cut -d' ' -f3-)
+    echo "Apply commit ${commit_hash}: ${commit_subject}? [y/N] "
+    read -r REPLY
+    if [ "${REPLY}" = "y" ] || [ "${REPLY}" = "Y" ]; then
+        git cherry-pick -xs "${commit_hash:?}"
+    fi
+    echo "${commit_hash:?}" > maint/.org.chromium.Chromium.last_checked_commit
+done
+
 # Create a new commit and push the changes
-git add sources/chromium.json sources/ugc.json
+git add sources/chromium.json sources/ugc.json maint/.org.chromium.Chromium.last_checked_commit
 git commit -s -m "Update Ungoogled Chromium to ${ugc_version:?}"
 git push origin "update-ugc-${ugc_version:?}"
 
