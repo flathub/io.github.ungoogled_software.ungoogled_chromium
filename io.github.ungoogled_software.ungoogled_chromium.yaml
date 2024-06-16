@@ -115,10 +115,7 @@ modules:
     build-commands:
       - cp -r "${PWD}" /app/ugc
     sources:
-      - type: git
-        url: https://github.com/ungoogled-software/ungoogled-chromium-flatpak
-        tag: 125.0.6422.141-1
-        commit: 3bb01d7922b72db7fc45df70271c1ae3224729bc
+      - sources/ugc.json
 
   - name: rust-nightly
     buildsystem: simple
@@ -180,24 +177,7 @@ modules:
       - ./install.sh
       - rm -rf /app/ugc
     sources:
-      - type: archive
-        url: https://commondatastorage.googleapis.com/chromium-browser-official/chromium-125.0.6422.141.tar.xz
-        sha256: 9966b50279d0cfaaf4b58570387f0d526388f8d5f6dd990e3f083a55d8d8e603
-      - type: archive
-        url: https://commondatastorage.googleapis.com/chromium-browser-clang/Linux_x64/clang-llvmorg-19-init-8091-gab037c4f-1.tgz
-        sha256: 6b797d118cc593eca0f2e568169295a5a9b65ddabed2de34b9a201a4bb7990f5
-        dest: third_party/llvm-build/Release+Asserts
-        strip-components: 0
-        only-arches: [x86_64]
-      - type: shell
-        commands:
-          - rm -rf third_party/llvm
-        only-arches: [aarch64]
-      - type: git
-        url: https://chromium.googlesource.com/external/github.com/llvm/llvm-project
-        commit: llvmorg-19-init-8091-gab037c4f
-        dest: third_party/llvm-fp
-        only-arches: [aarch64]
+      - sources/chromium.json
       - patches/chromium/_sources.json
       - patches/ffmpeg/_sources.json
       - type: file
