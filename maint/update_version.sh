@@ -82,7 +82,10 @@ jq --arg rust_nightly_version "${rust_nightly_version}" \
     .[2] |= (.url = $url_src | .sha256 = $sha256_src)' sources/rust-nightly.json > sources/rust-nightly.json.tmp
 mv sources/rust-nightly.json.tmp sources/rust-nightly.json
 
-# Pull changes from the org.chromium.Chromium remote
+# Stash the changes
+git stash push -m "Update Ungoogled Chromium to ${ugc_version:?}"
+
+# Fetch org.chromium.Chromium and offer to cherry-pick commits
 git remote add org.chromium.Chromium https://github.com/flathub/org.chromium.chromium 2>/dev/null || true
 git fetch org.chromium.Chromium master
 last_checked_commit=$(cat maint/.org.chromium.Chromium.last_checked_commit)
@@ -97,6 +100,9 @@ for commit in ${commits_to_consider}; do
     fi
     echo "${commit_hash:?}" > maint/.org.chromium.Chromium.last_checked_commit
 done
+
+# Pop the stashed changes
+git stash pop || true
 
 # Create a new commit and push the changes
 git add \
