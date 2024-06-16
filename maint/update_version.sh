@@ -14,7 +14,7 @@ echo "Clang version: ${clang_version:?}"
 echo "Clang subversion: ${clang_subversion:?}"
 
 # Extract the SHA256 hash of the Clang x64 tarball
-clang_tarball_url="https://commondatastorage.googleapis.com/chromium-browser-clang/Linux_x64/clang-${clang_version}-${clang_subversion}.tgz"
+clang_tarball_url="https://commondatastorage.googleapis.com/chromium-browser-clang/Linux_x64/clang-${clang_version}-${clang_subversion}.tar.xz"
 clang_sha256=$(curl -L -s ${clang_tarball_url:?} | sha256sum | cut -d' ' -f1)
 echo "Clang tarball URL: ${clang_tarball_url:?}"
 echo "Clang tarball SHA256: ${clang_sha256:?}"
