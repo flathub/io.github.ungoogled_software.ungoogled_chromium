@@ -137,7 +137,7 @@ git add \
     sources/ugc.json \
     sources/rust-nightly.json \
     maint/.org.chromium.Chromium.last_checked_commit
-git commit -s -m "Update Ungoogled Chromium to ${ugc_version:?}"
+git commit -s -m "Update Ungoogled Chromium to ${ugc_version:?}" || true
 git push origin "update-ugc-${ugc_version:?}"
 
 # Exit with success
