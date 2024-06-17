@@ -93,11 +93,18 @@ commits_to_consider=$(git log --pretty='%ae %h %s' --no-merges "${last_checked_c
 for commit in ${commits_to_consider}; do
     commit_hash=$(printf '%s\n' "${commit}" | awk '{print $2}')
     commit_subject=$(printf '%s\n' "${commit}" | cut -d' ' -f3-)
-    echo "Apply commit ${commit_hash}: ${commit_subject}? [y/N] "
-    read -r REPLY
-    if [ "${REPLY}" = "y" ] || [ "${REPLY}" = "Y" ]; then
-        git cherry-pick -xs "${commit_hash:?}"
-    fi
+    while true; do
+        echo "Apply commit ${commit_hash}: ${commit_subject}? [y/N] "
+        read -r REPLY || true
+        if [ "${REPLY}" = "y" ] || [ "${REPLY}" = "Y" ]; then
+            git cherry-pick -xs "${commit_hash:?}" || true
+            echo "Dropped to shell. Press Ctrl+D to continue cherry-picking."
+            "${SHELL:-/bin/sh}" || true
+            break
+        elif [ "${REPLY}" = "n" ] || [ "${REPLY}" = "N" ] || [ -z "${REPLY}" ]; then
+            break
+        fi
+    done
     echo "${commit_hash:?}" > maint/.org.chromium.Chromium.last_checked_commit
 done
 
