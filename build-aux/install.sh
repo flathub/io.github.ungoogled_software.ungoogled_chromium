@@ -14,9 +14,9 @@ popd
 install -Dm 755 out/ReleaseFree/libffmpeg.so /app/chromium/libffmpeg.so
 install -Dm 755 out/Release/libffmpeg.so /app/chromium/nonfree-codecs/lib/libffmpeg.so
 for size in 24 48 64 128 256; do
-	install -Dvm 644 "/app/ugc/icons/logo_${size}.png" "/app/share/icons/hicolor/${size}x${size}/apps/io.github.ungoogled_software.ungoogled_chromium.png";
+	install -Dvm 644 "chrome/app/theme/chromium/product_logo_${size}.png" "/app/share/icons/hicolor/${size}x${size}/apps/io.github.ungoogled_software.ungoogled_chromium.png";
 done
-install -Dvm 644 /app/ugc/icons/logo.svg /app/share/icons/hicolor/scalable/apps/io.github.ungoogled_software.ungoogled_chromium.svg
+install -Dvm 644 chrome/app/theme/chromium/product_logo.svg /app/share/icons/hicolor/scalable/apps/io.github.ungoogled_software.ungoogled_chromium.svg
 install -Dvm 644 cobalt.ini -t /app/etc
 install -Dvm 644 /app/ugc/io.github.ungoogled_software.ungoogled_chromium.desktop -t /app/share/applications
 install -Dvm 644 /app/ugc/io.github.ungoogled_software.ungoogled_chromium.metainfo.xml -t /app/share/metainfo

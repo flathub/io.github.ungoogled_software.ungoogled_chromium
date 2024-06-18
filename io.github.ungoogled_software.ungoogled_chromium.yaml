@@ -137,6 +137,7 @@ modules:
     build-options:
       prepend-ld-library-path: /app/lib/sdk/rust-nightly/lib
     build-commands:
+      - /app/ugc/branding/infect.sh /app/ugc ./
       - /app/ugc/src/utils/prune_binaries.py ./ /app/ugc/src/pruning.list
       - /app/ugc/src/utils/patches.py apply ./ /app/ugc/src/patches
       - /app/ugc/src/utils/domain_substitution.py apply -r /app/ugc/src/domain_regex.list
