@@ -26,9 +26,10 @@ if ! grep --version 2>/dev/null | grep -q 'GNU grep'; then
     exit 1
 fi
 
-# UGC version is {chromium_version}-{ugc_revision}
+# UGC version is {chromium_version}-{ugc_revision}-{fp_revision}
 ugc_version=${1:?}
-chromium_version=${ugc_version%-*}
+chromium_version=${ugc_version%-*} # Remove the FP revision
+chromium_version=${chromium_version%-*} # Remove the UGC revision
 echoerr "UGC version: ${ugc_version:?}"
 echoerr "Chromium version: ${chromium_version:?}"
 
