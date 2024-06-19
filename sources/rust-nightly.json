@@ -5,8 +5,8 @@
       "aarch64"
     ],
     "dest": "rust",
-    "url": "https://static.rust-lang.org/dist/2024-06-18/rust-nightly-aarch64-unknown-linux-gnu.tar.xz",
-    "sha256": "e3d39a32e91112884f1bd4bc8338915c40fe2b750c68d47ec3bc4cc0fdbca1a2"
+    "url": "https://static.rust-lang.org/dist/2024-06-19/rust-nightly-aarch64-unknown-linux-gnu.tar.xz",
+    "sha256": "4dcf3f50dd4fdad210fdeb17693b3a97cf0c2ead49888ad37b290d9ee69e328a"
   },
   {
     "type": "archive",
@@ -14,13 +14,13 @@
       "x86_64"
     ],
     "dest": "rust",
-    "url": "https://static.rust-lang.org/dist/2024-06-18/rust-nightly-x86_64-unknown-linux-gnu.tar.xz",
-    "sha256": "2e47534b23f33a6f018d3f883a5a630e82075aa0347effeecebeede6d0ba271b"
+    "url": "https://static.rust-lang.org/dist/2024-06-19/rust-nightly-x86_64-unknown-linux-gnu.tar.xz",
+    "sha256": "e6f143609bfd3608fc6ae68923c4e08888757a5371dd414f380a9880622d0c92"
   },
   {
     "type": "archive",
     "dest": "rust-src",
-    "url": "https://static.rust-lang.org/dist/2024-06-18/rust-src-nightly.tar.xz",
-    "sha256": "ce560c33f3c1ac25030e86c12eda420a5274f4f5717113b68a189ca9bfae2881"
+    "url": "https://static.rust-lang.org/dist/2024-06-19/rust-src-nightly.tar.xz",
+    "sha256": "ba97954237946c35e43ad55e9afe52b4fe62c776086cf4aeae3c460aea4bc9bb"
   }
 ]
