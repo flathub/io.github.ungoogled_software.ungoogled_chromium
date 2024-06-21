@@ -19,4 +19,5 @@ if [[ ! -f /app/chromium/extensions/no-mount-stamp ]]; then
   merge_extensions policies/recommended
 fi
 
+export CHROME_DESKTOP="io.github.ungoogled_software.ungoogled_chromium.desktop"
 exec cobalt "$@"
