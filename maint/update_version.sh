@@ -6,13 +6,25 @@ set -e
 # Fail on unset variables
 set -u
 
+# Set IFS to only split by newline
+IFS='
+'
+
 # Helper function to print to stderr
 echoerr() {
     printf "%s\n" "${*}" >&2
 }
 
 # Check for required tools
-DEPS="jq git curl base64 sha256sum grep awk cut"
+DEPS="
+jq
+git
+curl
+base64
+sha256sum
+grep
+awk
+cut"
 for dep in ${DEPS:?}; do
     if ! command -v "${dep:?}" >/dev/null; then
         echoerr "Error: ${dep:?} is not installed"
@@ -118,7 +130,7 @@ for commit in ${commits_to_consider}; do
     commit_hash=$(printf '%s\n' "${commit}" | awk '{print $2}')
     commit_subject=$(printf '%s\n' "${commit}" | cut -d' ' -f3-)
     while true; do
-        echoerr "Apply commit ${commit_hash}: ${commit_subject}? [y/N] "
+        printf "Apply commit %s: %s? [y/N] " "${commit_hash}" "${commit_subject}" >&2
         read -r REPLY || true
         if [ "${REPLY}" = "y" ] || [ "${REPLY}" = "Y" ]; then
             git cherry-pick -xs "${commit_hash:?}" || true
