@@ -154,6 +154,11 @@ modules:
       - rm -rf /app/ugc
     sources:
       - sources/chromium.json
+      - type: shell
+        commands:
+          # I don't know if this being included in the tarballs is intentional
+          # yet, so just remove it for now.
+          - rm -rf third_party/llvm-build
       - patches/chromium/_sources.json
       - patches/ffmpeg/_sources.json
       - type: file
