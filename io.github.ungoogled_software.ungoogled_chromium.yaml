@@ -148,6 +148,8 @@ modules:
       - /app/ugc/src/utils/domain_substitution.py apply -r /app/ugc/src/domain_regex.list
         -f /app/ugc/src/domain_substitution.list -c ./domsubcache.tar.gz ./
       - mv third_party/llvm-fp third_party/llvm || true
+      - rm -rf third_party/llvm-build
+      - mv third_party/llvm-build-fp third_party/llvm-build || true
       - ./bootstrap.sh
       - ./build.sh
       - ./install.sh
