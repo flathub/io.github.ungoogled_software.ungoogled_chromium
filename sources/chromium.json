@@ -1,13 +1,13 @@
 [
   {
     "type": "archive",
-    "url": "https://commondatastorage.googleapis.com/chromium-browser-official/chromium-126.0.6478.182.tar.xz",
-    "sha256": "3939f5b3116ebd3cb15ff8c7059888f6b00f4cfa8a77bde983ee4ce5d0eea427"
+    "url": "https://commondatastorage.googleapis.com/chromium-browser-official/chromium-127.0.6533.72.tar.xz",
+    "sha256": "7f21f1bfc89e1a2c474463ef950b72e6401d1375cf3c17d907bf3d346720efbe"
   },
   {
     "type": "archive",
-    "url": "https://commondatastorage.googleapis.com/chromium-browser-clang/Linux_x64/clang-llvmorg-19-init-9433-g76ea5feb-1.tar.xz",
-    "sha256": "a3491687a88a009e89c1b59e1395da9126a248d7819767cae3f42617e9a9ca4e",
+    "url": "https://commondatastorage.googleapis.com/chromium-browser-clang/Linux_x64/clang-llvmorg-19-init-10646-g084e2b53-57.tar.xz",
+    "sha256": "2c95e921b2a26b968e5f2160560ed1f35559f5cc8a64a4f87974d51eff8eea8b",
     "dest": "third_party/llvm-build/Release+Asserts",
     "strip-components": 0,
     "only-arches": [
@@ -26,7 +26,7 @@
   {
     "type": "git",
     "url": "https://chromium.googlesource.com/external/github.com/llvm/llvm-project",
-    "commit": "llvmorg-19-init-9433-g76ea5feb",
+    "commit": "llvmorg-19-init-10646-g084e2b53",
     "dest": "third_party/llvm-fp",
     "only-arches": [
       "aarch64"
