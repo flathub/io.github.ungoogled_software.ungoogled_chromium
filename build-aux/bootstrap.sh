@@ -39,7 +39,6 @@ cat >> out/Release/args.gn <<-EOF
 	use_vaapi=true
 	rtc_use_pipewire=true
 	rtc_link_pipewire=true
-	use_system_libwayland=false
 	use_system_libffi=true
 	use_qt=false
 	rust_sysroot_absolute="/app/lib/sdk/rust-nightly"
