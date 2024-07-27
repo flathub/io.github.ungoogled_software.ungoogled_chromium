@@ -122,7 +122,7 @@ git stash push -m "Update Ungoogled Chromium to ${ugc_version:?}"
 git remote add org.chromium.Chromium https://github.com/flathub/org.chromium.chromium 2>/dev/null || true
 git fetch org.chromium.Chromium master
 last_checked_commit=$(cat maint/.org.chromium.Chromium.last_checked_commit)
-commits_to_consider=$(git log --pretty='%ae %h %s' --no-merges \
+commits_to_consider=$(git log --pretty='%ae %h %s' --no-merges --reverse \
     "${last_checked_commit:?}..org.chromium.Chromium/master" | \
     grep -v '^sysadmin@flathub.org ' || true
 )
