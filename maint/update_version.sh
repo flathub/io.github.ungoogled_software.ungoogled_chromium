@@ -72,8 +72,8 @@ echoerr "Chromium SHA256: ${chromium_sha256:?}"
 uc_url=$(jq -r '.[0].url' sources/ungoogled-chromium.json)
 uc_tag=${uc_version:?}
 uc_commit=$(git ls-remote --tags "${uc_url:?}" "refs/tags/${uc_tag:?}" | cut -f1)
-echoerr "uc tag: ${uc_tag:?}"
-echoerr "uc commit: ${uc_commit:?}"
+echoerr "Ungoogled Chromium tag: ${uc_tag:?}"
+echoerr "Ungoogled Chromium commit: ${uc_commit:?}"
 
 # Get the Rust Nightly version
 rust_nightly_version=$(curl -L -s -f "https://static.rust-lang.org/dist/channel-rust-nightly.toml" | grep -oP 'date = "(.*?)"' | cut -d'"' -f2)
