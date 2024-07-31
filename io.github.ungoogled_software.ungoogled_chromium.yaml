@@ -115,13 +115,6 @@ modules:
         url: https://github.com/google/material-design-icons/raw/f7bd4f25f3764883717c09a1fd867f560c9a9581/font/MaterialIconsTwoTone-Regular.otf
         sha256: 03ccf13774af5b5cbbad641dfa33038d4e9f4b7979eedc2c0a15f06bf9eb33cd
 
-  - name: ungoogled-chromium
-    buildsystem: simple
-    build-commands:
-      - cp -r "${PWD}" /app/ugc
-    sources:
-      - sources/ugc.json
-
   - name: rust-nightly
     buildsystem: simple
     build-options:
@@ -142,16 +135,12 @@ modules:
     build-options:
       prepend-ld-library-path: /app/lib/sdk/rust-nightly/lib
     build-commands:
-      - /app/ugc/branding/infect.sh /app/ugc ./
-      - /app/ugc/src/utils/prune_binaries.py --keep-contingent-paths ./ /app/ugc/src/pruning.list
-      - /app/ugc/src/utils/patches.py apply ./ /app/ugc/src/patches
-      - /app/ugc/src/utils/domain_substitution.py apply -r /app/ugc/src/domain_regex.list
-        -f /app/ugc/src/domain_substitution.list -c ./domsubcache.tar.gz ./
+      - ./apply-uc-patches.sh
       - ./bootstrap.sh
       - ./build.sh
       - ./install.sh
-      - rm -rf /app/ugc
     sources:
+      - sources/ungoogled-chromium.json
       - sources/chromium.json
       - patches/chromium/_sources.json
       - patches/ffmpeg/_sources.json
