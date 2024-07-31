@@ -38,16 +38,16 @@ if ! grep --version 2>/dev/null | grep -q 'GNU grep'; then
     exit 1
 fi
 
-# UGC version is {chromium_version}-{ugc_revision}-{fp_revision}
-ugc_version=${1:?}
-chromium_version=${ugc_version%-*} # Remove the FP revision
-chromium_version=${chromium_version%-*} # Remove the UGC revision
-echoerr "UGC version: ${ugc_version:?}"
+# UC version is {chromium_version}-{uc_revision}-{fp_revision}
+uc_version=${1:?}
+chromium_version=${uc_version%-*} # Remove the FP revision
+chromium_version=${chromium_version%-*} # Remove the Ungoogled Chromium revision
+echoerr "Ungoogled Chromium version: ${uc_version:?}"
 echoerr "Chromium version: ${chromium_version:?}"
 
 # Create a new branch from the latest master
 git fetch origin master
-git checkout -b "update-ugc-${ugc_version:?}" origin/master
+git checkout -b "update-uc-${uc_version:?}" origin/master
 
 # Extract the LLVM version from the update.py script
 clang_update_script=$(curl -L -s -f "https://chromium.googlesource.com/chromium/src/+/${chromium_version}/tools/clang/scripts/update.py?format=TEXT" | base64 -d)
@@ -68,12 +68,12 @@ chromium_sha256=$(curl -L -s -f "${chromium_url:?}.hashes" | grep -iE '^sha256\s
 echoerr "Chromium URL: ${chromium_url:?}"
 echoerr "Chromium SHA256: ${chromium_sha256:?}"
 
-# Get the UGC tag and commit
-ugc_url=$(jq -r '.[0].url' sources/ugc.json)
-ugc_tag=${ugc_version:?}
-ugc_commit=$(git ls-remote --tags "${ugc_url:?}" "refs/tags/${ugc_tag:?}" | cut -f1)
-echoerr "UGC tag: ${ugc_tag:?}"
-echoerr "UGC commit: ${ugc_commit:?}"
+# Get the Ungoogled Chromium tag and commit
+uc_url=$(jq -r '.[0].url' sources/ungoogled-chromium.json)
+uc_tag=${uc_version:?}
+uc_commit=$(git ls-remote --tags "${uc_url:?}" "refs/tags/${uc_tag:?}" | cut -f1)
+echoerr "uc tag: ${uc_tag:?}"
+echoerr "uc commit: ${uc_commit:?}"
 
 # Get the Rust Nightly version
 rust_nightly_version=$(curl -L -s -f "https://static.rust-lang.org/dist/channel-rust-nightly.toml" | grep -oP 'date = "(.*?)"' | cut -d'"' -f2)
@@ -96,11 +96,11 @@ jq --arg clang_version "${clang_version}" \
     .[3] |= (.commit = $clang_version)' sources/chromium.json > sources/chromium.json.tmp
 mv sources/chromium.json.tmp sources/chromium.json
 
-# Update the UGC version
-jq --arg ugc_tag "${ugc_tag}" \
-   --arg ugc_commit "${ugc_commit}" \
-   '.[0] |= (.tag = $ugc_tag | .commit = $ugc_commit)' sources/ugc.json > sources/ugc.json.tmp
-mv sources/ugc.json.tmp sources/ugc.json
+# Update the Ungoogled Chromium version
+jq --arg uc_tag "${uc_tag}" \
+   --arg uc_commit "${uc_commit}" \
+   '.[0] |= (.tag = $uc_tag | .commit = $uc_commit)' sources/ungoogled-chromium.json > sources/ungoogled-chromium.json.tmp
+mv sources/ungoogled-chromium.json.tmp sources/ungoogled-chromium.json
 
 # Update the Rust Nightly version
 jq --arg rust_nightly_version "${rust_nightly_version}" \
@@ -116,7 +116,7 @@ jq --arg rust_nightly_version "${rust_nightly_version}" \
 mv sources/rust-nightly.json.tmp sources/rust-nightly.json
 
 # Stash the changes
-git stash push -m "Update Ungoogled Chromium to ${ugc_version:?}"
+git stash push -m "Update Ungoogled Chromium to ${uc_version:?}"
 
 # Fetch org.chromium.Chromium and offer to cherry-pick commits
 git remote add org.chromium.Chromium https://github.com/flathub/org.chromium.chromium 2>/dev/null || true
@@ -150,11 +150,11 @@ git stash pop || true
 # Create a new commit and push the changes
 git add \
     sources/chromium.json \
-    sources/ugc.json \
+    sources/ungoogled-chromium.json \
     sources/rust-nightly.json \
     maint/.org.chromium.Chromium.last_checked_commit
-git commit -s -m "Update Ungoogled Chromium to ${ugc_version:?}" || true
-git push origin "update-ugc-${ugc_version:?}"
+git commit -s -m "Update Ungoogled Chromium to ${uc_version:?}" || true
+git push origin "update-uc-${uc_version:?}"
 
 # Exit with success
 exit 0
