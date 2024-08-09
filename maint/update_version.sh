@@ -92,8 +92,8 @@ jq --arg clang_version "${clang_version}" \
    --arg chromium_url "${chromium_url}" \
    --arg chromium_sha256 "${chromium_sha256}" \
    '.[0] |= (.url = $chromium_url | .sha256 = $chromium_sha256) |
-    .[1] |= (.url = $clang_tarball_url | .sha256 = $clang_sha256) |
-    .[3] |= (.commit = $clang_version)' sources/chromium.json > sources/chromium.json.tmp
+    .[2] |= (.url = $clang_tarball_url | .sha256 = $clang_sha256) |
+    .[4] |= (.commit = $clang_version)' sources/chromium.json > sources/chromium.json.tmp
 mv sources/chromium.json.tmp sources/chromium.json
 
 # Update the Ungoogled Chromium version
