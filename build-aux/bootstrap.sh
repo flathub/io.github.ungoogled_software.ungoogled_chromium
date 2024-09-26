@@ -43,7 +43,6 @@ cat >> out/Release/args.gn <<-EOF
 	use_qt=false
 	rust_sysroot_absolute="/app/lib/sdk/rust-nightly"
 	rustc_version="$(/app/lib/sdk/rust-nightly/bin/rustc -V)"
-	use_system_re2=true
 EOF
 tools/gn/bootstrap/bootstrap.py --skip-generate-buildfiles -j"${FLATPAK_BUILDER_N_JOBS}"
 
