@@ -89,39 +89,6 @@ modules:
         done
       - touch /app/chromium/extensions/no-mount-stamp
 
-  # Dependency of re2
-  - name: abseil-cpp
-    buildsystem: cmake-ninja
-    config-opts:
-      - -DCMAKE_BUILD_TYPE=Release
-      - -DBUILD_SHARED_LIBS=ON
-      - -DABSL_PROPAGATE_CXX_STD=ON
-      - -DCMAKE_POSITION_INDEPENDENT_CODE=ON
-    sources:
-      - type: archive
-        url: https://github.com/abseil/abseil-cpp/archive/refs/tags/20240722.0.tar.gz
-        sha256: f50e5ac311a81382da7fa75b97310e4b9006474f9560ac46f54a9967f07d4ae3
-        x-checker-data:
-          type: anitya
-          project-id: 115295
-          url-template: https://github.com/abseil/abseil-cpp/archive/refs/tags/$version.tar.gz
-
-  # Required by Chromium if use_system_re2 is enabled
-  - name: re2
-    buildsystem: cmake-ninja
-    config-opts:
-      - -DCMAKE_BUILD_TYPE=Release
-      - -DBUILD_SHARED_LIBS=ON
-      - -DCMAKE_POSITION_INDEPENDENT_CODE=ON
-    sources:
-      - type: archive
-        url: https://github.com/google/re2/archive/refs/tags/2024-07-02.tar.gz
-        sha256: eb2df807c781601c14a260a507a5bb4509be1ee626024cb45acbd57cb9d4032b
-        x-checker-data:
-          type: anitya
-          project-id: 10500
-          url-template: https://github.com/google/re2/archive/refs/tags/$version.tar.gz
-
   - name: materialicons
     buildsystem: simple
     build-commands:
