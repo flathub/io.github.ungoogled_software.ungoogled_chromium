@@ -76,6 +76,7 @@ echoerr "Ungoogled Chromium tag: ${uc_tag:?}"
 echoerr "Ungoogled Chromium commit: ${uc_commit:?}"
 
 # Get the Rust Nightly version
+noop() {
 rust_nightly_version=$(curl -L -s -f "https://static.rust-lang.org/dist/channel-rust-nightly.toml" | grep -oP 'date = "(.*?)"' | cut -d'"' -f2)
 echoerr "Rust Nightly version: ${rust_nightly_version:?}"
 url_aarch64="https://static.rust-lang.org/dist/${rust_nightly_version:?}/rust-nightly-aarch64-unknown-linux-gnu.tar.xz"
@@ -84,6 +85,7 @@ url_x86_64="https://static.rust-lang.org/dist/${rust_nightly_version:?}/rust-nig
 sha256_x86_64=$(curl -L -s -f "${url_x86_64:?}.sha256" | cut -d' ' -f1)
 url_src="https://static.rust-lang.org/dist/${rust_nightly_version:?}/rust-src-nightly.tar.xz"
 sha256_src=$(curl -L -s -f "${url_src:?}.sha256" | cut -d' ' -f1)
+}
 
 # Update the Chromium version
 jq --arg clang_version "${clang_version}" \
@@ -103,6 +105,7 @@ jq --arg uc_tag "${uc_tag}" \
 mv sources/ungoogled-chromium.json.tmp sources/ungoogled-chromium.json
 
 # Update the Rust Nightly version
+noop() {
 jq --arg rust_nightly_version "${rust_nightly_version}" \
    --arg url_aarch64 "${url_aarch64}" \
    --arg sha256_aarch64 "${sha256_aarch64}" \
@@ -114,6 +117,7 @@ jq --arg rust_nightly_version "${rust_nightly_version}" \
     .[1] |= (.url = $url_x86_64 | .sha256 = $sha256_x86_64) |
     .[2] |= (.url = $url_src | .sha256 = $sha256_src)' sources/rust-nightly.json > sources/rust-nightly.json.tmp
 mv sources/rust-nightly.json.tmp sources/rust-nightly.json
+}
 
 # Stash the changes
 git stash push -m "Update Ungoogled Chromium to ${uc_version:?}"
@@ -147,12 +151,14 @@ done
 # Pop the stashed changes
 git stash pop || true
 
-# Create a new commit and push the changes
+# Add files to index
 git add \
     sources/chromium.json \
     sources/ungoogled-chromium.json \
-    sources/rust-nightly.json \
-    maint/.org.chromium.Chromium.last_checked_commit
+    maint/.org.chromium.Chromium.last_checked_commit \
+#    sources/rust-nightly.json \
+
+# Create a new commit and push the changes
 git commit -s -m "Update Ungoogled Chromium to ${uc_version:?}" || true
 git push -u origin "update-uc-${uc_version:?}"
 
