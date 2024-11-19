@@ -8,6 +8,20 @@
 # unset them here.
 unset CFLAGS CXXFLAGS LDFLAGS
 
+chrome_pgo_phase=2
+# Support the Gentoo Chromium tarballs, which are missing the full GN source.
+if [[ ! -f tools/gn/build/gen.py ]]; then
+	chrome_pgo_phase=0
+	cp -r tools/gn.git/* tools/gn
+	cat > tools/gn/bootstrap/last_commit_position.h <<-EOF
+	#ifndef OUT_LAST_COMMIT_POSITION_H_
+	#define OUT_LAST_COMMIT_POSITION_H_
+	#define LAST_COMMIT_POSITION_NUM 1
+	#define LAST_COMMIT_POSITION "unknown"
+	#endif
+	EOF
+fi
+
 if [[ -d third_party/llvm-build/Release+Asserts/bin ]]; then
 	# The build scripts check that the stamp file is present, so write it out
 	# here.
@@ -43,6 +57,7 @@ cat >> out/Release/args.gn <<-EOF
 	use_qt=false
 	rust_sysroot_absolute="/app/lib/sdk/rust-nightly"
 	rustc_version="$(/app/lib/sdk/rust-nightly/bin/rustc -V)"
+	chrome_pgo_phase=${chrome_pgo_phase}
 EOF
 tools/gn/bootstrap/bootstrap.py --skip-generate-buildfiles -j"${FLATPAK_BUILDER_N_JOBS}"
 
