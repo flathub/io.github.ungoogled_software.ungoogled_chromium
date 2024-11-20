@@ -2,8 +2,8 @@
   {
     "type": "git",
     "url": "https://github.com/ungoogled-software/ungoogled-chromium-flatpak",
-    "tag": "131.0.6778.69-1-1",
-    "commit": "b9823a4c18ed7ce4227c3c44fffc774a74233b7e",
+    "tag": "131.0.6778.85-1-1",
+    "commit": "98878592bdad684a9232b1542fe10fc0f25f7346",
     "dest": "uc"
   }
 ]
