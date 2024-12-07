@@ -63,8 +63,8 @@ echoerr "Clang tarball URL: ${clang_tarball_url:?}"
 echoerr "Clang tarball SHA256: ${clang_sha256:?}"
 
 # Get the Chromium SHA256 hash
-chromium_url="https://chromium-tarballs.distfiles.gentoo.org/chromium-${chromium_version}.tar.xz"
-chromium_sha256=$(curl -L -s -f "${chromium_url:?}" | sha256sum | cut -d' ' -f1)
+chromium_url="https://chromium-tarballs.distfiles.gentoo.org/chromium-${chromium_version}-linux.tar.xz"
+chromium_sha256=$(curl -L -s -f "${chromium_url:?}.hashes" | awk '/^sha256\s+/ {print $2}')
 echoerr "Chromium URL: ${chromium_url:?}"
 echoerr "Chromium SHA256: ${chromium_sha256:?}"
 
