@@ -1,8 +1,8 @@
 [
   {
     "type": "archive",
-    "url": "https://chromium-tarballs.distfiles.gentoo.org/chromium-131.0.6778.204-linux.tar.xz",
-    "sha256": "c57d1db59d96cb8f28c4c9ebc7bb4c828e72bcc4bb39cfa18f550d47a4591faa"
+    "url": "https://chromium-tarballs.distfiles.gentoo.org/chromium-131.0.6778.264-linux.tar.xz",
+    "sha256": "11858f10c3a8f9dd5ba8082ba2e3abb0f85a84d048bb572c06d60cd8a36b7cb2"
   },
   {
     "type": "shell",
