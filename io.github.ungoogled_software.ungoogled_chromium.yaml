@@ -130,6 +130,26 @@ modules:
       - cd rust-src && ./install.sh --prefix=/app/lib/sdk/rust-nightly --disable-ldconfig
         --verbose
 
+  - name: rust-bindgen
+    buildsystem: simple
+    build-options:
+      strip: false
+      no-debuginfo: true
+      prepend-path: /app/lib/sdk/rust-nightly/bin
+      env:
+        CARGO_HOME: /run/build/rust-bindgen/cargo
+    build-commands:
+      - cargo --offline fetch --manifest-path Cargo.toml --verbose
+      - cargo --offline build --release --verbose
+      - install -Dm 755 target/release/bindgen -t /app/lib/sdk/bindgen/bin
+    sources:
+      - type: git
+        url: https://chromium.googlesource.com/external/github.com/rust-lang/rust-bindgen
+        commit: f93d5dfa6d5d7409bea584f3eab38e1fc52b8360
+      - ./generated-sources.bindgen.json
+    cleanup:
+      - '*'
+
   - name: chromium
     buildsystem: simple
     build-options:
