@@ -69,9 +69,10 @@ add-extensions:
     autodelete: true
 
 sdk-extensions:
-  - org.freedesktop.Sdk.Extension.llvm18
+  - org.freedesktop.Sdk.Extension.llvm19
   - org.freedesktop.Sdk.Extension.node20
   - org.freedesktop.Sdk.Extension.openjdk21
+  - org.freedesktop.Sdk.Extension.rust-stable
 
 modules:
   - name: readelf-symlink
@@ -115,27 +116,12 @@ modules:
         url: https://github.com/google/material-design-icons/raw/f7bd4f25f3764883717c09a1fd867f560c9a9581/font/MaterialIconsTwoTone-Regular.otf
         sha256: 03ccf13774af5b5cbbad641dfa33038d4e9f4b7979eedc2c0a15f06bf9eb33cd
 
-  - name: rust-nightly
-    buildsystem: simple
-    build-options:
-      strip: false
-      no-debuginfo: true
-    cleanup:
-      - '*'
-    sources:
-      - sources/rust-nightly.json
-    build-commands:
-      - cd rust && ./install.sh --prefix=/app/lib/sdk/rust-nightly --without=rust-docs
-        --without=rust-docs-json-preview --disable-ldconfig --verbose
-      - cd rust-src && ./install.sh --prefix=/app/lib/sdk/rust-nightly --disable-ldconfig
-        --verbose
-
   - name: rust-bindgen
     buildsystem: simple
     build-options:
       strip: false
       no-debuginfo: true
-      prepend-path: /app/lib/sdk/rust-nightly/bin
+      prepend-path: /usr/lib/sdk/rust-stable/bin
       env:
         CARGO_HOME: /run/build/rust-bindgen/cargo
     build-commands:
@@ -153,7 +139,7 @@ modules:
   - name: chromium
     buildsystem: simple
     build-options:
-      prepend-ld-library-path: /app/lib/sdk/rust-nightly/lib
+      prepend-ld-library-path: /usr/lib/sdk/rust-stable/lib
     build-commands:
       - ./apply-uc-patches.sh
       - ./bootstrap.sh
