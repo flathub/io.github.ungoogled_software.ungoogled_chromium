@@ -49,21 +49,9 @@ echoerr "Chromium version: ${chromium_version:?}"
 git fetch origin master
 git checkout -b "update-uc-${uc_version:?}" origin/master
 
-# Extract the LLVM version from the update.py script
-clang_update_script=$(curl -L -s -f "https://chromium.googlesource.com/chromium/src/+/${chromium_version}/tools/clang/scripts/update.py?format=TEXT" | base64 -d)
-clang_version=$(printf %s "${clang_update_script:?}" | grep -oP "CLANG_REVISION = '(.*?)'" | cut -d"'" -f2) # llvmorg-19-init-9433-g76ea5feb
-clang_subversion=$(printf %s "${clang_update_script:?}" | grep -oP "CLANG_SUB_REVISION = (\d+)" | cut -d' ' -f3) # 1
-echoerr "Clang version: ${clang_version:?}"
-echoerr "Clang subversion: ${clang_subversion:?}"
-
-# Extract the SHA256 hash of the Clang x64 tarball
-clang_tarball_url="https://commondatastorage.googleapis.com/chromium-browser-clang/Linux_x64/clang-${clang_version}-${clang_subversion}.tar.xz"
-clang_sha256=$(curl -L -s -f "${clang_tarball_url:?}" | sha256sum | cut -d' ' -f1)
-echoerr "Clang tarball URL: ${clang_tarball_url:?}"
-echoerr "Clang tarball SHA256: ${clang_sha256:?}"
-
 # Get the Chromium SHA256 hash
-chromium_url="https://chromium-tarballs.distfiles.gentoo.org/chromium-${chromium_version}-linux.tar.xz"
+#chromium_url="https://chromium-tarballs.distfiles.gentoo.org/chromium-${chromium_version}-linux.tar.xz"
+chromium_url="https://commondatastorage.googleapis.com/chromium-browser-official/chromium-${chromium_version}.tar.xz"
 chromium_sha256=$(curl -L -s -f "${chromium_url:?}.hashes" | awk '/^sha256\s+/ {print $2}')
 echoerr "Chromium URL: ${chromium_url:?}"
 echoerr "Chromium SHA256: ${chromium_sha256:?}"
@@ -88,14 +76,9 @@ sha256_src=$(curl -L -s -f "${url_src:?}.sha256" | cut -d' ' -f1)
 }
 
 # Update the Chromium version
-jq --arg clang_version "${clang_version}" \
-   --arg clang_tarball_url "${clang_tarball_url}" \
-   --arg clang_sha256 "${clang_sha256}" \
-   --arg chromium_url "${chromium_url}" \
+jq --arg chromium_url "${chromium_url}" \
    --arg chromium_sha256 "${chromium_sha256}" \
-   '.[0] |= (.url = $chromium_url | .sha256 = $chromium_sha256) |
-    .[2] |= (.url = $clang_tarball_url | .sha256 = $clang_sha256) |
-    .[4] |= (.commit = $clang_version)' sources/chromium.json > sources/chromium.json.tmp
+   '.[0] |= (.url = $chromium_url | .sha256 = $chromium_sha256)' sources/chromium.json > sources/chromium.json.tmp
 mv sources/chromium.json.tmp sources/chromium.json
 
 # Update the Ungoogled Chromium version
