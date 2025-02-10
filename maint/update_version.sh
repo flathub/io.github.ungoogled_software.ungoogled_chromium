@@ -63,18 +63,6 @@ uc_commit=$(git ls-remote --tags "${uc_url:?}" "refs/tags/${uc_tag:?}" | cut -f1
 echoerr "Ungoogled Chromium tag: ${uc_tag:?}"
 echoerr "Ungoogled Chromium commit: ${uc_commit:?}"
 
-# Get the Rust Nightly version
-noop() {
-rust_nightly_version=$(curl -L -s -f "https://static.rust-lang.org/dist/channel-rust-nightly.toml" | grep -oP 'date = "(.*?)"' | cut -d'"' -f2)
-echoerr "Rust Nightly version: ${rust_nightly_version:?}"
-url_aarch64="https://static.rust-lang.org/dist/${rust_nightly_version:?}/rust-nightly-aarch64-unknown-linux-gnu.tar.xz"
-sha256_aarch64=$(curl -L -s -f "${url_aarch64:?}.sha256" | cut -d' ' -f1)
-url_x86_64="https://static.rust-lang.org/dist/${rust_nightly_version:?}/rust-nightly-x86_64-unknown-linux-gnu.tar.xz"
-sha256_x86_64=$(curl -L -s -f "${url_x86_64:?}.sha256" | cut -d' ' -f1)
-url_src="https://static.rust-lang.org/dist/${rust_nightly_version:?}/rust-src-nightly.tar.xz"
-sha256_src=$(curl -L -s -f "${url_src:?}.sha256" | cut -d' ' -f1)
-}
-
 # Update the Chromium version
 jq --arg chromium_url "${chromium_url}" \
    --arg chromium_sha256 "${chromium_sha256}" \
@@ -86,21 +74,6 @@ jq --arg uc_tag "${uc_tag}" \
    --arg uc_commit "${uc_commit}" \
    '.[0] |= (.tag = $uc_tag | .commit = $uc_commit)' sources/ungoogled-chromium.json > sources/ungoogled-chromium.json.tmp
 mv sources/ungoogled-chromium.json.tmp sources/ungoogled-chromium.json
-
-# Update the Rust Nightly version
-noop() {
-jq --arg rust_nightly_version "${rust_nightly_version}" \
-   --arg url_aarch64 "${url_aarch64}" \
-   --arg sha256_aarch64 "${sha256_aarch64}" \
-   --arg url_x86_64 "${url_x86_64}" \
-   --arg sha256_x86_64 "${sha256_x86_64}" \
-   --arg url_src "${url_src}" \
-   --arg sha256_src "${sha256_src}" \
-   '.[0] |= (.url = $url_aarch64 | .sha256 = $sha256_aarch64) |
-    .[1] |= (.url = $url_x86_64 | .sha256 = $sha256_x86_64) |
-    .[2] |= (.url = $url_src | .sha256 = $sha256_src)' sources/rust-nightly.json > sources/rust-nightly.json.tmp
-mv sources/rust-nightly.json.tmp sources/rust-nightly.json
-}
 
 # Stash the changes
 git stash push -m "Update Ungoogled Chromium to ${uc_version:?}"
@@ -138,8 +111,7 @@ git stash pop || true
 git add \
     sources/chromium.json \
     sources/ungoogled-chromium.json \
-    maint/.org.chromium.Chromium.last_checked_commit \
-#    sources/rust-nightly.json \
+    maint/.org.chromium.Chromium.last_checked_commit
 
 # Create a new commit and push the changes
 git commit -s -m "Update Ungoogled Chromium to ${uc_version:?}" || true
