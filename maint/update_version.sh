@@ -50,8 +50,8 @@ git fetch origin master
 git checkout -b "update-uc-${uc_version:?}" origin/master
 
 # Get the Chromium SHA256 hash
-#chromium_url="https://chromium-tarballs.distfiles.gentoo.org/chromium-${chromium_version}-linux.tar.xz"
-chromium_url="https://commondatastorage.googleapis.com/chromium-browser-official/chromium-${chromium_version}.tar.xz"
+chromium_url="https://chromium-tarballs.distfiles.gentoo.org/chromium-${chromium_version}-linux.tar.xz"
+#chromium_url="https://commondatastorage.googleapis.com/chromium-browser-official/chromium-${chromium_version}.tar.xz"
 chromium_sha256=$(curl -L -s -f "${chromium_url:?}.hashes" | awk '/^sha256\s+/ {print $2}')
 echoerr "Chromium URL: ${chromium_url:?}"
 echoerr "Chromium SHA256: ${chromium_sha256:?}"
