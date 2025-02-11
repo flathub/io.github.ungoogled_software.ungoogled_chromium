@@ -1,7 +1,7 @@
 [
   {
     "type": "archive",
-    "url": "https://commondatastorage.googleapis.com/chromium-browser-official/chromium-133.0.6943.53.tar.xz",
-    "sha256": "433c8891a3d717994b0e9544334491888e835a4b813354eefacae05489c23d01"
+    "url": "https://chromium-tarballs.distfiles.gentoo.org/chromium-133.0.6943.53-linux.tar.xz",
+    "sha256": "dbd06314054f738ef6aa4e0f5d7e765602b90df9820e62a21efe068a869de7a3"
   }
 ]
