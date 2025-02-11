@@ -93,6 +93,7 @@ cat >> out/Release/args.gn <<-EOF
 	icu_use_data_file=false
 	clang_base_path="/usr/lib/sdk/llvm19"
 	clang_version="$(clang --version | grep -m1 version | sed 's/.* \([0-9]\+\).*/\1/')"
+	chrome_pgo_phase=2
 	rust_sysroot_absolute="/usr/lib/sdk/rust-stable"
 	rust_bindgen_root="${PWD}/bindgen"
 	rustc_version="$(/usr/lib/sdk/rust-stable/bin/rustc -V)"
