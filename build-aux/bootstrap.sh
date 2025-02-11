@@ -1,7 +1,6 @@
 #!/bin/bash -ex
 
 # Possible replacements are listed in build/linux/unbundle/replace_gn_files.py
-# Keys are the names in the above script; values are the dependencies in Arch
 SYSTEM_LIBS=(
 	brotli
 	#dav1d
