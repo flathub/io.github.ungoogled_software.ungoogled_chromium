@@ -1,5 +1,35 @@
 #!/bin/bash -ex
 
+# Possible replacements are listed in build/linux/unbundle/replace_gn_files.py
+# Keys are the names in the above script; values are the dependencies in Arch
+SYSTEM_LIBS=(
+	brotli
+	#dav1d
+	#ffmpeg		# YouTube playback stopped working in Chromium 120
+	flac
+	fontconfig
+	freetype
+	harfbuzz-ng
+	icu
+	#jsoncpp	# needs libstdc++
+	#libaom
+	#libavif	# needs -DAVIF_ENABLE_EXPERIMENTAL_GAIN_MAP=ON
+	libjpeg
+	libpng
+	#libvpx
+	libwebp
+	libxml
+	libxslt
+	opus
+	#re2		# needs libstdc++
+	#snapp		# needs libstdc++
+	#woff2		# needs libstdc++
+	#zlib
+)
+UNWANTED_BUNDLED_LIBS=(
+	$(printf "%s\n" ${SYSTEM_LIBS[@]} | sed 's/^libjpeg$/&_turbo/')
+)
+
 # Needed to build GN itself.
 . /usr/lib/sdk/llvm19/enable.sh
 
@@ -21,41 +51,61 @@ sed -i -e 's/\<xmlMalloc\>/malloc/' -e 's/\<xmlFree\>/free/' \
 
 # Required so that rust-bindgen can find libclang
 # https://rust-lang.github.io/rust-bindgen/requirements.html
+# https://source.chromium.org/chromium/chromium/src/+/main:build/rust/rust_bindgen.gni;l=22?q=_libclang_path%20%3D%20rust_bindgen_root&ss=chromium
 cp -r /app/lib/sdk/bindgen bindgen
 ln -s /usr/lib/sdk/llvm19/lib -t bindgen
 
+# Remove bundled libraries for which we will use the system copies; this
+# *should* do what the remove_bundled_libraries.py script does, with the
+# added benefit of not having to list all the remaining libraries
+for lib in ${UNWANTED_BUNDLED_LIBS[@]}; do
+	find "third_party/${lib}" -type f \
+		\! -path "third_party/${lib}/chromium/*" \
+		\! -path "third_party/${lib}/google/*" \
+		\! -path "third_party/harfbuzz-ng/utils/hb_scoped.h" \
+		\! -regex '.*\.\(gn\|gni\|isolate\)' \
+		-delete
+done
+
+./build/linux/unbundle/replace_gn_files.py \
+	--system-libraries "${SYSTEM_LIBS[@]}"
+
+# Create flags for the Release build.
 # (TODO: enable use_qt in the future?)
 mkdir -p out/Release
 cp ./uc/src/flags.gn out/Release/args.gn
 cat >> out/Release/args.gn <<-EOF
 	custom_toolchain="//build/toolchain/linux/unbundle:default"
 	host_toolchain="//build/toolchain/linux/unbundle:default"
-	use_sysroot=false
-	use_lld=true
-	enable_nacl=false
-	blink_symbol_level=0
-	use_pulseaudio=true
-	clang_use_chrome_plugins=false
 	is_official_build=true
-	treat_warnings_as_errors=false
-	proprietary_codecs=true
+	symbol_level=0
+	blink_enable_generated_code_formatting=false
 	ffmpeg_branding="Chrome"
+	proprietary_codecs=true
 	is_component_ffmpeg=true
-	use_vaapi=true
-	enable_widevine=true
 	rtc_use_pipewire=true
-	rtc_link_pipewire=true
-	disable_fieldtrial_testing_config=true
-	use_system_libwayland=false
+	link_pulseaudio=true
+	use_sysroot=false
 	use_system_libffi=true
 	use_qt=false
-	enable_remoting=false
+	use_vaapi=true
+	enable_platform_hevc=true
+	enable_hevc_parser_and_hw_decoder=true
+	icu_use_data_file=false
 	clang_base_path="/usr/lib/sdk/llvm19"
-	clang_use_chrome_plugins=false
 	clang_version="$(clang --version | grep -m1 version | sed 's/.* \([0-9]\+\).*/\1/')"
-	chrome_pgo_phase=2
 	rust_sysroot_absolute="/usr/lib/sdk/rust-stable"
 	rust_bindgen_root="${PWD}/bindgen"
 	rustc_version="$(/usr/lib/sdk/rust-stable/bin/rustc -V)"
 EOF
 tools/gn/bootstrap/bootstrap.py -v --no-clean --skip-generate-buildfiles -j"${FLATPAK_BUILDER_N_JOBS}"
+
+# Create flags for the ReleaseFree build.
+mkdir -p out/ReleaseFree
+cp out/Release{,Free}/args.gn
+cat >> out/ReleaseFree/args.gn <<-EOF
+	proprietary_codecs=false
+	ffmpeg_branding="Chromium"
+	enable_platform_hevc=false
+	enable_hevc_parser_and_hw_decoder=false
+EOF

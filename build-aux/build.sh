@@ -50,9 +50,6 @@ CXXFLAGS=${CXXFLAGS/-fstack-clash-protection}
 CXXFLAGS=${CXXFLAGS/-Wp,-D_GLIBCXX_ASSERTIONS}
 
 # Configuring Chromium
-mkdir -p out/ReleaseFree
-cp out/Release{,Free}/args.gn
-echo -e 'proprietary_codecs = false\nffmpeg_branding = "Chromium"' >> out/ReleaseFree/args.gn
 out/Release/gn gen out/Release
 out/Release/gn gen out/ReleaseFree
 
