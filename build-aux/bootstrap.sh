@@ -51,7 +51,7 @@ sed -i -e 's/\<xmlMalloc\>/malloc/' -e 's/\<xmlFree\>/free/' \
 
 # Required so that rust-bindgen can find libclang
 # https://rust-lang.github.io/rust-bindgen/requirements.html
-# https://source.chromium.org/chromium/chromium/src/+/main:build/rust/rust_bindgen.gni;l=22?q=_libclang_path%20%3D%20rust_bindgen_root&ss=chromium
+# https://source.chromium.org/chromium/chromium/src/+/main:build/rust/rust_bindgen.gni;l=20-27;drc=09afac1d1aa18250073002ddedd0e064e4c2a981
 cp -r /app/lib/sdk/bindgen bindgen
 ln -s /usr/lib/sdk/llvm19/lib -t bindgen
 
