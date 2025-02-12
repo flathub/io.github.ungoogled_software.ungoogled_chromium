@@ -11,7 +11,8 @@ ln_overwrite_all() {
 ln_overwrite_all /usr/lib/sdk/node20 third_party/node/linux/node-linux-x64
 ln_overwrite_all /usr/lib/sdk/openjdk21 third_party/jdk/current
 
-# Use system clang
+# Use our LLVM toolchain for building Chromium instead of Chromium's bundled
+# version. This saves us from needing to use Google's custom Clang build.
 . /usr/lib/sdk/llvm19/enable.sh
 export CC=clang
 export CXX=clang++
@@ -45,6 +46,11 @@ CXXFLAGS=${CXXFLAGS/-fcf-protection}
 # https://bugs.archlinux.org/task/73518
 CFLAGS=${CFLAGS/-fstack-clash-protection}
 CXXFLAGS=${CXXFLAGS/-fstack-clash-protection}
+
+# Unset -Wp,-D_FORTIFY_SOURCE=3 to allow Chromium to set it selectively.
+# Setting it globally will cause a significant increase in binary size.
+CFLAGS=${CFLAGS/-Wp,-D_FORTIFY_SOURCE=3}
+CXXFLAGS=${CXXFLAGS/-Wp,-D_FORTIFY_SOURCE=3}
 
 # https://crbug.com/957519#c122
 CXXFLAGS=${CXXFLAGS/-Wp,-D_GLIBCXX_ASSERTIONS}
