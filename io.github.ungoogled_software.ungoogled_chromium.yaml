@@ -108,7 +108,8 @@ modules:
           url: https://api.github.com/repos/google/material-design-icons/releases/latest
           version-query: .tag_name
           timestamp-query: .published_at
-          url-query: '"https://github.com/google/material-design-icons/archive/refs/tags/" + $version + ".tar.gz"'
+          url-query: '"https://github.com/google/material-design-icons/archive/refs/tags/"
+            + $version + ".tar.gz"'
 
   - name: rust-bindgen
     buildsystem: simple
@@ -126,6 +127,7 @@ modules:
       - type: git
         url: https://github.com/rust-lang/rust-bindgen
         commit: af7fd38d5e80514406fb6a8bba2d407d252c30b9
+        tag: v0.71.1
         x-checker-data:
           type: git
           tag-pattern: v(.+)
