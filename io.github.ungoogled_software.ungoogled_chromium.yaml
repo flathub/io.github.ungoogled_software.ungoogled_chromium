@@ -7,8 +7,6 @@ base-version: '24.08'
 command: chromium
 finish-args:
   - --require-version=1.8.2
-  - --filesystem=home
-  - --filesystem=/run/.heim_org.h5l.kcm-socket
   - --device=all
   - --env=LD_LIBRARY_PATH=/app/chromium/nonfree-codecs/lib
   - --share=ipc
@@ -35,7 +33,16 @@ finish-args:
   - --talk-name=org.mate.ScreenSaver
   - --talk-name=org.xfce.ScreenSaver
   - --own-name=org.mpris.MediaPlayer2.chromium.*
-  - --persist=.pki # https://github.com/flathub/com.github.Eloston.UngoogledChromium/issues/34
+  - --filesystem=/run/.heim_org.h5l.kcm-socket
+  - --filesystem=xdg-run/pipewire-0
+  # To install a PWA application
+  - --filesystem=home/.local/share/applications:create
+  - --filesystem=home/.local/share/icons:create
+  - --filesystem=xdg-desktop
+  # For default download directory to work as expected
+  - --filesystem=xdg-download
+  # For imported CA certificates
+  - --persist=.pki
 
 add-extensions:
   io.github.ungoogled_software.ungoogled_chromium.Codecs:
