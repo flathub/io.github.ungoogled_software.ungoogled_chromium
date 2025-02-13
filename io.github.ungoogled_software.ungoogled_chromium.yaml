@@ -8,7 +8,6 @@ command: chromium
 finish-args:
   - --require-version=1.8.2
   - --device=all
-  - --env=LD_LIBRARY_PATH=/app/chromium/nonfree-codecs/lib
   - --share=ipc
   - --share=network
   - --socket=cups
@@ -45,12 +44,6 @@ finish-args:
   - --persist=.pki
 
 add-extensions:
-  io.github.ungoogled_software.ungoogled_chromium.Codecs:
-    directory: chromium/nonfree-codecs
-    add-ld-path: lib
-    bundle: true
-    autodelete: true
-
   io.github.ungoogled_software.ungoogled_chromium.NativeMessagingHost:
     version: '1'
     directory: chromium/native-messaging-hosts
@@ -152,18 +145,24 @@ modules:
       - ./build.sh
       - ./install.sh
     sources:
-      - sources/ungoogled-chromium.json
-      - sources/chromium.json
+      - type: git
+        url: https://github.com/ungoogled-software/ungoogled-chromium-flatpak
+        tag: 133.0.6943.53-1-1
+        commit: 0f147ab656302b21c492bc81ac53d0de4ef2bd16
+        dest: uc
+        x-checker-data:
+          type: git
+          tag-pattern: (\d+\.\d+\.\d+\.\d+)-(\d+)-(\d+)
+      - type: archive
+        url: https://chromium-tarballs.distfiles.gentoo.org/chromium-133.0.6943.53-linux.tar.xz
+        sha256: dbd06314054f738ef6aa4e0f5d7e765602b90df9820e62a21efe068a869de7a3
+        x-checker-data:
+          type: json
+          url: https://versionhistory.googleapis.com/v1/chrome/platforms/linux/channels/stable/versions/all/releases?filter=endtime%3Dnone%2Cfraction%3E%3D0.5&order_by=version%20desc
+          version-query: .releases[0].version
+          url-query: '"https://chromium-tarballs.distfiles.gentoo.org/chromium-" +
+            $version + "-linux.tar.xz"'
       - patches/chromium/_sources.json
-      - patches/ffmpeg/_sources.json
-      # XXX: this patch file is standalone because it's not integrated with the
-      # patch set tooling used for main Chromium & FFmpeg.
-      - type: patch
-        path: patches/Revert-cppgc-Decommit-pooled-pages-by-default.patch
-      # Increase FORTIFY_SOURCE level to match Flatpak's default flags
-      # https://gitlab.archlinux.org/archlinux/packaging/packages/chromium/-/blob/main/increase-fortify-level.patch
-      - type: patch
-        path: patches/increase-fortify-level.patch
       - type: file
         path: chromium.sh
       - type: file

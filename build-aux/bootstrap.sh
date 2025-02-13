@@ -69,8 +69,8 @@ done
 ./build/linux/unbundle/replace_gn_files.py \
 	--system-libraries "${SYSTEM_LIBS[@]}"
 
-# Create flags for the Release build.
-# (TODO: enable use_qt in the future?)
+# Create flags file for GN
+# TODO: enable use_qt in the future?
 mkdir -p out/Release
 cp ./uc/src/flags.gn out/Release/args.gn
 cat >> out/Release/args.gn <<-EOF
@@ -81,7 +81,6 @@ cat >> out/Release/args.gn <<-EOF
 	blink_enable_generated_code_formatting=false
 	ffmpeg_branding="Chrome"
 	proprietary_codecs=true
-	is_component_ffmpeg=true
 	rtc_use_pipewire=true
 	link_pulseaudio=true
 	use_sysroot=false
@@ -99,13 +98,3 @@ cat >> out/Release/args.gn <<-EOF
 	rustc_version="$(/usr/lib/sdk/rust-stable/bin/rustc -V)"
 EOF
 tools/gn/bootstrap/bootstrap.py -v --no-clean --skip-generate-buildfiles -j"${FLATPAK_BUILDER_N_JOBS}"
-
-# Create flags for the ReleaseFree build.
-mkdir -p out/ReleaseFree
-cp out/Release{,Free}/args.gn
-cat >> out/ReleaseFree/args.gn <<-EOF
-	proprietary_codecs=false
-	ffmpeg_branding="Chromium"
-	enable_platform_hevc=false
-	enable_hevc_parser_and_hw_decoder=false
-EOF

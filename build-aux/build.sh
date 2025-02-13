@@ -49,10 +49,6 @@ CXXFLAGS=${CXXFLAGS/-fstack-clash-protection}
 # https://crbug.com/957519#c122
 CXXFLAGS=${CXXFLAGS/-Wp,-D_GLIBCXX_ASSERTIONS}
 
-# Configuring Chromium
+# Configure and build Chromium
 out/Release/gn gen out/Release
-out/Release/gn gen out/ReleaseFree
-
-# Building Chromium
-ninja -C out/ReleaseFree -j"${FLATPAK_BUILDER_N_JOBS}" libffmpeg.so
 ninja -C out/Release -j"${FLATPAK_BUILDER_N_JOBS}" chrome chrome_crashpad_handler
