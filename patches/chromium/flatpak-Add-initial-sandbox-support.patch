@@ -1,4 +1,4 @@
-From 83651c3cc40f5289500cb50c4ce208c5268a9587 Mon Sep 17 00:00:00 2001
+From e29f4b52c8770033504794b934bc14b1d7261ef1 Mon Sep 17 00:00:00 2001
 From: Ryan Gonzalez <rymg19@gmail.com>
 Date: Tue, 17 Mar 2020 13:18:27 -0500
 Subject: [PATCH] flatpak: Add initial sandbox support
@@ -506,7 +506,7 @@ index 0000000000000..22799eb42f782
 +#endif
 diff --git a/sandbox/linux/services/flatpak_sandbox.cc b/sandbox/linux/services/flatpak_sandbox.cc
 new file mode 100644
-index 0000000000000..2a915a5b9fa11
+index 0000000000000..31229fdf59127
 --- /dev/null
 +++ b/sandbox/linux/services/flatpak_sandbox.cc
 @@ -0,0 +1,576 @@
