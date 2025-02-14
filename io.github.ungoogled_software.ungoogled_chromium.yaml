@@ -158,8 +158,8 @@ modules:
         sha256: 3d442e6fb581aa55e93fc2727ceea24cae23969f294d9becf6f6712dec702be9
         x-checker-data:
           type: json
-          url: https://versionhistory.googleapis.com/v1/chrome/platforms/linux/channels/stable/versions/all/releases?filter=endtime%3Dnone%2Cfraction%3E%3D0.5&order_by=version%20desc
-          version-query: .releases[0].version
+          url: https://api.github.com/repos/ungoogled-software/ungoogled-chromium-flatpak/git/refs/tags
+          version-query: .[-1].ref | sub("-\\d+-\\d+$"; "") | sub("^refs/tags/"; "")
           url-query: '"https://commondatastorage.googleapis.com/chromium-browser-official/chromium-" +
             $version + ".tar.xz"'
       - patches/chromium/_sources.json
