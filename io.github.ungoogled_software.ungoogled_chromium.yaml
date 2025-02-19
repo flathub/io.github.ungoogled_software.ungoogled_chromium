@@ -147,21 +147,21 @@ modules:
     sources:
       - type: git
         url: https://github.com/ungoogled-software/ungoogled-chromium-flatpak
-        tag: 133.0.6943.98-1-1
-        commit: 7b16e3fb99cb26754f3e9fe47716b9c2c56b7242
+        tag: 133.0.6943.126-1-1
+        commit: cd8bd9dea7d313832ad2f09c47db050cd1f977f6
         dest: uc
         x-checker-data:
           type: git
           tag-pattern: ^(\d+\.\d+\.\d+\.\d+-\d+-\d+)$
       - type: archive
-        url: https://commondatastorage.googleapis.com/chromium-browser-official/chromium-133.0.6943.98.tar.xz
-        sha256: 3d442e6fb581aa55e93fc2727ceea24cae23969f294d9becf6f6712dec702be9
+        url: https://commondatastorage.googleapis.com/chromium-browser-official/chromium-133.0.6943.126.tar.xz
+        sha256: bb99b5d8a4ec2374f58d3b6c694bffde91af1b80db5c46783166dd51beada024
         x-checker-data:
           type: json
           url: https://api.github.com/repos/ungoogled-software/ungoogled-chromium-flatpak/git/refs/tags
           version-query: .[-1].ref | sub("-\\d+-\\d+$"; "") | sub("^refs/tags/"; "")
-          url-query: '"https://commondatastorage.googleapis.com/chromium-browser-official/chromium-" +
-            $version + ".tar.xz"'
+          url-query: '"https://commondatastorage.googleapis.com/chromium-browser-official/chromium-"
+            + $version + ".tar.xz"'
       - patches/chromium/_sources.json
       - type: file
         path: chromium.sh
