@@ -101,6 +101,7 @@ cat >> out/Release/args.gn <<-EOF
 	use_system_libwayland=true
 	proprietary_codecs=true
 	ffmpeg_branding="Chrome"
+	chrome_pgo_phase=2
 EOF
 
 # Bootstrap GN
