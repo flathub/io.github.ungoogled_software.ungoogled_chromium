@@ -69,7 +69,7 @@ add-extensions:
 
 sdk-extensions:
   - org.freedesktop.Sdk.Extension.llvm19
-  - org.freedesktop.Sdk.Extension.node20
+  - org.freedesktop.Sdk.Extension.node22
   - org.freedesktop.Sdk.Extension.openjdk21
   - org.freedesktop.Sdk.Extension.rust-stable
 
