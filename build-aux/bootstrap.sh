@@ -75,7 +75,6 @@ cat >> out/Release/args.gn <<-EOF
 	angle_has_histograms=false
 	angle_build_tests=false
 	build_angle_perftests=false
-	treat_warnings_as_errors=false
 	use_qt=false
 	is_cfi=false
 	icu_use_data_file=false
