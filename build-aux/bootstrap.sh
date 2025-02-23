@@ -68,7 +68,6 @@ EOF
 cat >> out/Release/args.gn <<-EOF
 	is_debug=false
 	use_sysroot=false
-	use_libjpeg_turbo=true
 	safe_browsing_use_unrar=false
 	enable_vr=false
 	build_dawn_tests=false
@@ -92,13 +91,14 @@ cat >> out/Release/args.gn <<-EOF
 	rtc_use_pipewire=true
 	v8_enable_backtrace=true
 	use_system_lcms2=true
-	use_system_libffi=true
 	use_system_libjpeg=true
+	use_system_libopenjpeg2=true
 	use_system_libpng=true
 	use_system_libtiff=false
 	use_system_freetype=true
 	use_system_harfbuzz=true
-	use_system_libopenjpeg2=true
+	use_system_libffi=true
+	use_system_libwayland=true
 	proprietary_codecs=true
 	ffmpeg_branding="Chrome"
 EOF

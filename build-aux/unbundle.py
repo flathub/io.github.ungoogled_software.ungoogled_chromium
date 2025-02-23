@@ -6,7 +6,7 @@ sys.path.append("build/linux/unbundle")
 
 import replace_gn_files  # type: ignore
 
-keepers = (
+KEEPERS = (
     # Not present in SDK.
     "crc32c",
     "double-conversion",
@@ -52,15 +52,23 @@ keepers = (
     "zlib",  # 'undefined symbol: Cr_z_crc32_z' when linking with system zlib
     "ffmpeg",  # https://crbug.com/40218408
 )
-to_remove = set()
+TO_REMOVE = [lib for lib in replace_gn_files.REPLACEMENTS if lib not in KEEPERS]
 
-for lib in keepers:
-    if lib not in replace_gn_files.REPLACEMENTS:
-        print(f"ERROR: {lib} is invalid. Please update keepers list.", file=sys.stderr)
+
+def DoMain(_):
+    # Ensure all libraries in KEEPERS are in replace_gn_files. This helps
+    # keep the list in sync with Chromium.
+    should_exit = False
+    for lib in KEEPERS:
+        if lib not in replace_gn_files.REPLACEMENTS:
+            print(f"ERROR: {lib} is not in replace_gn_files", file=sys.stderr)
+            should_exit = True
+    if should_exit:
         sys.exit(1)
 
-for lib, rule in replace_gn_files.REPLACEMENTS.items():
-    if lib not in keepers:
-        to_remove.add(lib)
+    # Replace bundled libraries with system libraries.
+    replace_gn_files.DoMain(["--system-libraries", *TO_REMOVE])
 
-replace_gn_files.DoMain(("--system-libraries", *to_remove))
+
+if __name__ == "__main__":
+    DoMain([])
