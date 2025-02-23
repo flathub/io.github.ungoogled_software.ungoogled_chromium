@@ -71,6 +71,7 @@ cat >> out/Release/args.gn <<-EOF
 	safe_browsing_use_unrar=false
 	enable_vr=false
 	build_dawn_tests=false
+	enable_perfetto_unittests=false
 	enable_iterator_debugging=false
 	angle_has_histograms=false
 	angle_build_tests=false
