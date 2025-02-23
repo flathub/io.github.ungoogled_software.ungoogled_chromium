@@ -1,34 +1,5 @@
 #!/bin/bash -ex
 
-# Possible replacements are listed in build/linux/unbundle/replace_gn_files.py
-SYSTEM_LIBS=(
-	brotli
-	#dav1d
-	#ffmpeg		# YouTube playback stopped working in Chromium 120
-	flac
-	fontconfig
-	freetype
-	harfbuzz-ng
-	icu
-	#jsoncpp	# needs libstdc++
-	#libaom
-	#libavif	# needs -DAVIF_ENABLE_EXPERIMENTAL_GAIN_MAP=ON
-	libjpeg
-	libpng
-	#libvpx
-	libwebp
-	libxml
-	libxslt
-	opus
-	#re2		# needs libstdc++
-	#snapp		# needs libstdc++
-	#woff2		# needs libstdc++
-	#zlib
-)
-UNWANTED_BUNDLED_LIBS=(
-	$(printf "%s\n" ${SYSTEM_LIBS[@]} | sed 's/^libjpeg$/&_turbo/')
-)
-
 # Needed to build GN itself.
 . /usr/lib/sdk/llvm19/enable.sh
 
@@ -54,47 +25,83 @@ sed -i -e 's/\<xmlMalloc\>/malloc/' -e 's/\<xmlFree\>/free/' \
 cp -r /app/lib/sdk/bindgen bindgen
 ln -s /usr/lib/sdk/llvm19/lib -t bindgen
 
-# Remove bundled libraries for which we will use the system copies; this
-# *should* do what the remove_bundled_libraries.py script does, with the
-# added benefit of not having to list all the remaining libraries
-for lib in ${UNWANTED_BUNDLED_LIBS[@]}; do
-	find "third_party/${lib}" -type f \
-		\! -path "third_party/${lib}/chromium/*" \
-		\! -path "third_party/${lib}/google/*" \
-		\! -path "third_party/harfbuzz-ng/utils/hb_scoped.h" \
-		\! -regex '.*\.\(gn\|gni\|isolate\)' \
-		-delete
-done
-
-./build/linux/unbundle/replace_gn_files.py \
-	--system-libraries "${SYSTEM_LIBS[@]}"
-
-# Create flags file for GN
-# TODO: enable use_qt in the future?
+# Create initial args.gn from Ungoogled Chromium's flags.gn
 mkdir -p out/Release
 cp ./uc/src/flags.gn out/Release/args.gn
+
+# Use system Rust and Clang
 cat >> out/Release/args.gn <<-EOF
-	custom_toolchain="//build/toolchain/linux/unbundle:default"
-	host_toolchain="//build/toolchain/linux/unbundle:default"
-	is_official_build=true
-	symbol_level=0
-	blink_enable_generated_code_formatting=false
-	ffmpeg_branding="Chrome"
-	proprietary_codecs=true
-	rtc_use_pipewire=true
-	link_pulseaudio=true
-	use_sysroot=false
-	use_system_libffi=true
-	use_qt=false
-	use_vaapi=true
-	enable_platform_hevc=true
-	enable_hevc_parser_and_hw_decoder=true
-	icu_use_data_file=false
-	clang_base_path="/usr/lib/sdk/llvm19"
-	clang_version="$(clang --version | grep -m1 version | sed 's/.* \([0-9]\+\).*/\1/')"
-	chrome_pgo_phase=2
 	rust_sysroot_absolute="/usr/lib/sdk/rust-stable"
 	rust_bindgen_root="${PWD}/bindgen"
 	rustc_version="$(/usr/lib/sdk/rust-stable/bin/rustc -V)"
+	clang_base_path="/usr/lib/sdk/llvm19"
+	clang_version="$(clang --version | grep -m1 version | sed 's/.* \([0-9]\+\).*/\1/')"
+	custom_toolchain="//build/toolchain/linux/unbundle:default"
+	host_toolchain="//build/toolchain/linux/unbundle:default"
 EOF
+
+# Use VAAPI on x86_64 and V4L2 on aarch64
+case "${FLATPAK_ARCH}" in
+	x86_64)
+		cat >> out/Release/args.gn <<-EOF
+			use_vaapi=true
+		EOF
+		;;
+	aarch64)
+		cat >> out/Release/args.gn <<-EOF
+			use_v4l2_codec=true
+			use_vaapi=false
+		EOF
+		;;
+	*)
+		echo >&2 "Unsupported architecture: ${FLATPAK_ARCH}"
+		exit 1
+		;;
+esac
+
+# Use ThinLTO for faster builds
+cat >> out/Release/args.gn <<-EOF
+	use_thin_lto=true
+EOF
+
+# Disabled features
+cat >> out/Release/args.gn <<-EOF
+	is_debug=false
+	use_sysroot=false
+	use_libjpeg_turbo=true
+	safe_browsing_use_unrar=false
+	enable_vr=false
+	build_dawn_tests=false
+	enable_iterator_debugging=false
+	angle_has_histograms=false
+	angle_build_tests=false
+	build_angle_perftests=false
+	treat_warnings_as_errors=false
+	use_qt=false
+	is_cfi=false
+	icu_use_data_file=false
+EOF
+
+# Enabled features
+cat >> out/Release/args.gn <<-EOF
+	use_gio=true
+	is_official_build=true
+	symbol_level=0
+	use_pulseaudio=true
+	link_pulseaudio=true
+	rtc_use_pipewire=true
+	v8_enable_backtrace=true
+	use_system_lcms2=true
+	use_system_libffi=true
+	use_system_libjpeg=true
+	use_system_libpng=true
+	use_system_libtiff=false
+	use_system_freetype=true
+	use_system_harfbuzz=true
+	use_system_libopenjpeg2=true
+	proprietary_codecs=true
+	ffmpeg_branding="Chrome"
+EOF
+
+# Bootstrap GN
 tools/gn/bootstrap/bootstrap.py -v --no-clean --skip-generate-buildfiles -j"${FLATPAK_BUILDER_N_JOBS}"
