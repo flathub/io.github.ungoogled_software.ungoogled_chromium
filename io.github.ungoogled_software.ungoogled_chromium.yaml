@@ -141,6 +141,7 @@ modules:
       prepend-ld-library-path: /usr/lib/sdk/rust-stable/lib
     build-commands:
       - ./apply-uc-patches.sh
+      - ./unbundle.py
       - ./bootstrap.sh
       - ./build.sh
       - ./install.sh
