@@ -97,7 +97,6 @@ cat >> out/Release/args.gn <<-EOF
 	use_system_libtiff=false
 	use_system_freetype=true
 	use_system_harfbuzz=true
-	use_system_libffi=true
 	use_system_libwayland=true
 	proprietary_codecs=true
 	ffmpeg_branding="Chrome"
