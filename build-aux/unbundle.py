@@ -27,7 +27,7 @@ KEEPERS = (
     "woff2",
     # Present in SDK, but causes issues when unbundled.
     "libvpx",  # https://crbug.com/1307941
-    "libaom",  # media/gpu/vaapi/BUILD.gn depends on libaomrc, no upstream bug yet
+    "libaom",  # https://crbug.com/aomedia/42302569
     "absl_algorithm",  # all absl bundled due to https://crbug.com/339654390
     "absl_base",
     "absl_cleanup",
