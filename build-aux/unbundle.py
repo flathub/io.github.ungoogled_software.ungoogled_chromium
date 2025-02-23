@@ -25,6 +25,7 @@ KEEPERS = (
     "vulkan-SPIRV-Tools",
     "vulkan_memory_allocator",
     "woff2",
+    #
     # Present in SDK, but causes issues when unbundled.
     "libvpx",  # https://crbug.com/1307941
     "libaom",  # https://crbug.com/aomedia/42302569
@@ -49,7 +50,7 @@ KEEPERS = (
     "absl_time",
     "absl_types",
     "absl_utility",
-    "zlib",  # 'undefined symbol: Cr_z_crc32_z' when linking with system zlib
+    "zlib",  # https://crbug.com/40218746 & https://crbug.com/40225256
     "ffmpeg",  # https://crbug.com/40218408
 )
 TO_REMOVE = [lib for lib in replace_gn_files.REPLACEMENTS if lib not in KEEPERS]
