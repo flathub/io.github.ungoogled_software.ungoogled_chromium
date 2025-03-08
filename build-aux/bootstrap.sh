@@ -59,11 +59,6 @@ case "${FLATPAK_ARCH}" in
 		;;
 esac
 
-# Use ThinLTO for faster builds
-cat >> out/Release/args.gn <<-EOF
-	use_thin_lto=true
-EOF
-
 # Disabled features
 cat >> out/Release/args.gn <<-EOF
 	is_debug=false
@@ -77,7 +72,6 @@ cat >> out/Release/args.gn <<-EOF
 	angle_build_tests=false
 	build_angle_perftests=false
 	use_qt=false
-	is_cfi=false
 	icu_use_data_file=false
 EOF
 
@@ -85,6 +79,8 @@ EOF
 cat >> out/Release/args.gn <<-EOF
 	use_gio=true
 	is_official_build=true
+	is_cfi=true
+	use_thin_lto=true
 	symbol_level=0
 	use_pulseaudio=true
 	link_pulseaudio=true
