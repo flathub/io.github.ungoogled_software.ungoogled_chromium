@@ -19,6 +19,12 @@ sed -i -e 's/\<xmlMalloc\>/malloc/' -e 's/\<xmlFree\>/free/' \
 	third_party/blink/renderer/core/xml/parser/xml_document_parser.cc \
 	third_party/libxml/chromium/*.cc
 
+# Rust 1.86 ships adler2 but we need to change it to adler when
+# using older Rust versions (idea for this borrowed from Gentoo)
+if ! find /usr/lib/sdk/rust-stable/lib/rustlib | grep -q adler2; then
+	sed -i 's/adler2/adler/' build/rust/std/BUILD.gn
+fi
+
 # Required so that rust-bindgen can find libclang
 # https://rust-lang.github.io/rust-bindgen/requirements.html
 # https://source.chromium.org/chromium/chromium/src/+/main:build/rust/rust_bindgen.gni;l=20-27;drc=09afac1d1aa18250073002ddedd0e064e4c2a981

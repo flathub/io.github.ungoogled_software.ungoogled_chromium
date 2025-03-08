@@ -163,6 +163,11 @@ modules:
           url-query: '"https://commondatastorage.googleapis.com/chromium-browser-official/chromium-"
             + $version + "-lite.tar.xz"'
       - patches/chromium/_sources.json
+      - patches/chromium-archlinux/_sources.json
+      # XXX: this patch file is standalone because it's not integrated with the
+      # patch set tooling used for main Chromium & FFmpeg.
+      - type: patch
+        path: patches/Revert-cppgc-Decommit-pooled-pages-by-default.patch
       - type: file
         path: chromium.sh
       - type: file

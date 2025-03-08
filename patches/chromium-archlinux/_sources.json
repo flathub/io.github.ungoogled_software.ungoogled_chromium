@@ -1,0 +1,8 @@
+[
+  {
+    "type": "patch",
+    "paths": [
+      "patches/chromium-archlinux/increase-fortify-level.patch"
+    ]
+  }
+]
