@@ -154,14 +154,14 @@ modules:
           type: git
           tag-pattern: ^(\d+\.\d+\.\d+\.\d+-\d+-\d+)$
       - type: archive
-        url: https://commondatastorage.googleapis.com/chromium-browser-official/chromium-134.0.6998.35.tar.xz
-        sha256: d77f09bfa9bda8bbc4638ead83339d5ec52e39032c5a7047060dfdf94b767be7
+        url: https://commondatastorage.googleapis.com/chromium-browser-official/chromium-134.0.6998.35-lite.tar.xz
+        sha256: 5f41260448edcaf2586fde025861828aeccacdc62aa72cee2bbfeb03630777d6
         x-checker-data:
           type: json
           url: https://api.github.com/repos/ungoogled-software/ungoogled-chromium-flatpak/git/refs/tags
           version-query: .[-1].ref | sub("-\\d+-\\d+$"; "") | sub("^refs/tags/"; "")
           url-query: '"https://commondatastorage.googleapis.com/chromium-browser-official/chromium-"
-            + $version + ".tar.xz"'
+            + $version + "-lite.tar.xz"'
       - patches/chromium/_sources.json
       - type: file
         path: chromium.sh
