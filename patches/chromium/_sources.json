@@ -10,7 +10,8 @@
       "patches/chromium/Use-CHROME_WRAPPER-as-the-executable-on-restart.patch",
       "patches/chromium/Add-support-for-respecting-system-proxy-settings-when-runn.patch",
       "patches/chromium/Revert-cppgc-Decommit-pooled-pages-by-default.patch",
-      "patches/chromium/increase-fortify-level.patch"
+      "patches/chromium/increase-fortify-level.patch",
+      "patches/chromium/rust-use-adler-instead-of-adler2.patch"
     ]
   }
 ]
