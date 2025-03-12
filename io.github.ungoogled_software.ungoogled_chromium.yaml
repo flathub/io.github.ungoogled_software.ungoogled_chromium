@@ -15,6 +15,7 @@ finish-args:
   - --socket=pulseaudio
   - --socket=x11
   - --socket=wayland
+  - --allow=bluetooth # FIDO2 CTAP hybrid transport
   - --system-talk-name=org.bluez
   - --system-talk-name=org.freedesktop.Avahi
   - --system-talk-name=org.freedesktop.UPower
