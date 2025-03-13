@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2017 the Chromium authors, with modifications -->
+<component type="desktop-application">
+  <id>io.github.ungoogled_software.ungoogled_chromium</id>
+  <launchable type="desktop-id">io.github.ungoogled_software.ungoogled_chromium.desktop</launchable>
+  <name>Ungoogled Chromium</name>
+  <developer id="io.github.ungoogled_software">
+    <name>Ungoogled Software</name>
+  </developer>
+  <summary>Chromium without Google</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license xml:space="preserve">BSD-3-Clause and LGPL-2.1+ and Apache-2.0 and IJG and MIT and GPL-2.0+ and ISC and OpenSSL and (MPL-1.1 or GPL-2.0 or LGPL-2.0)</project_license>
+  <url type="homepage">https://github.com/ungoogled-software/ungoogled-chromium</url>
+  <url type="help">https://github.com/ungoogled-software/ungoogled-chromium/blob/master/SUPPORT.md</url>
+  <url type="bugtracker">https://github.com/ungoogled-software/ungoogled-chromium-flatpak/issues</url>
+  <keywords>
+    <keyword>web browser</keyword>
+    <keyword>chromium</keyword>
+    <keyword>ungoogled</keyword>
+    <keyword>privacy</keyword>
+    <keyword>security</keyword>
+    <keyword>transparency</keyword>
+    <keyword>control</keyword>
+  </keywords>
+  <categories>
+    <category>Network</category>
+    <category>WebBrowser</category>
+    <category>WebDevelopment</category>
+    <category>Viewer</category>
+  </categories>
+  <description>
+    <p>Ungoogled Chromium is Google Chromium, sans dependency on Google web services. It also
+      features some tweaks to enhance privacy, control, and transparency <em>(almost all of which
+      require manual activation or enabling)</em>.</p>
+    <p>Ungoogled Chromium retains the default Chromium experience as closely as possible. Unlike
+      other Chromium forks that have their own visions of a web browser, Ungoogled Chromium is
+      essentially a drop-in replacement for Chromium.</p>
+    <p>Without signing in to a Google Account, Chromium does pretty well in terms of security and
+      privacy. However, Chromium still has some dependency on Google web services and binaries. In
+      addition, Google designed Chromium to be easy and intuitive for users, which means they
+      compromise on transparency and control of inner operations.</p>
+    <p>Ungoogled Chromium addresses these issues in the following ways:</p>
+    <ul>
+      <li>Remove all remaining background requests to any web services while building and running
+        the browser</li>
+      <li>Remove all code specific to Google web services</li>
+      <li>Remove all uses of pre-made binaries from the source code, and replace them with
+        user-provided alternatives when possible</li>
+      <li>Disable features that inhibit control and transparency, and add or modify features that
+        promote them (these changes will almost always require manual activation or enabling)</li>
+    </ul>
+    <p>These features are implemented as configuration flags, patches, and custom scripts.</p>
+  </description>
+  <branding>
+    <color type="primary" scheme_preference="light">#ff8f8f</color>
+    <color type="primary" scheme_preference="dark">#5e3838</color>
+  </branding>
+  <screenshots>
+    <screenshot type="default">
+      <caption>About window with light mode</caption>
+      <image xml:space="preserve">https://raw.githubusercontent.com/ungoogled-software/ungoogled-chromium-flatpak/master/screenshots/about_light.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Welcome window with light mode</caption>
+      <image xml:space="preserve">https://raw.githubusercontent.com/ungoogled-software/ungoogled-chromium-flatpak/master/screenshots/welcome_light.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Welcome window with dark mode</caption>
+      <image xml:space="preserve">https://raw.githubusercontent.com/ungoogled-software/ungoogled-chromium-flatpak/master/screenshots/welcome_dark.png</image>
+    </screenshot>
+  </screenshots>
+  <releases>
+    <release version="134.0.6998.88-1" date="2025-03-13">
+      <description></description>
+    </release>
+  </releases>
+  <content_rating type="oars-1.1" />
+  <update_contact>https://github.com/ungoogled-software/ungoogled-chromium-flatpak/issues</update_contact>
+</component>

@@ -15,6 +15,6 @@ for size in 24 48 64 128 256; do
 done
 install -Dvm 644 chrome/app/theme/chromium/product_logo.svg /app/share/icons/hicolor/scalable/apps/io.github.ungoogled_software.ungoogled_chromium.svg
 install -Dvm 644 cobalt.ini -t /app/etc
-install -Dvm 644 ./uc/io.github.ungoogled_software.ungoogled_chromium.desktop -t /app/share/applications
-install -Dvm 644 ./uc/io.github.ungoogled_software.ungoogled_chromium.metainfo.xml -t /app/share/metainfo
+install -Dvm 644 io.github.ungoogled_software.ungoogled_chromium.desktop -t /app/share/applications
+install -Dvm 644 io.github.ungoogled_software.ungoogled_chromium.metainfo.xml -t /app/share/metainfo
 install -Dvm 755 chromium.sh /app/bin/chromium

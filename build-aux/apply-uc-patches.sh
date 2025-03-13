@@ -1,14 +1,14 @@
 #!/bin/bash -ex
 
 # Apply Flatpak specific branding
-./uc/branding/infect.sh ./uc ./
+cp -rv ./branding/to_copy/. .
 
 # Prune binaries
-./uc/src/utils/prune_binaries.py ./ ./uc/src/pruning.list
+./uc/utils/prune_binaries.py ./ ./uc/pruning.list
 
 # Apply patches
-./uc/src/utils/patches.py apply ./ ./uc/src/patches
+./uc/utils/patches.py apply ./ ./uc/patches
 
 # Substitute domains
-./uc/src/utils/domain_substitution.py apply -r ./uc/src/domain_regex.list \
-	-f ./uc/src/domain_substitution.list -c ./domsubcache.tar.gz ./
+./uc/utils/domain_substitution.py apply -r ./uc/domain_regex.list \
+	-f ./uc/domain_substitution.list -c ./domsubcache.tar.gz ./

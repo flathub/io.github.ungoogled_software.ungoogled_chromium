@@ -33,7 +33,7 @@ ln -s /usr/lib/sdk/llvm19/lib -t bindgen
 
 # Create initial args.gn from Ungoogled Chromium's flags.gn
 mkdir -p out/Release
-cp ./uc/src/flags.gn out/Release/args.gn
+cp ./uc/flags.gn out/Release/args.gn
 
 # Use system Rust and Clang
 cat >> out/Release/args.gn <<-EOF
