@@ -179,27 +179,38 @@ modules:
       - ./install.sh
     sources:
       - type: git
-        url: https://github.com/ungoogled-software/ungoogled-chromium-flatpak
-        tag: 134.0.6998.88-1-1
-        commit: 3508d7612eb32c46f4d0efef487101c232ddbb7d
+        url: https://github.com/ungoogled-software/ungoogled-chromium
+        tag: 134.0.6998.88-1
+        commit: d7f9f01862c5f641bd69688fb2c854a23a6f10e4
         dest: uc
         x-checker-data:
-          type: git
-          tag-pattern: ^(\d+\.\d+\.\d+\.\d+-\d+-\d+)$
+          type: json
+          url: https://api.github.com/repos/ungoogled-software/ungoogled-chromium/releases/latest
+          tag-query: .tag_name
+          version-query: $tag
+          timestamp-query: .published_at
+          is-main-source: true
       - type: archive
         url: https://commondatastorage.googleapis.com/chromium-browser-official/chromium-134.0.6998.88-lite.tar.xz
         sha256: aa079fa2a8ff15f1a8528d67f5c310cd7da41d6c9e607a38d57b0e5a11169d59
         x-checker-data:
           type: json
-          url: https://api.github.com/repos/ungoogled-software/ungoogled-chromium-flatpak/git/refs/tags
-          version-query: .[-1].ref | sub("-\\d+-\\d+$"; "") | sub("^refs/tags/"; "")
+          url: https://api.github.com/repos/ungoogled-software/ungoogled-chromium/releases/latest
+          version-query: .tag_name | sub("-\\d+$"; "")
           url-query: '"https://commondatastorage.googleapis.com/chromium-browser-official/chromium-"
             + $version + "-lite.tar.xz"'
       - patches/chromium/_sources.json
       - patches/chromium-archlinux/_sources.json
+      - type: file
+        path: io.github.ungoogled_software.ungoogled_chromium.desktop
+      - type: file
+        path: io.github.ungoogled_software.ungoogled_chromium.metainfo.xml
       - type: file
         path: chromium.sh
       - type: file
         path: cobalt.ini
       - type: dir
         path: build-aux
+      - type: dir
+        path: branding
+        dest: branding
