@@ -180,15 +180,15 @@ modules:
     sources:
       - type: git
         url: https://github.com/ungoogled-software/ungoogled-chromium-flatpak
-        tag: 134.0.6998.35-1-1
-        commit: 7e4d98fa8d7a754ef45b013a4337be01ce05946d
+        tag: 134.0.6998.88-1-1
+        commit: 3508d7612eb32c46f4d0efef487101c232ddbb7d
         dest: uc
         x-checker-data:
           type: git
           tag-pattern: ^(\d+\.\d+\.\d+\.\d+-\d+-\d+)$
       - type: archive
-        url: https://commondatastorage.googleapis.com/chromium-browser-official/chromium-134.0.6998.35-lite.tar.xz
-        sha256: 5f41260448edcaf2586fde025861828aeccacdc62aa72cee2bbfeb03630777d6
+        url: https://commondatastorage.googleapis.com/chromium-browser-official/chromium-134.0.6998.88-lite.tar.xz
+        sha256: aa079fa2a8ff15f1a8528d67f5c310cd7da41d6c9e607a38d57b0e5a11169d59
         x-checker-data:
           type: json
           url: https://api.github.com/repos/ungoogled-software/ungoogled-chromium-flatpak/git/refs/tags
