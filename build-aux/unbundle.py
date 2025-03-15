@@ -17,18 +17,17 @@ KEEPERS = (
     "libusb",
     "libXNVCtrl",
     "libyuv",
+    "openh264",  # https://gitlab.com/freedesktop-sdk/freedesktop-sdk/-/commit/719900f1db1b5a5579bca419f70916cec7c05055
     "re2",
     "snappy",
     "swiftshader-SPIRV-Headers",
     "swiftshader-SPIRV-Tools",
+    "vulkan_memory_allocator",
     "vulkan-SPIRV-Headers",
     "vulkan-SPIRV-Tools",
-    "vulkan_memory_allocator",
     "woff2",
     #
     # Present in SDK, but causes issues when unbundled.
-    "libvpx",  # https://crbug.com/1307941
-    "libaom",  # https://crbug.com/aomedia/42302569
     "absl_algorithm",  # all absl bundled due to https://crbug.com/339654390
     "absl_base",
     "absl_cleanup",
@@ -38,8 +37,8 @@ KEEPERS = (
     "absl_flags",
     "absl_functional",
     "absl_hash",
-    "absl_log",
     "absl_log_internal",
+    "absl_log",
     "absl_memory",
     "absl_meta",
     "absl_numeric",
@@ -50,8 +49,10 @@ KEEPERS = (
     "absl_time",
     "absl_types",
     "absl_utility",
-    "zlib",  # https://crbug.com/40218746 & https://crbug.com/40225256
     "ffmpeg",  # https://crbug.com/40218408
+    "libaom",  # https://crbug.com/aomedia/42302569
+    "libvpx",  # https://crbug.com/1307941
+    "zlib",  # https://crbug.com/40225256
 )
 TO_REMOVE = [lib for lib in replace_gn_files.REPLACEMENTS if lib not in KEEPERS]
 
