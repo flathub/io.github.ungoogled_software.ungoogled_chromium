@@ -38,6 +38,8 @@ finish-args:
   # To install a PWA application
   - --filesystem=home/.local/share/applications:create
   - --filesystem=home/.local/share/icons:create
+  # To allow installing shortcuts on the desktop
+  - --filesystem=xdg-desktop
   # For default download directory to work as expected
   - --filesystem=xdg-download
   # For MPRIS media cover art
