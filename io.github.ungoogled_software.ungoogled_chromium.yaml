@@ -40,6 +40,8 @@ finish-args:
   - --filesystem=home/.local/share/icons:create
   # For default download directory to work as expected
   - --filesystem=xdg-download
+  # For MPRIS media cover art
+  - --filesystem=/tmp
   # For imported CA certificates
   - --persist=.pki
   # For GNOME proxy resolution
