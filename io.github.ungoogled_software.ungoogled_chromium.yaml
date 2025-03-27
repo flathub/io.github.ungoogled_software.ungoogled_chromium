@@ -163,8 +163,8 @@ modules:
     sources:
       - type: git
         url: https://github.com/ungoogled-software/ungoogled-chromium
-        tag: 134.0.6998.165-1
-        commit: 04870c51c7d5c091e70e73dc10151ed620802808
+        tag: 134.0.6998.177-1
+        commit: 97331af270f756c046a8bd0741cf405b9aa17a48
         dest: uc
         x-checker-data:
           type: json
@@ -174,8 +174,8 @@ modules:
           timestamp-query: .published_at
           is-main-source: true
       - type: archive
-        url: https://commondatastorage.googleapis.com/chromium-browser-official/chromium-134.0.6998.165-lite.tar.xz
-        sha256: dd6a8d05771dc4879a8a74779e54fff0313ef1345be721167a594dd7bfe4c239
+        url: https://commondatastorage.googleapis.com/chromium-browser-official/chromium-134.0.6998.177-lite.tar.xz
+        sha256: bed3de0ca7fe13a627dc533ed75d59c74078fc037361b71f727bc2c71659bf9d
         x-checker-data:
           type: json
           url: https://api.github.com/repos/ungoogled-software/ungoogled-chromium/releases/latest
