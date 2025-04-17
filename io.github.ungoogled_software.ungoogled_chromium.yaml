@@ -184,6 +184,7 @@ modules:
             + $version + "-lite.tar.xz"'
       - patches/chromium/_sources.json
       - patches/chromium-archlinux/_sources.json
+      - patches/chromium-uc-fp/_sources.json
       - type: file
         path: io.github.ungoogled_software.ungoogled_chromium.desktop
       - type: file
