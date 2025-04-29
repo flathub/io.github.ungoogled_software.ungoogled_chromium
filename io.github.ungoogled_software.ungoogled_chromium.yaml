@@ -82,7 +82,7 @@ add-extensions:
     autodelete: true
 
 sdk-extensions:
-  - org.freedesktop.Sdk.Extension.llvm19
+  - org.freedesktop.Sdk.Extension.llvm20
   - org.freedesktop.Sdk.Extension.node22
   - org.freedesktop.Sdk.Extension.openjdk21
   - org.freedesktop.Sdk.Extension.rust-stable
@@ -163,8 +163,8 @@ modules:
     sources:
       - type: git
         url: https://github.com/ungoogled-software/ungoogled-chromium
-        tag: 135.0.7049.114-1
-        commit: 87bb243619c37600f637bc129f5516944a4263d2
+        #tag: 136.0.7103.48-1
+        commit: 176fe36f2f5a9dba5b76e4dccb789ae5250fd8a4
         dest: uc
         x-checker-data:
           type: json
@@ -174,8 +174,8 @@ modules:
           timestamp-query: .published_at
           is-main-source: true
       - type: archive
-        url: https://commondatastorage.googleapis.com/chromium-browser-official/chromium-135.0.7049.114-lite.tar.xz
-        sha256: 33c538ae7443d0cc11b9841276d20abe8c260198fa50e905e88aa9b8c2052e83
+        url: https://commondatastorage.googleapis.com/chromium-browser-official/chromium-136.0.7103.48-lite.tar.xz
+        sha256: 914055d1af3961c9851189aebb06b536b5f667eb3c5b86f577f0609816efd138
         x-checker-data:
           type: json
           url: https://api.github.com/repos/ungoogled-software/ungoogled-chromium/releases/latest

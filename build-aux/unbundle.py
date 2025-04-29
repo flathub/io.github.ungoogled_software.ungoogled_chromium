@@ -19,6 +19,7 @@ KEEPERS = (
     "libyuv",
     "openh264",  # https://gitlab.com/freedesktop-sdk/freedesktop-sdk/-/commit/719900f1db1b5a5579bca419f70916cec7c05055
     "re2",
+    "simdutf",
     "snappy",
     "swiftshader-SPIRV-Headers",
     "swiftshader-SPIRV-Tools",

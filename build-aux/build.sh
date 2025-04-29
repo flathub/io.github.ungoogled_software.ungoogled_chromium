@@ -12,7 +12,7 @@ ln_overwrite_all /usr/lib/sdk/node22 third_party/node/linux/node-linux-x64
 ln_overwrite_all /usr/lib/sdk/openjdk21 third_party/jdk/current
 
 # Use system clang
-. /usr/lib/sdk/llvm19/enable.sh
+. /usr/lib/sdk/llvm20/enable.sh
 export CC=clang
 export CXX=clang++
 export AR=ar
