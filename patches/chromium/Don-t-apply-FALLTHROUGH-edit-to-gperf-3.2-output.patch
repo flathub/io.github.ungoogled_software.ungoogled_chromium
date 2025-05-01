@@ -1,4 +1,4 @@
-From f8f21fb4aa01f75acbb12abf5ea8c263c6817141 Mon Sep 17 00:00:00 2001
+From 225fc867f6101d6d0ead9d7ce64cddb5ac47d49f Mon Sep 17 00:00:00 2001
 From: Daniel Richard G <iskunk@gmail.com>
 Date: Tue, 15 Apr 2025 01:13:20 -0700
 Subject: [PATCH] Don't apply /*FALLTHROUGH*/ edit to gperf 3.2 output
@@ -18,12 +18,14 @@ Reviewed-by: Roland Bock <rbock@google.com>
 Auto-Submit: Daniel Richard G. <iskunk@gmail.com>
 Cr-Commit-Position: refs/heads/main@{#1446962}
 ---
+ third_party/blink/renderer/build/scripts/gperf.py | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
 diff --git a/third_party/blink/renderer/build/scripts/gperf.py b/third_party/blink/renderer/build/scripts/gperf.py
-index 42630d3..bc9cc70f 100644
+index 42630d37c5d89..bc9cc70faa271 100644
 --- a/third_party/blink/renderer/build/scripts/gperf.py
 +++ b/third_party/blink/renderer/build/scripts/gperf.py
-@@ -35,10 +35,13 @@
+@@ -35,10 +35,13 @@ def generate_gperf(gperf_path, gperf_input, gperf_args):
          # https://savannah.gnu.org/bugs/index.php?53028
          gperf_output = re.sub(r'\bregister ', '', gperf_output)
          # -Wimplicit-fallthrough needs an explicit fallthrough statement,
@@ -41,3 +43,6 @@ index 42630d3..bc9cc70f 100644
          # -Wpointer-to-int-cast warns about casting pointers to smaller ints
          # Replace {(int)(long)&(foo), bar} with
          # {static_cast<int>(reinterpret_cast<uintptr_t>(&(foo)), bar}
+-- 
+2.49.0
+
