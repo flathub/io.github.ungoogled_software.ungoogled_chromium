@@ -5,7 +5,7 @@ Please direct bug reports to the [official repository](
 
 ### Extension points
 
-To avoid having to expose more of the host filesystem in the sandbox but still
+To avoid having to expose more of the host file system in the sandbox but still
 allowing extending Chromium, the following extension points are defined:
 - io.github.ungoogled_software.ungoogled_chromium.Policy
 - io.github.ungoogled_software.ungoogled_chromium.Extension
@@ -34,7 +34,7 @@ on version '1' and exposes the `native-messaging-hosts` subdirectory to Chromium
 Extension points can be provided as regular flatpaks and an example is provided
 under `examples/policies/block-dinosaur-game`. Important to note that extension points'
 name must follow the syntax of `<ExtensionPointName>.<id>`, where `<ExtensionPointName>`
-is one of the supported extension points above and `<id>` is a generic id for this
+is one of the supported extension points above and `<id>` is a generic ID for this
 specific extension point.
 
 Flatpak also supports “unmanaged extensions”, allowing loading extensions installed
@@ -50,22 +50,22 @@ This could be done for example by creating an extension point under
 being a symlink to `/etc/chromium-browser`. Note that `<version>` must match the
 extension point version.
 
-Also important to note that in the example above one would not be able to symlink the
+Also, important to note that in the example above one would not be able to symlink the
 actual policy file directly, as otherwise flatpak would not be able to resolve the
 symlink when bind mounting the extension point.
 
-### How do I install Widevine CDM?
+### How do I install WideVine CDM?
 
 1. Download and execute [widevine-install.sh](widevine-install.sh)
-2. Restart the browser
+2. Restart Ungoogled Chromium **twice** for the changes to take effect.
 
 ### Miscellaneous Issues
 
 For other problems please check https://ungoogled-software.github.io/ungoogled-chromium-wiki/faq
-before creating an issue in this repository. However keep in mind the following while
+before creating an issue in this repository. However, keep in mind the following while
 reading any document about Ungoogled Chromium:
 
-* `~/.config/chromium` -> `~/.var/app/io.github.ungoogled_software.ungoogled_chromium/config/chromium`
+* `~/.config/chromium` → `~/.var/app/io.github.ungoogled_software.ungoogled_chromium/config/chromium`
 
 `~/.config/chromium` is not accessible to Ungoogled Chromium and the above path should be used
 instead.
