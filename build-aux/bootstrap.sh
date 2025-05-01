@@ -20,13 +20,6 @@ sed -i -e 's/\<xmlMalloc\>/malloc/' -e 's/\<xmlFree\>/free/' \
 	third_party/blink/renderer/core/xml/parser/xml_document_parser.cc \
 	third_party/libxml/chromium/*.cc
 
-# Rust 1.86 ships adler2 but we need to change it to adler when
-# using older Rust versions (idea for this borrowed from Gentoo)
-adler2_found=$(find /usr/lib/sdk/rust-stable/lib/rustlib -name '*adler2*' -printf 1 -quit)
-if [[ -z "${adler2_found}" ]]; then
-	sed -i 's/adler2/adler/' build/rust/std/BUILD.gn
-fi
-
 # Remove node version check dependency
 # https://chromium-review.googlesource.com/c/chromium/src/+/6334038
 sed -i '\#deps += \[ "//third_party/node:check_version" \]#d' \
