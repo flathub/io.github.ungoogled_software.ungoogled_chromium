@@ -1,4 +1,5 @@
-#!/bin/bash -ex
+#!/bin/bash
+set -exo pipefail
 
 # Apply Flatpak specific branding
 cp -rv ./branding/to_copy/. .

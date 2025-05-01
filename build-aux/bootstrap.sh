@@ -1,4 +1,5 @@
-#!/bin/bash -ex
+#!/bin/bash
+set -exo pipefail
 
 # Needed to build GN itself.
 . /usr/lib/sdk/llvm20/enable.sh
@@ -21,7 +22,8 @@ sed -i -e 's/\<xmlMalloc\>/malloc/' -e 's/\<xmlFree\>/free/' \
 
 # Rust 1.86 ships adler2 but we need to change it to adler when
 # using older Rust versions (idea for this borrowed from Gentoo)
-if ! find /usr/lib/sdk/rust-stable/lib/rustlib | grep -q adler2; then
+adler2_found=$(find /usr/lib/sdk/rust-stable/lib/rustlib -name '*adler2*' -printf 1 -quit)
+if [[ -z "${adler2_found}" ]]; then
 	sed -i 's/adler2/adler/' build/rust/std/BUILD.gn
 fi
 
@@ -41,12 +43,14 @@ mkdir -p out/Release
 cp ./uc/flags.gn out/Release/args.gn
 
 # Use system Rust and Clang
+rustc_version=$(/usr/lib/sdk/rust-stable/bin/rustc -V)
+clang_version=$(clang --version | grep -m1 version | sed 's/.* \([0-9]\+\).*/\1/')
 cat >> out/Release/args.gn <<-EOF
 	rust_sysroot_absolute="/usr/lib/sdk/rust-stable"
 	rust_bindgen_root="${PWD}/bindgen"
-	rustc_version="$(/usr/lib/sdk/rust-stable/bin/rustc -V)"
+	rustc_version="${rustc_version}"
 	clang_base_path="/usr/lib/sdk/llvm20"
-	clang_version="$(clang --version | grep -m1 version | sed 's/.* \([0-9]\+\).*/\1/')"
+	clang_version="${clang_version}"
 	custom_toolchain="//build/toolchain/linux/unbundle:default"
 	host_toolchain="//build/toolchain/linux/unbundle:default"
 EOF
