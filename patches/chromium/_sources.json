@@ -7,7 +7,8 @@
       "patches/chromium/flatpak-Adjust-paths-for-the-sandbox.patch",
       "patches/chromium/Import-chromium-71.0.3578.98-widevine-r3.patch-arm64-suppo.patch",
       "patches/chromium/Remove-the-ability-to-create-desktop-shortcuts.patch",
-      "patches/chromium/Use-CHROME_WRAPPER-as-the-executable-on-restart.patch"
+      "patches/chromium/Use-CHROME_WRAPPER-as-the-executable-on-restart.patch",
+      "patches/chromium/Don-t-apply-FALLTHROUGH-edit-to-gperf-3.2-output.patch"
     ]
   }
 ]

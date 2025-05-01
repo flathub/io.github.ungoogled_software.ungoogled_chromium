@@ -1,8 +1,0 @@
-[
-  {
-    "type": "patch",
-    "paths": [
-      "patches/chromium-uc-fp/gperf.patch"
-    ]
-  }
-]

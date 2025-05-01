@@ -169,7 +169,6 @@ modules:
         url: https://commondatastorage.googleapis.com/chromium-browser-official/chromium-136.0.7103.59-lite.tar.xz
         sha256: a124a9bc3f6f3e24fa97c5ec59d94a040b774a8fbca2e1196bf39b240f0d42f2
       - patches/chromium/_sources.json
-      - patches/chromium-uc-fp/_sources.json
       - type: file
         path: io.github.ungoogled_software.ungoogled_chromium.desktop
       - type: file
