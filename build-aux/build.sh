@@ -35,6 +35,10 @@ CXXFLAGS+=' -Wno-unknown-warning-option'
 CFLAGS=${CFLAGS/-g }
 CXXFLAGS=${CXXFLAGS/-g }
 
+# Let Chromium set its own fortify level
+CFLAGS=${CFLAGS/-Wp,-D_FORTIFY_SOURCE=?}
+CXXFLAGS=${CXXFLAGS/-Wp,-D_FORTIFY_SOURCE=?}
+
 # https://github.com/ungoogled-software/ungoogled-chromium-archlinux/issues/123
 CFLAGS=${CFLAGS/-fexceptions}
 CFLAGS=${CFLAGS/-fcf-protection}
