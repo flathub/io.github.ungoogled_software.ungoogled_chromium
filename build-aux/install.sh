@@ -1,4 +1,5 @@
-#!/bin/bash -ex
+#!/bin/bash
+set -exo pipefail
 
 mkdir -p /app/chromium
 

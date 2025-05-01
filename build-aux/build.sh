@@ -1,4 +1,5 @@
-#!/bin/bash -ex
+#!/bin/bash
+set -exo pipefail
 
 ln_overwrite_all() {
 	rm -rf "${2}"
