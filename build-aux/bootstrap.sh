@@ -69,39 +69,49 @@ esac
 
 # Disabled features
 cat >> out/Release/args.gn <<-EOF
-	is_debug=false
-	use_sysroot=false
-	enable_vr=false
-	build_dawn_tests=false
-	enable_perfetto_unittests=false
-	enable_iterator_debugging=false
-	angle_has_histograms=false
 	angle_build_tests=false
+	angle_has_histograms=false
+	blink_enable_generated_code_formatting=false
 	build_angle_perftests=false
+	build_dawn_tests=false
+	devtools_skip_typecheck=false
+	enable_iterator_debugging=false
+	enable_nocompile_tests=false
+	enable_perfetto_unittests=false
+	enable_pseudolocales=false
+	enable_screen_ai_browsertests=false
+	enable_update_notifications=false
+	enable_updater=false
+	enable_vr=false
+	icu_use_data_file=false
+	is_debug=false
+	rtc_build_examples=false
+	skia_enable_skshaper_tests=false
+	symbol_level=0
+	tint_build_unittests=false
 	use_qt5=false
 	use_qt6=false
-	icu_use_data_file=false
+	use_sysroot=false
+	use_system_libtiff=false
 EOF
 
 # Enabled features
 cat >> out/Release/args.gn <<-EOF
+	chrome_pgo_phase=2
+	ffmpeg_branding="Chrome"
 	is_official_build=true
-	use_thin_lto=true
-	symbol_level=0
-	use_pulseaudio=true
 	link_pulseaudio=true
+	proprietary_codecs=true
 	rtc_use_pipewire=true
+	use_pulseaudio=true
+	use_system_freetype=true
+	use_system_harfbuzz=true
 	use_system_lcms2=true
 	use_system_libjpeg=true
 	use_system_libopenjpeg2=true
 	use_system_libpng=true
-	use_system_libtiff=false
-	use_system_freetype=true
-	use_system_harfbuzz=true
 	use_system_libwayland=true
-	proprietary_codecs=true
-	ffmpeg_branding="Chrome"
-	chrome_pgo_phase=2
+	use_system_minigbm=true
 EOF
 
 # Bootstrap GN
