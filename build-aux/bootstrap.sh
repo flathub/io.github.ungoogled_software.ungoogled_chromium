@@ -86,7 +86,6 @@ EOF
 # Enabled features
 cat >> out/Release/args.gn <<-EOF
 	is_official_build=true
-	is_cfi=true
 	use_thin_lto=true
 	symbol_level=0
 	use_pulseaudio=true
