@@ -71,7 +71,6 @@ esac
 cat >> out/Release/args.gn <<-EOF
 	is_debug=false
 	use_sysroot=false
-	safe_browsing_use_unrar=false
 	enable_vr=false
 	build_dawn_tests=false
 	enable_perfetto_unittests=false
@@ -86,7 +85,6 @@ EOF
 
 # Enabled features
 cat >> out/Release/args.gn <<-EOF
-	use_gio=true
 	is_official_build=true
 	is_cfi=true
 	use_thin_lto=true
@@ -94,7 +92,6 @@ cat >> out/Release/args.gn <<-EOF
 	use_pulseaudio=true
 	link_pulseaudio=true
 	rtc_use_pipewire=true
-	v8_enable_backtrace=true
 	use_system_lcms2=true
 	use_system_libjpeg=true
 	use_system_libopenjpeg2=true
