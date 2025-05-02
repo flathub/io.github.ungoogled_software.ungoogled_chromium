@@ -23,6 +23,10 @@ export NM=nm
 # https://github.com/ungoogled-software/ungoogled-chromium/pull/2696#issuecomment-1918173198
 export RUSTC_BOOTSTRAP=1
 
+# Initialize our own compiler flags
+export CFLAGS='' CXXFLAGS=''
+unset LDFLAGS RUSTFLAGS
+
 # Facilitate deterministic builds (taken from build/config/compiler/BUILD.gn)
 CFLAGS+='   -Wno-builtin-macro-redefined'
 CXXFLAGS+=' -Wno-builtin-macro-redefined'
@@ -31,28 +35,6 @@ CPPFLAGS+=' -D__DATE__=  -D__TIME__=  -D__TIMESTAMP__='
 # Do not warn about unknown warning options
 CFLAGS+='   -Wno-unknown-warning-option'
 CXXFLAGS+=' -Wno-unknown-warning-option'
-
-# Let Chromium set its own symbol level
-CFLAGS=${CFLAGS/-g }
-CXXFLAGS=${CXXFLAGS/-g }
-
-# Let Chromium set its own fortify level
-CFLAGS=${CFLAGS/-Wp,-D_FORTIFY_SOURCE=?}
-CXXFLAGS=${CXXFLAGS/-Wp,-D_FORTIFY_SOURCE=?}
-
-# https://github.com/ungoogled-software/ungoogled-chromium-archlinux/issues/123
-CFLAGS=${CFLAGS/-fexceptions}
-CFLAGS=${CFLAGS/-fcf-protection}
-CXXFLAGS=${CXXFLAGS/-fexceptions}
-CXXFLAGS=${CXXFLAGS/-fcf-protection}
-
-# This appears to cause random segfaults when combined with ThinLTO
-# https://bugs.archlinux.org/task/73518
-CFLAGS=${CFLAGS/-fstack-clash-protection}
-CXXFLAGS=${CXXFLAGS/-fstack-clash-protection}
-
-# https://crbug.com/957519#c122
-CXXFLAGS=${CXXFLAGS/-Wp,-D_GLIBCXX_ASSERTIONS}
 
 # Configure and build Chromium
 out/Release/gn gen out/Release
