@@ -22,7 +22,12 @@ TOPLEVEL_FILES=(
 )
 
 cp -v "${TOPLEVEL_FILES[@]/#/out/Release/}" /app/chromium/
+
 install -Dvm644 -t /app/chromium/locales out/Release/locales/*.pak
+for pak_file in /app/chromium/locales/*.pak; do
+	gzip -9n "${pak_file}"
+	mv "${pak_file}.gz" "${pak_file}"
+done
 
 for size in 24 48 64 128 256; do
 	install -Dvm644 "chrome/app/theme/chromium/product_logo_${size}.png" "/app/share/icons/hicolor/${size}x${size}/apps/io.github.ungoogled_software.ungoogled_chromium.png"
