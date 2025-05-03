@@ -23,8 +23,8 @@ export NM=nm
 # https://github.com/ungoogled-software/ungoogled-chromium/pull/2696#issuecomment-1918173198
 export RUSTC_BOOTSTRAP=1
 
-# Initialize our own compiler flags
-export CFLAGS='' CXXFLAGS=''
+# Initialize our own compiler flags and disable the SDK's defaults
+export CFLAGS='' CXXFLAGS='' CPPFLAGS=''
 unset LDFLAGS RUSTFLAGS
 
 # Facilitate deterministic builds (taken from build/config/compiler/BUILD.gn)
