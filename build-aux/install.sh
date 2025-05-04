@@ -23,10 +23,18 @@ TOPLEVEL_FILES=(
 
 cp -v "${TOPLEVEL_FILES[@]/#/out/Release/}" /app/chromium/
 
-install -Dvm644 -t /app/chromium/locales out/Release/locales/*.pak
-for pak_file in /app/chromium/locales/*.pak; do
-	gzip -9n "${pak_file}"
-	mv "${pak_file}.gz" "${pak_file}"
+mkdir -p /app/chromium/locales
+for locale_path in out/Release/locales/*.pak; do
+	locale_file=${locale_path##*/}
+	lang_region=${locale_file%.pak}
+	lang_code=${lang_region%%-*}
+
+	dest_dir="/app/share/runtime/locale/${lang_code}"
+	dest_file="${dest_dir}/${locale_file}"
+
+	mkdir -p "${dest_dir}"
+	gzip -9nc "${locale_path}" > "${dest_file}"
+	ln -svf "${dest_file}" "/app/chromium/locales/${locale_file}"
 done
 
 for size in 24 48 64 128 256; do
