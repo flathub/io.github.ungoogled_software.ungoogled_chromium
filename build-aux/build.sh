@@ -36,6 +36,11 @@ CPPFLAGS+=' -D__DATE__=  -D__TIME__=  -D__TIMESTAMP__='
 CFLAGS+='   -Wno-unknown-warning-option'
 CXXFLAGS+=' -Wno-unknown-warning-option'
 
+# Configure CCACHE for faster builds
+export CCACHE_COMPRESS=true
+export CCACHE_NOHASHDIR=true
+export CCACHE_SLOPPINESS=time_macros,include_file_ctime,include_file_mtime
+
 # Configure and build Chromium
 out/Release/gn gen out/Release
 ninja -C out/Release -j"${FLATPAK_BUILDER_N_JOBS}" chrome chrome_crashpad_handler

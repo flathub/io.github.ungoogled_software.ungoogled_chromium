@@ -78,6 +78,7 @@ cat >> out/Release/args.gn <<-EOF
 	enable_iterator_debugging=false
 	enable_nocompile_tests=false
 	enable_perfetto_unittests=false
+	enable_precompiled_headers=false
 	enable_pseudolocales=false
 	enable_screen_ai_browsertests=false
 	enable_update_notifications=false
@@ -97,7 +98,7 @@ EOF
 
 # Enabled features
 cat >> out/Release/args.gn <<-EOF
-	chrome_pgo_phase=2
+	cc_wrapper="ccache"
 	ffmpeg_branding="Chrome"
 	is_official_build=true
 	link_pulseaudio=true
