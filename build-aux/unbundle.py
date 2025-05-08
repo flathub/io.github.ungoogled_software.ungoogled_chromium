@@ -51,6 +51,8 @@ KEEPERS = (
     "absl_types",
     "absl_utility",
     "ffmpeg",  # https://crbug.com/40218408
+    "fontconfig",  # https://github.com/ungoogled-software/ungoogled-chromium-flatpak/issues/29
+    "freetype",  # https://github.com/ungoogled-software/ungoogled-chromium-flatpak/issues/29
     "libaom",  # https://crbug.com/aomedia/42302569
     "libvpx",  # https://crbug.com/1307941
     "zlib",  # https://crbug.com/40225256
