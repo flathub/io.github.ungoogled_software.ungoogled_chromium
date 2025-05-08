@@ -105,7 +105,6 @@ cat >> out/Release/args.gn <<-EOF
 	proprietary_codecs=true
 	rtc_use_pipewire=true
 	use_pulseaudio=true
-	use_system_freetype=true
 	use_system_harfbuzz=true
 	use_system_lcms2=true
 	use_system_libjpeg=true
