@@ -6,7 +6,8 @@ ln_overwrite_all() {
 	ln -svf "${1}" "${2}"
 }
 
-# Initialize our own compiler flags and disable the SDK's defaults
+# Set custom flags and disable SDK defaults
+# https://gitlab.com/freedesktop-sdk/freedesktop-sdk/-/blob/release/24.08/include/flags.yml
 export CFLAGS='' CXXFLAGS='' CPPFLAGS=''
 unset LDFLAGS RUSTFLAGS
 
@@ -64,38 +65,30 @@ cp "${bindgen_path}" bindgen/bin
 ln -s "${LIBCLANG_PATH}" -t bindgen
 
 # Determine the Rust toolchain version and sysroot
-export RUSTC_PATH=$(command -v rustc)
-if [[ -z "${RUSTC_PATH}" ]]; then
-	echo 'Error: rustc not found in PATH' >&2
-	exit 1
-fi
-export RUSTC_VERSION=$("${RUSTC_PATH}" -V)
-export RUST_SYSROOT=$("${RUSTC_PATH}" --print sysroot)
+RUST_SYSROOT_ABSOLUTE=$(rustc --print sysroot)
+RUSTC_VERSION=$(rustc -V)
+export RUST_SYSROOT_ABSOLUTE RUSTC_VERSION
 
-# Setup the Rust toolchain
+# Configure the Rust toolchain
 flags+=(
-	'rust_sysroot_absolute = getenv("RUST_SYSROOT")'
+	'rust_sysroot_absolute = getenv("RUST_SYSROOT_ABSOLUTE")'
 	'rust_bindgen_root = getenv("PWD") + "/bindgen"'
 	'rustc_version = getenv("RUSTC_VERSION")'
 )
 
 # Determine the Clang toolchain version and base path
-export CLANG_PATH=$(command -v clang)
-if [[ -z "${CLANG_PATH}" ]]; then
-	echo 'Error: clang not found in PATH' >&2
-	exit 1
-fi
-export CLANG_VERSION=$("${CLANG_PATH}" -dumpversion | awk -F. '{print $1}')
-export CLANG_BIN_DIR=$("${CLANG_PATH}" --version | awk '/^InstalledDir: / {sub(/^InstalledDir: /, ""); print}')
+CLANG_BASE_PATH=$(llvm-config --prefix)
+CLANG_VERSION=$(llvm-config --version | awk -F. '{print $1}')
+export CLANG_BASE_PATH CLANG_VERSION
 
-# Setup the Clang toolchain
+# Configure the Clang toolchain
 flags+=(
-	'clang_base_path = getenv("CLANG_BIN_DIR") + "/.."'
+	'clang_base_path = getenv("CLANG_BASE_PATH")'
 	'clang_version = getenv("CLANG_VERSION")'
 	'host_toolchain = "//build/toolchain/linux/unbundle:default"'
 )
 
-# Setup CCACHE if enabled by flatpak-builder
+# Use ccache if enabled by flatpak-builder
 if [[ "${CCACHE_DIR}" == "/run/ccache" ]]; then
 	flags+=('cc_wrapper = "ccache"')
 fi
@@ -117,32 +110,21 @@ case "${FLATPAK_ARCH}" in
 		;;
 esac
 
-# Disabled features
-flags+=('angle_build_tests = false')
-flags+=('angle_has_histograms = false')
-flags+=('blink_enable_generated_code_formatting = false')
-flags+=('build_angle_perftests = false')
-flags+=('build_dawn_tests = false')
-flags+=('devtools_skip_typecheck = false')
-flags+=('enable_iterator_debugging = false')
-flags+=('enable_nocompile_tests = false')
-flags+=('enable_perfetto_unittests = false')
-flags+=('enable_precompiled_headers = false')
-flags+=('enable_pseudolocales = false')
-flags+=('enable_screen_ai_browsertests = false')
-flags+=('enable_update_notifications = false')
-flags+=('enable_updater = false')
-flags+=('enable_vr = false')
+# The SDK provides libtiff 4.6.0, but TIFFOpenOptionsSetMaxCumulatedMemAlloc()
+# is available only from libtiff 4.7 onwards. Therefore, we disable the SDK's
+# libtiff and use the bundled version instead.
+flags+=('use_system_libtiff = false')
+
+# We need to disable ICU data file support when using system ICU. Note that
+# if we enable this option, we will need to copy icudtl.dat from out/Release
+# to the app directory.
 flags+=('icu_use_data_file = false')
-flags+=('is_debug = false')
-flags+=('rtc_build_examples = false')
-flags+=('skia_enable_skshaper_tests = false')
+
+# Disabled features
 flags+=('symbol_level = 0')
-flags+=('tint_build_unittests = false')
 flags+=('use_qt5 = false')
 flags+=('use_qt6 = false')
 flags+=('use_sysroot = false')
-flags+=('use_system_libtiff = false')
 
 # Enabled features
 flags+=('ffmpeg_branding = "Chrome"')
