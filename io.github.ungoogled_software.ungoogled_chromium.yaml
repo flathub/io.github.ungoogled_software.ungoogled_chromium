@@ -81,6 +81,33 @@ add-extensions:
     no-autodownload: true
     autodelete: true
 
+build-options:
+  append-path: /usr/lib/sdk/llvm20/bin:/usr/lib/sdk/rust-stable/bin
+  append-ld-library-path: /usr/lib/sdk/rust-stable/lib
+  env:
+    # Configure the build system to use the LLVM toolchain
+    AR: llvm-ar
+    CC: clang
+    CXX: clang++
+    NM: llvm-nm
+    RANLIB: llvm-ranlib
+    STRIP: llvm-strip
+
+    # Configure rust-bindgen to use the LLVM toolchain
+    LIBCLANG_PATH: /usr/lib/sdk/llvm20/lib
+
+    # Set paths to Node and OpenJDK
+    NODE_HOME: /usr/lib/sdk/node22
+    JAVA_HOME: /usr/lib/sdk/openjdk21
+
+    # Allow the use of nightly features with stable Rust compiler
+    # https://github.com/ungoogled-software/ungoogled-chromium/pull/2696#issuecomment-1918173198
+    RUSTC_BOOTSTRAP: '1'
+
+    # Configure CCACHE for faster builds
+    CCACHE_NOHASHDIR: 'true'
+    CCACHE_SLOPPINESS: time_macros,include_file_ctime,include_file_mtime
+
 sdk-extensions:
   - org.freedesktop.Sdk.Extension.llvm20
   - org.freedesktop.Sdk.Extension.node22
@@ -88,6 +115,15 @@ sdk-extensions:
   - org.freedesktop.Sdk.Extension.rust-stable
 
 modules:
+  - name: ccache-setup
+    buildsystem: simple
+    build-commands:
+      - |
+        set -euxo pipefail
+        [ "${CCACHE_DIR}" = /run/ccache ] || exit 0
+        ln -svf /usr/bin/ccache /run/ccache/bin/clang
+        ln -svf /usr/bin/ccache /run/ccache/bin/clang++
+
   - name: dconf
     buildsystem: meson
     config-opts:
@@ -116,48 +152,19 @@ modules:
     buildsystem: simple
     build-commands:
       # Chromium expects to find readelf with its full toolprefix on arm64
-      - ln -s /usr/bin/readelf /app/bin/aarch64-linux-gnu-readelf
+      - ln -s /usr/bin/readelf "${FLATPAK_DEST}/bin/aarch64-linux-gnu-readelf"
 
   - name: extensions
     buildsystem: simple
     build-commands:
-      - mkdir -p /app/chromium/{extensions,native-messaging-hosts,policies}
-      - for dir in native-messaging-hosts policies; do ln -s /app/chromium/{$dir,extensions}/$dir;
+      - mkdir -p "${FLATPAK_DEST}/chromium/"{extensions,native-messaging-hosts,policies}
+      - for dir in native-messaging-hosts policies; do ln -sfv "${FLATPAK_DEST}/chromium/"{${dir},extensions}"/${dir}";
         done
-      - touch /app/chromium/extensions/no-mount-stamp
-
-  - name: rust-bindgen
-    buildsystem: simple
-    build-options:
-      strip: false
-      no-debuginfo: true
-      prepend-path: /usr/lib/sdk/rust-stable/bin
-      env:
-        CARGO_HOME: /run/build/rust-bindgen/cargo
-    build-commands:
-      - cargo --offline fetch --manifest-path Cargo.toml --verbose
-      - cargo --offline build --release --verbose
-      - install -Dm 755 target/release/bindgen -t /app/lib/sdk/bindgen/bin
-    sources:
-      - type: git
-        url: https://github.com/rust-lang/rust-bindgen
-        commit: af7fd38d5e80514406fb6a8bba2d407d252c30b9
-        tag: v0.71.1
-        x-checker-data:
-          type: git
-          tag-pattern: v(.+)
-      - ./generated-sources.bindgen.json
-    cleanup:
-      - '*'
+      - touch "${FLATPAK_DEST}/chromium/extensions/no-mount-stamp"
 
   - name: chromium
     buildsystem: simple
-    build-options:
-      prepend-ld-library-path: /usr/lib/sdk/rust-stable/lib
     build-commands:
-      - ./apply-uc-patches.sh
-      - ./unbundle.py
-      - ./bootstrap.sh
       - ./build.sh
       - ./install.sh
     sources:
@@ -180,5 +187,4 @@ modules:
       - type: dir
         path: build-aux
       - type: dir
-        path: branding
-        dest: branding
+        path: branding/to_copy
