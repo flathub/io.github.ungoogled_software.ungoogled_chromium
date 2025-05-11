@@ -85,7 +85,7 @@ build-options:
   append-path: /usr/lib/sdk/llvm20/bin:/usr/lib/sdk/rust-stable/bin
   append-ld-library-path: /usr/lib/sdk/rust-stable/lib
   env:
-    # Configure the build system to use the LLVM toolchain
+    # Use LLVM for builds
     AR: llvm-ar
     CC: clang
     CXX: clang++
@@ -93,12 +93,12 @@ build-options:
     RANLIB: llvm-ranlib
     STRIP: llvm-strip
 
-    # Configure rust-bindgen to use the LLVM toolchain
+    # Point bindgen to LLVM's libclang
     LIBCLANG_PATH: /usr/lib/sdk/llvm20/lib
 
-    # Set paths to Node and OpenJDK
+    # Paths to Node.js and OpenJDK
     NODE_HOME: /usr/lib/sdk/node22
-    JAVA_HOME: /usr/lib/sdk/openjdk21
+    JAVA_HOME: /usr/lib/sdk/openjdk
 
     # Allow the use of nightly features with stable Rust compiler
     # https://github.com/ungoogled-software/ungoogled-chromium/pull/2696#issuecomment-1918173198
@@ -111,11 +111,11 @@ build-options:
 sdk-extensions:
   - org.freedesktop.Sdk.Extension.llvm20
   - org.freedesktop.Sdk.Extension.node22
-  - org.freedesktop.Sdk.Extension.openjdk21
+  - org.freedesktop.Sdk.Extension.openjdk
   - org.freedesktop.Sdk.Extension.rust-stable
 
 modules:
-  - name: ccache-setup
+  - name: setup-ccache-clang
     buildsystem: simple
     build-commands:
       - |
