@@ -84,6 +84,7 @@ add-extensions:
 build-options:
   append-path: /usr/lib/sdk/llvm20/bin:/usr/lib/sdk/rust-stable/bin
   append-ld-library-path: /usr/lib/sdk/rust-stable/lib
+  ldflags: -fuse-ld=/usr/lib/sdk/rust-stable/bin/mold
   env:
     # Use LLVM for builds
     AR: llvm-ar
@@ -104,6 +105,12 @@ build-options:
     # https://github.com/ungoogled-software/ungoogled-chromium/pull/2696#issuecomment-1918173198
     RUSTC_BOOTSTRAP: '1'
 
+    # Configure Rust to use mold as the linker
+    CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER: clang
+    CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUSTFLAGS: -C link-arg=-fuse-ld=/usr/lib/sdk/rust-stable/bin/mold
+    CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: clang
+    CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_RUSTFLAGS: -C link-arg=-fuse-ld=/usr/lib/sdk/rust-stable/bin/mold
+
     # Configure CCACHE for faster builds
     CCACHE_NOHASHDIR: 'true'
     CCACHE_SLOPPINESS: time_macros,include_file_ctime,include_file_mtime
@@ -115,7 +122,7 @@ sdk-extensions:
   - org.freedesktop.Sdk.Extension.rust-stable
 
 modules:
-  - name: setup-ccache-clang
+  - name: clang-ccache-symlink
     buildsystem: simple
     build-commands:
       - |
@@ -123,6 +130,21 @@ modules:
         [ "${CCACHE_DIR}" = /run/ccache ] || exit 0
         ln -svf /usr/bin/ccache /run/ccache/bin/clang
         ln -svf /usr/bin/ccache /run/ccache/bin/clang++
+
+  - name: readelf-symlink
+    only-arches: [aarch64]
+    buildsystem: simple
+    build-commands:
+      # Chromium expects to find readelf with its full toolprefix on arm64
+      - ln -sfv /usr/bin/readelf "${FLATPAK_DEST}/bin/aarch64-linux-gnu-readelf"
+
+  - name: extensions
+    buildsystem: simple
+    build-commands:
+      - mkdir -pv "${FLATPAK_DEST}/chromium/"{extensions,native-messaging-hosts,policies}
+      - for dir in native-messaging-hosts policies; do ln -sfv "${FLATPAK_DEST}/chromium/"{${dir},extensions}"/${dir}";
+        done
+      - touch "${FLATPAK_DEST}/chromium/extensions/no-mount-stamp"
 
   - name: dconf
     buildsystem: meson
@@ -146,21 +168,6 @@ modules:
           name: dconf
           stable-only: true
       - patches/dconf/_sources.json
-
-  - name: readelf-symlink
-    only-arches: [aarch64]
-    buildsystem: simple
-    build-commands:
-      # Chromium expects to find readelf with its full toolprefix on arm64
-      - ln -s /usr/bin/readelf "${FLATPAK_DEST}/bin/aarch64-linux-gnu-readelf"
-
-  - name: extensions
-    buildsystem: simple
-    build-commands:
-      - mkdir -p "${FLATPAK_DEST}/chromium/"{extensions,native-messaging-hosts,policies}
-      - for dir in native-messaging-hosts policies; do ln -sfv "${FLATPAK_DEST}/chromium/"{${dir},extensions}"/${dir}";
-        done
-      - touch "${FLATPAK_DEST}/chromium/extensions/no-mount-stamp"
 
   - name: chromium
     buildsystem: simple

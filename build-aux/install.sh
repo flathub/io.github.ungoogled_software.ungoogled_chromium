@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euxo pipefail
 
-mkdir -p "${FLATPAK_DEST}/chromium"
+mkdir -pv "${FLATPAK_DEST}/chromium"
 
 TOPLEVEL_FILES=(
 	chrome
@@ -23,7 +23,7 @@ TOPLEVEL_FILES=(
 
 cp -v "${TOPLEVEL_FILES[@]/#/out/Release/}" "${FLATPAK_DEST}/chromium/"
 
-mkdir -p "${FLATPAK_DEST}/chromium/locales"
+mkdir -pv "${FLATPAK_DEST}/chromium/locales"
 for locale_path in out/Release/locales/*.pak; do
 	locale_file=${locale_path##*/}
 	lang_region=${locale_file%.pak}
@@ -32,7 +32,7 @@ for locale_path in out/Release/locales/*.pak; do
 	dest_dir="${FLATPAK_DEST}/share/runtime/locale/${lang_code}"
 	dest_file="${dest_dir}/${locale_file}"
 
-	mkdir -p "${dest_dir}"
+	mkdir -pv "${dest_dir}"
 	gzip -9nc "${locale_path}" > "${dest_file}"
 	ln -svf "${dest_file}" "${FLATPAK_DEST}/chromium/locales/${locale_file}"
 done
