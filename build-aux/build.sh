@@ -8,7 +8,7 @@ ln_overwrite_all() {
 
 # Set custom flags and disable SDK defaults
 # https://gitlab.com/freedesktop-sdk/freedesktop-sdk/-/blob/release/24.08/include/flags.yml
-export CFLAGS='' CXXFLAGS='' CPPFLAGS=''
+export CFLAGS= CXXFLAGS= CPPFLAGS=
 unset LDFLAGS RUSTFLAGS
 
 # Facilitate deterministic builds (taken from build/config/compiler/BUILD.gn)
@@ -55,14 +55,14 @@ flags+=('custom_toolchain = "//build/toolchain/linux/unbundle:default"')
 # Required so that rust-bindgen can find libclang
 # https://rust-lang.github.io/rust-bindgen/requirements.html
 # https://source.chromium.org/chromium/chromium/src/+/main:build/rust/rust_bindgen.gni;l=20-27;drc=09afac1d1aa18250073002ddedd0e064e4c2a981
-mkdir -p bindgen/bin
+mkdir -pv bindgen/bin
 bindgen_path=$(command -v bindgen)
 if [[ -z "${bindgen_path}" ]]; then
 	echo 'Error: bindgen not found in PATH' >&2
 	exit 1
 fi
-cp "${bindgen_path}" bindgen/bin
-ln -s "${LIBCLANG_PATH}" -t bindgen
+ln -svf "${bindgen_path}" bindgen/bin/bindgen
+ln -svf "${LIBCLANG_PATH}" -t bindgen
 
 # Determine the Rust toolchain version and sysroot
 RUST_SYSROOT_ABSOLUTE=$(rustc --print sysroot)
