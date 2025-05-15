@@ -115,7 +115,7 @@ sdk-extensions:
   - org.freedesktop.Sdk.Extension.rust-stable
 
 modules:
-  - name: setup-ccache-clang
+  - name: clang-ccache-symlink
     buildsystem: simple
     build-commands:
       - |
@@ -123,6 +123,21 @@ modules:
         [ "${CCACHE_DIR}" = /run/ccache ] || exit 0
         ln -svf /usr/bin/ccache /run/ccache/bin/clang
         ln -svf /usr/bin/ccache /run/ccache/bin/clang++
+
+  - name: readelf-symlink
+    only-arches: [aarch64]
+    buildsystem: simple
+    build-commands:
+      # Chromium expects to find readelf with its full toolprefix on arm64
+      - ln -sfv /usr/bin/readelf "${FLATPAK_DEST}/bin/aarch64-linux-gnu-readelf"
+
+  - name: extensions
+    buildsystem: simple
+    build-commands:
+      - mkdir -pv "${FLATPAK_DEST}/chromium/"{extensions,native-messaging-hosts,policies}
+      - for dir in native-messaging-hosts policies; do ln -sfv "${FLATPAK_DEST}/chromium/"{${dir},extensions}"/${dir}";
+        done
+      - touch "${FLATPAK_DEST}/chromium/extensions/no-mount-stamp"
 
   - name: dconf
     buildsystem: meson
@@ -147,21 +162,6 @@ modules:
           stable-only: true
       - patches/dconf/_sources.json
 
-  - name: readelf-symlink
-    only-arches: [aarch64]
-    buildsystem: simple
-    build-commands:
-      # Chromium expects to find readelf with its full toolprefix on arm64
-      - ln -s /usr/bin/readelf "${FLATPAK_DEST}/bin/aarch64-linux-gnu-readelf"
-
-  - name: extensions
-    buildsystem: simple
-    build-commands:
-      - mkdir -p "${FLATPAK_DEST}/chromium/"{extensions,native-messaging-hosts,policies}
-      - for dir in native-messaging-hosts policies; do ln -sfv "${FLATPAK_DEST}/chromium/"{${dir},extensions}"/${dir}";
-        done
-      - touch "${FLATPAK_DEST}/chromium/extensions/no-mount-stamp"
-
   - name: chromium
     buildsystem: simple
     build-commands:
@@ -170,11 +170,11 @@ modules:
     sources:
       - type: git
         url: https://github.com/ungoogled-software/ungoogled-chromium
-        commit: ecacfbbb500a86d206597e20bc17e53a11c9bac5
+        commit: 1a4952eb9ee8653b3bb45e3abe6e9736eeec6de0
         dest: uc
       - type: archive
-        url: https://chromium-tarballs.distfiles.gentoo.org/chromium-136.0.7103.92-linux.tar.xz
-        sha256: fbb59ab84bcd877c5fc6714b6cfa29bc3548d0f0d894fc2edd9e0c037272e56e
+        url: https://chromium-tarballs.distfiles.gentoo.org/chromium-136.0.7103.113-linux.tar.xz
+        sha256: 2eec4669d1aa6c72f7df0e5f3b106751996eed2b0e1edd7ac0dc59a74ca010d8
       - patches/chromium/_sources.json
       - type: file
         path: io.github.ungoogled_software.ungoogled_chromium.desktop
