@@ -2,13 +2,13 @@
 set -euxo pipefail
 
 ln_overwrite_all() {
-	rm -rfv "${2}"
-	ln -svf "${1}" "${2}"
+	rm -rfv "$2"
+	ln -svf "$1" "$2"
 }
 
 # Set custom flags and disable SDK defaults
 # https://gitlab.com/freedesktop-sdk/freedesktop-sdk/-/blob/release/24.08/include/flags.yml
-export CFLAGS= CXXFLAGS= CPPFLAGS=
+export CFLAGS='' CXXFLAGS='' CPPFLAGS=''
 unset LDFLAGS RUSTFLAGS
 
 # Facilitate deterministic builds (taken from build/config/compiler/BUILD.gn)
