@@ -5,21 +5,21 @@ set -euo pipefail
 widevine_ver_url="https://dl.google.com/widevine-cdm/versions.txt"
 widevine_ver="$(wget -qO- "${widevine_ver_url}" | tail -n1)"
 if [[ -z "${widevine_ver}" ]]; then
-    echo "Error: Failed to get WideVine version from ${widevine_ver_url}" >&2
-    exit 1
+	echo "Error: Failed to get WideVine version from ${widevine_ver_url}" >&2
+	exit 1
 fi
 
 # Determine architecture
 arch="$(uname -m)"
 case "${arch}" in
-    x86_64)
-        widevine_arch="x64"
-        chromium_arch="x64"
-        ;;
-    *)
-        echo "Error: Unsupported architecture ${arch}" >&2
-        exit 1
-        ;;
+	x86_64)
+		widevine_arch="x64"
+		chromium_arch="x64"
+		;;
+	*)
+		echo "Error: Unsupported architecture ${arch}" >&2
+		exit 1
+		;;
 esac
 
 # Create temporary files/directories and set up cleanup
@@ -33,10 +33,10 @@ echo "======================================================================"
 echo "Downloading WideVine version ${widevine_ver} for ${widevine_arch}..."
 echo "URL: ${widevine_zip_url}"
 if ! wget -qO "${tmp_zip}" "${widevine_zip_url}"; then
-    echo "----------------------------------------------------------------------" >&2
-    echo "Error: Failed to download WideVine from ${widevine_zip_url}" >&2
-    echo "======================================================================" >&2
-    exit 1
+	echo "----------------------------------------------------------------------" >&2
+	echo "Error: Failed to download WideVine from ${widevine_zip_url}" >&2
+	echo "======================================================================" >&2
+	exit 1
 fi
 echo "Download complete."
 echo "======================================================================"
@@ -44,10 +44,10 @@ echo "======================================================================"
 # Extract WideVine
 echo "Extracting WideVine..."
 if ! unzip -qod "${tmp_dir}" "${tmp_zip}"; then
-    echo "----------------------------------------------------------------------" >&2
-    echo "Error: Failed to extract ${tmp_zip} to ${tmp_dir}" >&2
-    echo "======================================================================" >&2
-    exit 1
+	echo "----------------------------------------------------------------------" >&2
+	echo "Error: Failed to extract ${tmp_zip} to ${tmp_dir}" >&2
+	echo "======================================================================" >&2
+	exit 1
 fi
 echo "Extraction complete."
 echo "======================================================================"

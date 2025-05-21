@@ -120,7 +120,7 @@ modules:
     build-commands:
       - |
         set -euxo pipefail
-        [ "${CCACHE_DIR}" = /run/ccache ] || exit 0
+        [[ "${CCACHE_DIR}" = "/run/ccache" ]] || exit 0
         ln -svf /usr/bin/ccache /run/ccache/bin/clang
         ln -svf /usr/bin/ccache /run/ccache/bin/clang++
 
@@ -134,8 +134,8 @@ modules:
   - name: extensions
     buildsystem: simple
     build-commands:
-      - mkdir -pv "${FLATPAK_DEST}/chromium/"{extensions,native-messaging-hosts,policies}
-      - for dir in native-messaging-hosts policies; do ln -sfv "${FLATPAK_DEST}/chromium/"{${dir},extensions}"/${dir}";
+      - mkdir -pv "${FLATPAK_DEST}"/chromium/{extensions,native-messaging-hosts,policies}
+      - for dir in native-messaging-hosts policies; do ln -sfv "${FLATPAK_DEST}/chromium/"{"${dir}",extensions}"/${dir}";
         done
       - touch "${FLATPAK_DEST}/chromium/extensions/no-mount-stamp"
 
