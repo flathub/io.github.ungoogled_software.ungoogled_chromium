@@ -1,0 +1,10 @@
+[
+  {
+    "type": "patch",
+    "paths": [
+      "patches/chromium-uc/Reland-Use-global_allocator-to-provide-Rust-allocato.patch",
+      "patches/chromium-uc/Call-Rust-default-allocator-directly-from-Rust.patch",
+      "patches/chromium-uc/Roll-rust-only-f7b43542838f0a4a6cfdb17fbeadf45002042.patch"
+    ]
+  }
+]
