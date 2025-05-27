@@ -70,6 +70,7 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="137.0.7151.40-1" date="2025-05-27" />
     <release version="136.0.7103.113-1" date="2025-05-15" />
     <release version="136.0.7103.92-1" date="2025-05-08" />
     <release version="136.0.7103.59-1" date="2025-04-30" />

@@ -14,4 +14,4 @@ COMMIT_MSG="Update Ungoogled Chromium to ${VERSION}"
 sed -i "/<releases>/a \\
     <release version=\"${VERSION}\" date=\"${DATE}\" />" "${METAFILE}"
 git add "${METAFILE}"
-git commit -m "${COMMIT_MSG}"
+git commit -sm "${COMMIT_MSG}"
