@@ -170,11 +170,11 @@ modules:
     sources:
       - type: git
         url: https://github.com/ungoogled-software/ungoogled-chromium
-        commit: 76f98dc4eb94681cd0d585854928127233354b08
+        commit: dbb383d84e3a4dbf5bed3322fc9b1b3b5b7c20f3
         dest: uc
       - type: archive
-        url: https://chromium-tarballs.distfiles.gentoo.org/chromium-137.0.7151.55-linux.tar.xz
-        sha256: 7b8fa89febed9fae0297c8175bd35cc912d794fbf03d33a121a0bc9d3d13ef34
+        url: https://chromium-tarballs.distfiles.gentoo.org/chromium-137.0.7151.68-linux.tar.xz
+        sha256: 63dfb8509737466ac4de636ddf3d8110f1434e0c4999ba5e6f34891439dbfe20
       - patches/chromium/_sources.json
       - type: patch
         path: patches/pdfium-fix-build-with-system-libpng.patch
