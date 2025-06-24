@@ -170,17 +170,12 @@ modules:
     sources:
       - type: git
         url: https://github.com/ungoogled-software/ungoogled-chromium
-        commit: 9a900f1e48fbdf0da1f0ece4d69064b2f19e1be8
+        commit: 935d22973092d51c73f9f2785389201d2978eca7
         dest: uc
       - type: archive
-        url: https://commondatastorage.googleapis.com/chromium-browser-official/chromium-137.0.7151.119-lite.tar.xz
-        sha256: 515ee24f24a24a68ec2a4ddbe58e460097769771039e3364ac89e6681fd4cae1
+        url: https://commondatastorage.googleapis.com/chromium-browser-official/chromium-138.0.7204.35-lite.tar.xz
+        sha256: b92bca69ad568309c2250dfc1b105e7a2420b6dea8b50ee85e69ed387100f376
       - patches/chromium/_sources.json
-      - type: patch
-        path: patches/pdfium-fix-build-with-system-libpng.patch
-        options:
-          - -d
-          - third_party/pdfium
       - type: file
         path: io.github.ungoogled_software.ungoogled_chromium.desktop
       - type: file
