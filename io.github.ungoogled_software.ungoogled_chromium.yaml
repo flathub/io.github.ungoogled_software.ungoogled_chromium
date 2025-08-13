@@ -82,8 +82,7 @@ add-extensions:
     autodelete: true
 
 build-options:
-  append-path: /usr/lib/sdk/llvm20/bin:/usr/lib/sdk/rust-stable/bin
-  append-ld-library-path: /usr/lib/sdk/rust-stable/lib
+  append-path: /usr/lib/sdk/llvm20/bin
   env:
     # Use LLVM for builds
     AR: llvm-ar
@@ -112,7 +111,6 @@ sdk-extensions:
   - org.freedesktop.Sdk.Extension.llvm20
   - org.freedesktop.Sdk.Extension.node22
   - org.freedesktop.Sdk.Extension.openjdk
-  - org.freedesktop.Sdk.Extension.rust-stable
 
 modules:
   - name: clang-ccache-symlink
@@ -162,19 +160,87 @@ modules:
           stable-only: true
       - patches/dconf/_sources.json
 
+  - name: rust-nightly
+    buildsystem: simple
+    build-options:
+      strip: false
+      no-debuginfo: true
+    cleanup:
+      - '*'
+    sources:
+      - type: archive
+        only-arches:
+          - aarch64
+        dest: rust
+        url: https://static.rust-lang.org/dist/2025-04-21/rust-nightly-aarch64-unknown-linux-gnu.tar.xz
+        sha256: 8853c6793fb22b1d005592f584d986262454de838bddc61cedc14a12442795ec
+        # x-checker-data:
+        #  type: rust
+        #  package: rust
+        #  channel: nightly
+        #  target: aarch64-unknown-linux-gnu
+      - type: archive
+        only-arches:
+          - x86_64
+        dest: rust
+        url: https://static.rust-lang.org/dist/2025-04-21/rust-nightly-x86_64-unknown-linux-gnu.tar.xz
+        sha256: 633ef7829cbfa55f0465f7a9aa616f550ed24f5c06c3eeb174e9be0e5e4a0505
+        # x-checker-data:
+        #  type: rust
+        #  package: rust
+        #  channel: nightly
+        #  target: x86_64-unknown-linux-gnu
+      - type: archive
+        dest: rust-src
+        url: https://static.rust-lang.org/dist/2025-04-21/rust-src-nightly.tar.xz
+        sha256: 76fbba0a950e707c5172deb9e892e3302bab942b8f60b1b9075b4bab01b61407
+        # x-checker-data:
+        #  type: rust
+        #  package: rust-src
+        #  channel: nightly
+        #  target: '*'
+    build-commands:
+      - cd rust && ./install.sh --prefix=/app/lib/sdk/rust-nightly --without=rust-docs
+        --without=rust-docs-json-preview --disable-ldconfig --verbose
+      - cd rust-src && ./install.sh --prefix=/app/lib/sdk/rust-nightly --disable-ldconfig
+        --verbose
+
+  - name: rust-bindgen
+    buildsystem: simple
+    build-options:
+      strip: false
+      no-debuginfo: true
+      prepend-path: /app/lib/sdk/rust-nightly/bin
+      env:
+        CARGO_HOME: /run/build/rust-bindgen/cargo
+    build-commands:
+      - cargo --offline fetch --manifest-path Cargo.toml --verbose
+      - cargo --offline build --release --verbose
+      - install -Dm 755 target/release/bindgen -t /app/lib/sdk/bindgen/bin
+    sources:
+      - type: git
+        url: https://chromium.googlesource.com/external/github.com/rust-lang/rust-bindgen
+        commit: f93d5dfa6d5d7409bea584f3eab38e1fc52b8360
+      - ./generated-sources.bindgen.json
+    cleanup:
+      - '*'
+      
   - name: chromium
     buildsystem: simple
+    build-options:
+      prepend-ld-library-path: /app/lib/sdk/rust-nightly/lib
+      prepend-path: /app/lib/sdk/rust-nightly/bin:/app/lib/sdk/bindgen/bin
     build-commands:
       - ./build.sh
       - ./install.sh
     sources:
       - type: git
         url: https://github.com/ungoogled-software/ungoogled-chromium
-        commit: a078b9be0f51f5b866edc0fd21996d4c7816f07f
+        commit: bcd55afb27f27318848f0b76accda84ce9c40b89
         dest: uc
       - type: archive
-        url: https://commondatastorage.googleapis.com/chromium-browser-official/chromium-139.0.7258.66-lite.tar.xz
-        sha256: 8cd37b224dba4fc5e3c8ac98cc278d17a713a3b5a2f1dbb241ad94caca83d630
+        url: https://commondatastorage.googleapis.com/chromium-browser-official/chromium-139.0.7258.127-lite.tar.xz
+        sha256: 140e6a3b5f21f128d807812befdc15bc1eb0b1bf9c9f4445414236272b50646e
       - patches/chromium/_sources.json
       - type: file
         path: io.github.ungoogled_software.ungoogled_chromium.desktop
