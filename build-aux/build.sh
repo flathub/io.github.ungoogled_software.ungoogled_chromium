@@ -115,11 +115,6 @@ esac
 # libtiff and use the bundled version instead.
 flags+=('use_system_libtiff = false')
 
-# We need to disable ICU data file support when using system ICU. Note that
-# if we enable this option, we will need to copy icudtl.dat from out/Release
-# to the app directory.
-flags+=('icu_use_data_file = false')
-
 # Disabled features
 flags+=('symbol_level = 0')
 flags+=('use_qt5 = false')
