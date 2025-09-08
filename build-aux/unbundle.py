@@ -51,6 +51,7 @@ KEEPERS = (
     "absl_types",
     "absl_utility",
     "ffmpeg",  # https://crbug.com/40218408
+    "icu",     # https://github.com/flathub/io.github.ungoogled_software.ungoogled_chromium/pull/142#issuecomment-3267736499
     "libaom",  # https://crbug.com/aomedia/42302569
     "libvpx",  # https://crbug.com/1307941
     "zlib",  # https://crbug.com/40225256

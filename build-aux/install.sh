@@ -8,6 +8,7 @@ TOPLEVEL_FILES=(
 	chrome_100_percent.pak
 	chrome_200_percent.pak
 	chrome_crashpad_handler
+	icudtl.dat
 	resources.pak
 	v8_context_snapshot.bin
 
