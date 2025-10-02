@@ -120,6 +120,7 @@ flags+=('symbol_level = 0')
 flags+=('use_qt5 = false')
 flags+=('use_qt6 = false')
 flags+=('use_sysroot = false')
+flags+=('use_clang_modules = false')
 
 # Enabled features
 flags+=('ffmpeg_branding = "Chrome"')
