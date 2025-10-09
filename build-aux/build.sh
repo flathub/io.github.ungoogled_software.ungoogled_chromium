@@ -91,6 +91,7 @@ flags+=(
 # Use ccache if enabled by flatpak-builder
 if [[ "${CCACHE_DIR}" == "/run/ccache" ]]; then
 	flags+=('cc_wrapper = "ccache"')
+	flags+=('chrome_pgo_phase = 0')
 fi
 
 # Use VAAPI on x86_64 and V4L2 on aarch64
