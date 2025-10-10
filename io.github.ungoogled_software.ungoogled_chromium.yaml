@@ -104,10 +104,6 @@ build-options:
     # https://github.com/ungoogled-software/ungoogled-chromium/pull/2696#issuecomment-1918173198
     RUSTC_BOOTSTRAP: '1'
 
-    # Configure CCACHE for faster builds
-    CCACHE_NOHASHDIR: 'true'
-    CCACHE_SLOPPINESS: time_macros,include_file_ctime,include_file_mtime
-
 sdk-extensions:
   - org.freedesktop.Sdk.Extension.llvm20
   - org.freedesktop.Sdk.Extension.node22
@@ -123,6 +119,22 @@ modules:
         [[ "${CCACHE_DIR}" = "/run/ccache" ]] || exit 0
         ln -svf /usr/bin/ccache /run/ccache/bin/clang
         ln -svf /usr/bin/ccache /run/ccache/bin/clang++
+
+  - name: ccache-setup
+    buildsystem: simple
+    build-commands:
+      - |
+        set -euxo pipefail
+        [[ "${CCACHE_DIR}" = "/run/ccache" ]] || exit 0
+        ccache --set-config=compression=true
+        ccache --set-config=compression_level=6
+        ccache --set-config=hash_dir=false
+        ccache --set-config=max_size=8G
+        ccache --set-config=sloppiness=time_macros,include_file_ctime,include_file_mtime
+        ccache --recompress 6
+        ccache --cleanup
+        ccache --show-stats --zero-stats -vv
+        ccache --show-config
 
   - name: readelf-symlink
     only-arches: [aarch64]
@@ -189,3 +201,12 @@ modules:
         path: build-aux
       - type: dir
         path: branding/to_copy
+
+  - name: ccache-final-stats
+    buildsystem: simple
+    build-commands:
+      - |
+        set -euxo pipefail
+        [[ "${CCACHE_DIR}" = "/run/ccache" ]] || exit 0
+        ccache --show-stats -vv
+        ccache --show-config
