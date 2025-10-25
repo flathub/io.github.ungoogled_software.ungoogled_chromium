@@ -3,7 +3,7 @@ app-id: io.github.ungoogled_software.ungoogled_chromium.Extension.block-dinosaur
 branch: '1'
 runtime: io.github.ungoogled_software.ungoogled_chromium
 runtime-version: stable
-sdk: org.freedesktop.Sdk//24.08
+sdk: org.freedesktop.Sdk//25.08
 build-extension: true
 appstream-compose: false
 
