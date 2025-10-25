@@ -110,11 +110,6 @@ case "${FLATPAK_ARCH}" in
 		;;
 esac
 
-# The SDK provides libtiff 4.6.0, but TIFFOpenOptionsSetMaxCumulatedMemAlloc()
-# is available only from libtiff 4.7 onwards. Therefore, we disable the SDK's
-# libtiff and use the bundled version instead.
-flags+=('use_system_libtiff = false')
-
 # Disabled features
 flags+=('symbol_level = 0')
 flags+=('use_qt5 = false')
@@ -135,6 +130,7 @@ flags+=('use_system_lcms2 = true')
 flags+=('use_system_libjpeg = true')
 flags+=('use_system_libopenjpeg2 = true')
 flags+=('use_system_libpng = true')
+flags+=('use_system_libtiff = true')
 flags+=('use_system_libwayland = true')
 flags+=('use_system_minigbm = true')
 

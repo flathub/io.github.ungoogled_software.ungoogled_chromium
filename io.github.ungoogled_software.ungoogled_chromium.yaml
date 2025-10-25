@@ -1,9 +1,9 @@
 app-id: io.github.ungoogled_software.ungoogled_chromium
 runtime: org.freedesktop.Platform
-runtime-version: '24.08'
+runtime-version: '25.08'
 sdk: org.freedesktop.Sdk
 base: org.chromium.Chromium.BaseApp
-base-version: '24.08'
+base-version: '25.08'
 command: chromium
 finish-args:
   - --require-version=1.8.2
@@ -82,7 +82,7 @@ add-extensions:
     autodelete: true
 
 build-options:
-  append-path: /usr/lib/sdk/llvm20/bin:/usr/lib/sdk/rust-stable/bin
+  append-path: /usr/lib/sdk/llvm21/bin:/usr/lib/sdk/rust-stable/bin
   append-ld-library-path: /usr/lib/sdk/rust-stable/lib
   env:
     # Use LLVM for builds
@@ -94,7 +94,7 @@ build-options:
     STRIP: llvm-strip
 
     # Point bindgen to LLVM's libclang
-    LIBCLANG_PATH: /usr/lib/sdk/llvm20/lib
+    LIBCLANG_PATH: /usr/lib/sdk/llvm21/lib
 
     # Paths to Node.js and OpenJDK
     NODE_HOME: /usr/lib/sdk/node22
@@ -109,7 +109,7 @@ build-options:
     CCACHE_SLOPPINESS: time_macros,include_file_ctime,include_file_mtime
 
 sdk-extensions:
-  - org.freedesktop.Sdk.Extension.llvm20
+  - org.freedesktop.Sdk.Extension.llvm21
   - org.freedesktop.Sdk.Extension.node22
   - org.freedesktop.Sdk.Extension.openjdk
   - org.freedesktop.Sdk.Extension.rust-stable
