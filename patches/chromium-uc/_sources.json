@@ -2,7 +2,8 @@
   {
     "type": "patch",
     "paths": [
-      "patches/chromium-uc/gentoo-stylesheet.patch"
+      "patches/chromium-uc/gentoo-stylesheet.patch",
+      "patches/chromium-uc/fix-tarball-dawn-commit-hash.patch"
     ]
   }
 ]
