@@ -170,7 +170,7 @@ modules:
     sources:
       - type: git
         url: https://github.com/ungoogled-software/ungoogled-chromium
-        commit: 6a7a75d0d49745f29a314fa4d7be40f3efa9f01c
+        commit: ae476a674cd6359c27f0fd67d741549c9eeb0bb4
         dest: uc
       - type: archive
         url: https://commondatastorage.googleapis.com/chromium-browser-official/chromium-142.0.7444.59-lite.tar.xz
