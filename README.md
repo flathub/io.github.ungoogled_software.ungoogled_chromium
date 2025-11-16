@@ -71,6 +71,4 @@ reading any document about Ungoogled Chromium:
 instead.
 
 Also keep in mind that after making a change, make sure to do a `flatpak kill io.github.ungoogled_software.ungoogled_chromium`
-to ensure that Ungoogled Chromium was actually restarted. This is because by default, Chromium
-runs in the background after being started for the first time (closing the window doesn't actually
-exit Chromium, just keeps it in a sort of "standby" mode).
+to ensure that Ungoogled Chromium was actually restarted.
