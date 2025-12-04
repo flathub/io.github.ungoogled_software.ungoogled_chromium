@@ -3,6 +3,7 @@ set -euxo pipefail
 
 ln_overwrite_all() {
 	rm -rfv "$2"
+	mkdir -pv "$(dirname "$2")"
 	ln -svf "$1" "$2"
 }
 
@@ -102,6 +103,7 @@ case "${FLATPAK_ARCH}" in
 		flags+=(
 			'use_v4l2_codec = true'
 			'use_vaapi = false'
+			'use_av1_hw_decoder = true'
 		)
 		;;
 	*)
