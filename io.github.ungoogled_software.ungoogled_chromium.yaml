@@ -173,8 +173,8 @@ modules:
         commit: 1341de3a37dd8fd193a1f446e368f241148dfab7
         dest: uc
       - type: archive
-        url: https://commondatastorage.googleapis.com/chromium-browser-official/chromium-143.0.7499.146-lite.tar.xz
-        sha256: d79916348f34ecb154201ba2908a0c1ffaf8ae9670215c575b76cf95b10fb076
+        url: https://commondatastorage.googleapis.com/chromium-browser-official/chromium-143.0.7499.169-lite.tar.xz
+        sha256: 0d03408450e552a1012321b61f5bb6e0f07a7f6e2ef111b519066876c1a5e747
       - patches/chromium/_sources.json
       - patches/chromium-uc/_sources.json
       - type: file
