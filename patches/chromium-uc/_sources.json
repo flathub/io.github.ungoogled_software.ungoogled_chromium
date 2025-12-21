@@ -3,8 +3,7 @@
     "type": "patch",
     "paths": [
       "patches/chromium-uc/fix-rk3588-v4l2-av1-decoder.patch",
-      "patches/chromium-uc/gentoo-stylesheet.patch",
-      "patches/chromium-uc/libpng-testonly.patch"
+      "patches/chromium-uc/gentoo-stylesheet.patch"
    ]
   }
 ]

@@ -126,15 +126,7 @@ flags+=('link_pulseaudio = true')
 flags+=('proprietary_codecs = true')
 flags+=('rtc_use_pipewire = true')
 flags+=('use_pulseaudio = true')
-flags+=('use_system_freetype = true')
-flags+=('use_system_harfbuzz = true')
-flags+=('use_system_lcms2 = true')
-flags+=('use_system_libjpeg = true')
-flags+=('use_system_libopenjpeg2 = true')
-flags+=('use_system_libpng = true')
-flags+=('use_system_libtiff = true')
-flags+=('use_system_libwayland = true')
-flags+=('use_system_minigbm = true')
+flags+=('use_system_libffi = true')
 
 # Bootstrap GN
 tools/gn/bootstrap/bootstrap.py -v --no-clean --skip-generate-buildfiles -j"${FLATPAK_BUILDER_N_JOBS}"
