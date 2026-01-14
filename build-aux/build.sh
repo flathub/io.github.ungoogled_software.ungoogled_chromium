@@ -63,7 +63,18 @@ if [[ -z "${bindgen_path}" ]]; then
 	exit 1
 fi
 ln -svf "${bindgen_path}" bindgen/bin/bindgen
+rustfmt_path=$(command -v rustfmt)
+if [[ -z "${rustfmt_path}" ]]; then
+	echo 'Error: rustfmt not found in PATH' >&2
+	exit 1
+fi
+ln -svf "${rustfmt_path}" bindgen/bin/rustfmt
 ln -svf "${LIBCLANG_PATH}" -t bindgen
+
+# To use correct libadler2 lib
+# See also: https://github.com/ungoogled-software/ungoogled-chromium/pull/3598
+sed -i 's/rustc_nightly_capability = use_chromium_rust_toolchain/rustc_nightly_capability = true/' \
+	build/config/rust.gni
 
 # Determine the Rust toolchain version and sysroot
 RUST_SYSROOT_ABSOLUTE=$(rustc --print sysroot)
