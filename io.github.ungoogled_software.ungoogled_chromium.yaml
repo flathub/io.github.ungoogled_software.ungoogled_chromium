@@ -97,7 +97,7 @@ build-options:
     LIBCLANG_PATH: /usr/lib/sdk/llvm21/lib
 
     # Paths to Node.js and OpenJDK
-    NODE_HOME: /usr/lib/sdk/node22
+    NODE_HOME: /usr/lib/sdk/node24
     JAVA_HOME: /usr/lib/sdk/openjdk
 
     # Allow the use of nightly features with stable Rust compiler
@@ -110,7 +110,7 @@ build-options:
 
 sdk-extensions:
   - org.freedesktop.Sdk.Extension.llvm21
-  - org.freedesktop.Sdk.Extension.node22
+  - org.freedesktop.Sdk.Extension.node24
   - org.freedesktop.Sdk.Extension.openjdk
   - org.freedesktop.Sdk.Extension.rust-stable
 
@@ -176,7 +176,6 @@ modules:
         url: https://commondatastorage.googleapis.com/chromium-browser-official/chromium-144.0.7559.59-lite.tar.xz
         sha256: 8d6de5bbf447b9d0f3c99843230ffebe5954cbcb38d9f8c2ddbbeb5fbcfa9179
       - patches/chromium/_sources.json
-      - patches/chromium-uc/_sources.json
       - type: file
         path: io.github.ungoogled_software.ungoogled_chromium.desktop
       - type: file
