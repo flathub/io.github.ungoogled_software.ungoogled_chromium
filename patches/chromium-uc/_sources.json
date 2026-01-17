@@ -1,8 +1,0 @@
-[
-  {
-    "type": "patch",
-    "paths": [
-      "patches/chromium-uc/chromium-138-nodejs-version-check.patch"
-    ]
-  }
-]
