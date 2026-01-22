@@ -139,17 +139,15 @@ flags+=('rtc_use_pipewire = true')
 flags+=('use_pulseaudio = true')
 flags+=('use_system_libffi = true')
 
-# Bootstrap GN
-tools/gn/bootstrap/bootstrap.py -v --no-clean --skip-generate-buildfiles -j"${FLATPAK_BUILDER_N_JOBS}"
-
-# Configure Chromium
-out/Release/gn gen --args="${flags[*]}" out/Release --fail-on-unused-args
-
 # Check NodeJS version before we actually start the build.
 # This is done so that we don't fail a couple of hours into the build.
 third_party/node/check_version.py \
 	--expected_version_file third_party/node/update_node_binaries \
 	--out_file /dev/null
 
-# Build Chromium
+# Bootstrap GN
+tools/gn/bootstrap/bootstrap.py -v --no-clean --skip-generate-buildfiles -j"${FLATPAK_BUILDER_N_JOBS}"
+
+# Configure and build Chromium
+out/Release/gn gen --args="${flags[*]}" out/Release --fail-on-unused-args
 ninja -C out/Release -j"${FLATPAK_BUILDER_N_JOBS}" chrome chrome_crashpad_handler
