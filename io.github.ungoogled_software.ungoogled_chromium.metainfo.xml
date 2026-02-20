@@ -70,6 +70,7 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="145.0.7632.109-1" date="2026-02-20" />
     <release version="145.0.7632.75-1" date="2026-02-14" />
     <release version="145.0.7632.45-1" date="2026-02-11" />
     <release version="144.0.7559.132-1" date="2026-02-04" />
