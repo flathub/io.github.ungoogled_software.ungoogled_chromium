@@ -170,11 +170,11 @@ modules:
     sources:
       - type: git
         url: https://github.com/ungoogled-software/ungoogled-chromium
-        commit: 54de4017eec02650d43c2bf37af70d41d1d66e93
+        commit: 3ef1b41ede373eb9d5eca3eb91f28be78b1a1412
         dest: uc
       - type: archive
-        url: https://commondatastorage.googleapis.com/chromium-browser-official/chromium-145.0.7632.109-lite.tar.xz
-        sha256: 4b9460a4c852b824dbd3c6de00948fe97b760e89ac56c62b5e28f8581a5c1690
+        url: https://commondatastorage.googleapis.com/chromium-browser-official/chromium-145.0.7632.116-lite.tar.xz
+        sha256: 1c6a35ce9bc2347473678aa69292c3b358d3818e7a5cc827ec412829eff73ca4
       - patches/chromium/_sources.json
       - type: file
         path: io.github.ungoogled_software.ungoogled_chromium.desktop
