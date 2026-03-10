@@ -45,7 +45,7 @@ finish-args:
   # For MPRIS media cover art
   - --filesystem=/tmp
   # For imported CA certificates
-  - --persist=.pki
+  - --filesystem=xdg-data/pki/nssdb:create
   # For GNOME proxy resolution
   - --filesystem=xdg-run/dconf
   - --filesystem=~/.config/dconf:ro
