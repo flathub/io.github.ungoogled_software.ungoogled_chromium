@@ -1,0 +1,9 @@
+[
+  {
+    "type": "patch",
+    "paths": [
+      "patches/chromium-uc/chromium-146-apply-upstream-libmuck-fix.patch",
+      "patches/chromium-uc/chromium-146-drop-unknown-clang-flag.patch"
+    ]
+  }
+]
