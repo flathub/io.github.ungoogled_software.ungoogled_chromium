@@ -78,7 +78,7 @@ sed -i 's/rustc_nightly_capability = use_chromium_rust_toolchain/rustc_nightly_c
 
 # Determine the Rust toolchain version and sysroot
 RUST_SYSROOT_ABSOLUTE=$(rustc --print sysroot)
-RUSTC_VERSION=$(rustc -V)
+RUSTC_VERSION=$(rustc -V | awk '{print $2}')
 export RUST_SYSROOT_ABSOLUTE RUSTC_VERSION
 
 # Configure the Rust toolchain
