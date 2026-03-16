@@ -54,11 +54,6 @@ Also, important to note that in the example above one would not be able to symli
 actual policy file directly, as otherwise flatpak would not be able to resolve the
 symlink when bind mounting the extension point.
 
-### How do I install WideVine CDM?
-
-1. Download and execute [widevine-install.sh](widevine-install.sh)
-2. Restart Ungoogled Chromium **twice** for the changes to take effect.
-
 ### Miscellaneous Issues
 
 For other problems please check https://ungoogled-software.github.io/ungoogled-chromium-wiki/faq
