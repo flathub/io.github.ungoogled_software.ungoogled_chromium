@@ -82,7 +82,7 @@ add-extensions:
     autodelete: true
 
 build-options:
-  append-path: /usr/lib/sdk/llvm21/bin:/usr/lib/sdk/rust-stable/bin
+  append-path: /usr/lib/sdk/llvm22/bin:/usr/lib/sdk/rust-stable/bin
   append-ld-library-path: /usr/lib/sdk/rust-stable/lib
   env:
     # Use LLVM for builds
@@ -94,7 +94,7 @@ build-options:
     STRIP: llvm-strip
 
     # Point bindgen to LLVM's libclang
-    LIBCLANG_PATH: /usr/lib/sdk/llvm21/lib
+    LIBCLANG_PATH: /usr/lib/sdk/llvm22/lib
 
     # Paths to Node.js and OpenJDK
     NODE_HOME: /usr/lib/sdk/node24
@@ -109,7 +109,7 @@ build-options:
     CCACHE_SLOPPINESS: time_macros,include_file_ctime,include_file_mtime
 
 sdk-extensions:
-  - org.freedesktop.Sdk.Extension.llvm21
+  - org.freedesktop.Sdk.Extension.llvm22
   - org.freedesktop.Sdk.Extension.node24
   - org.freedesktop.Sdk.Extension.openjdk
   - org.freedesktop.Sdk.Extension.rust-stable
@@ -186,11 +186,11 @@ modules:
     sources:
       - type: git
         url: https://github.com/ungoogled-software/ungoogled-chromium
-        commit: f20303e7b1172c441a5b2371edee8fefb4dba2c7
+        commit: 9805b3260c287f8c19afd3978ed057fa3ebe450c
         dest: uc
       - type: archive
-        url: https://commondatastorage.googleapis.com/chromium-browser-official/chromium-147.0.7727.55-lite.tar.xz
-        sha256: 57594966be592efdb9fe6491f5a834de237f5c7decdca5eb1f7d7a5d38dd54e9
+        url: https://commondatastorage.googleapis.com/chromium-browser-official/chromium-147.0.7727.101-lite.tar.xz
+        sha256: 87b499c215e895c518bc25b8a0648a2e23a6a3e865cd43a1243c21ae974140f6
       - patches/chromium/_sources.json
       - patches/chromium-uc/_sources.json
       - type: file
