@@ -1,0 +1,50 @@
+diff --git a/patches/flatpak-series b/patches/flatpak-series
+new file mode 100644
+index 00000000..f47f4cd1
+--- /dev/null
++++ b/patches/flatpak-series
+@@ -0,0 +1 @@
++flatpak/fix-fp-first-run-path.patch
+\ No newline at end of file
+diff --git a/patches/flatpak/fix-fp-first-run-path.patch b/patches/flatpak/fix-fp-first-run-path.patch
+new file mode 100644
+index 00000000..43622323
+--- /dev/null
++++ b/patches/flatpak/fix-fp-first-run-path.patch
+@@ -0,0 +1,14 @@
++diff --git a/chrome/browser/ui/webui/ungoogled_first_run.h b/chrome/browser/ui/webui/ungoogled_first_run.h
++index 8eb29a90..f1fcb0b0 100644
++--- a/chrome/browser/ui/webui/ungoogled_first_run.h
+++++ b/chrome/browser/ui/webui/ungoogled_first_run.h
++@@ -82,7 +82,8 @@ class UFRDataSource : public content::URLDataSource {
++    <li>This is a base64-encoded file that needs to be decoded. Use the button below to select the .txt file you saved
++     and save/move the resulting bdic file to your Dictionaries directory. Default locations:
++     <ul>
++-     <li>Linux: <code>~/.config/chromium/Dictionaries/</code><br></li>
+++     <li>Linux (non-Flatpak): <code>~/.config/chromium/Dictionaries/</code><br></li>
+++     <li><b>Linux (Flatpak):</b> <code>~/.var/app/io.github.ungoogled_software.ungoogled_chromium/config/chromium/Dictionaries/</code><br></li>
++      <li>Mac: <code>~/Library/Application Support/Chromium/Dictionaries/</code><br></li>
++      <li>Windows: <code>%LOCALAPPDATA%\Chromium\User Data\Dictionaries\</code><br></li>
++     </ul>
+diff --git a/utils/patches.py b/utils/patches.py
+index 4aa29d38..436bf9bc 100755
+--- a/utils/patches.py
++++ b/utils/patches.py
+@@ -140,11 +140,12 @@ def apply_patches(patch_path_iter, tree_path, reverse=False, patch_bin_path=None
+ 
+ def generate_patches_from_series(patches_dir, resolve=False):
+     """Generates pathlib.Path for patches from a directory in GNU Quilt format"""
+-    for patch_path in parse_series(patches_dir / 'series'):
+-        if resolve:
+-            yield (patches_dir / patch_path).resolve()
+-        else:
+-            yield patch_path
++    for series_fname in ('series', 'flatpak-series'):
++        for patch_path in parse_series(patches_dir / series_fname):
++            if resolve:
++                yield (patches_dir / patch_path).resolve()
++            else:
++                yield patch_path
+ 
+ 
+ def _copy_files(path_iter, source, destination):
