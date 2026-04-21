@@ -1,0 +1,12 @@
+[
+  {
+    "type": "patch",
+    "paths": [
+      "patches/ungoogled-chromium/fix-first-run-config-path.patch"
+    ],
+    "options": [
+      "-d",
+      "uc"
+    ]
+  }
+]
