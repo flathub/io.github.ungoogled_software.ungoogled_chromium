@@ -88,6 +88,19 @@ flags+=(
 	'rustc_version = getenv("RUSTC_VERSION")'
 )
 
+# Some targets expect the Rust toolchain to be located at a specific path, so we symlink it there.
+ln_overwrite_all "${RUST_SYSROOT_ABSOLUTE}" third_party/rust-toolchain
+
+# To use correct gperf binary
+gperf_path=$(command -v gperf)
+if [[ -z "${gperf_path}" ]]; then
+	echo 'Error: gperf not found in PATH' >&2
+	exit 1
+fi
+rm -rfv third_party/gperf/cipd/bin/
+mkdir -pv third_party/gperf/cipd/bin/
+ln -svf "${gperf_path}" third_party/gperf/cipd/bin/
+
 # Determine the Clang toolchain version and base path
 CLANG_BASE_PATH=$(llvm-config --prefix)
 CLANG_VERSION=$(llvm-config --version | awk -F. '{print $1}')

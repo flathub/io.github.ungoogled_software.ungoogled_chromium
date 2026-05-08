@@ -10,7 +10,7 @@ import replace_gn_files  # type: ignore
 TO_REMOVE = [
     "fontconfig",
     "freetype",
-    "harfbuzz-ng",
+    "harfbuzz",
 ]
 
 

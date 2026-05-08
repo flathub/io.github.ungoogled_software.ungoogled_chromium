@@ -1,4 +1,4 @@
-From 6a11699bd12ef7e66839b7b5caee77adcc5f6d7a Mon Sep 17 00:00:00 2001
+From c868019c51f21f1eb5966fd2c0b83ddfb8ae9ff6 Mon Sep 17 00:00:00 2001
 From: Ryan Gonzalez <rymg19@gmail.com>
 Date: Tue, 17 Mar 2020 13:18:27 -0500
 Subject: [PATCH] flatpak: Add initial sandbox support
@@ -30,11 +30,11 @@ Subject: [PATCH] flatpak: Add initial sandbox support
  create mode 100644 sandbox/linux/services/flatpak_sandbox.h
 
 diff --git a/.gitignore b/.gitignore
-index 14c35adad3781..e810ae1915c44 100644
+index 870c721e8048f..1433cbb2c3da9 100644
 --- a/.gitignore
 +++ b/.gitignore
-@@ -79,6 +79,7 @@ vs-chromium-project.txt
- /.android_emulator/
+@@ -74,6 +74,7 @@ vs-chromium-project.txt
+ /.android_emulator_cipd_cache/
  /.clangd/
  /.clangd-index/
 +/.flatpak-builder/
@@ -42,10 +42,10 @@ index 14c35adad3781..e810ae1915c44 100644
  /.externalToolBuilders/
  /.settings/
 diff --git a/base/threading/thread_restrictions.h b/base/threading/thread_restrictions.h
-index 089384b9f83b6..9d645d21c13a0 100644
+index a1bb1a4602902..eb81195f9fcbe 100644
 --- a/base/threading/thread_restrictions.h
 +++ b/base/threading/thread_restrictions.h
-@@ -411,6 +411,9 @@ class ScopedAllowThreadJoinForWebRtcTransport;
+@@ -419,6 +419,9 @@ class ScopedAllowThreadJoinForWebRtcTransport;
  namespace rlz_lib {
  class FinancialPing;
  }
@@ -55,7 +55,7 @@ index 089384b9f83b6..9d645d21c13a0 100644
  namespace service_manager {
  class ServiceProcessLauncher;
  }
-@@ -642,6 +645,7 @@ class BASE_EXPORT ScopedAllowBlocking {
+@@ -654,6 +657,7 @@ class BASE_EXPORT ScopedAllowBlocking {
    friend class remoting::
        ScopedBypassIOThreadRestrictions;  // http://crbug.com/1144161
    friend class remoting::ScopedAllowBlockingForCrashReporting;
@@ -63,7 +63,7 @@ index 089384b9f83b6..9d645d21c13a0 100644
    friend class ui::DrmDisplayHostManager;
    friend class ui::ScopedAllowBlockingForGbmSurface;
    friend class ui::SelectFileDialogLinux;
-@@ -784,6 +788,7 @@ class BASE_EXPORT ScopedAllowBaseSyncPrimitives {
+@@ -799,6 +803,7 @@ class BASE_EXPORT ScopedAllowBaseSyncPrimitives {
    friend class rlz_lib::FinancialPing;
    friend class shell_integration_linux::
        LaunchXdgUtilityScopedAllowBaseSyncPrimitives;
@@ -72,10 +72,10 @@ index 089384b9f83b6..9d645d21c13a0 100644
    friend class syncer::HttpBridge;
    friend class syncer::GetLocalChangesRequest;
 diff --git a/chrome/browser/resources/sandbox_internals/sandbox_internals.ts b/chrome/browser/resources/sandbox_internals/sandbox_internals.ts
-index 1d2c06f540674..9946482709bbf 100644
+index 9273695331dc2..6606dbcad0243 100644
 --- a/chrome/browser/resources/sandbox_internals/sandbox_internals.ts
 +++ b/chrome/browser/resources/sandbox_internals/sandbox_internals.ts
-@@ -140,6 +140,7 @@ function addGoodBadRow(name: string, result: boolean): HTMLElement {
+@@ -142,6 +142,7 @@ function addGoodBadRow(name: string, result: boolean): HTMLElement {
  function linuxHandler() {
    const suidSandbox = loadTimeData.getBoolean('suid');
    const nsSandbox = loadTimeData.getBoolean('userNs');
@@ -83,7 +83,7 @@ index 1d2c06f540674..9946482709bbf 100644
  
    let layer1SandboxType = 'None';
    let layer1SandboxCssClass = StatusClass.BAD;
-@@ -149,6 +150,9 @@ function linuxHandler() {
+@@ -151,6 +152,9 @@ function linuxHandler() {
    } else if (nsSandbox) {
      layer1SandboxType = 'Namespace';
      layer1SandboxCssClass = StatusClass.GOOD;
@@ -125,10 +125,10 @@ index 1174a704b8126..e7fd738b705fb 100644
                       status & sandbox::policy::SandboxLinux::kNetNS;
    // A second-layer sandbox is also required to be adequately sandboxed.
 diff --git a/content/browser/child_process_host_impl.cc b/content/browser/child_process_host_impl.cc
-index 685af654e0832..cb2d7fb0966d1 100644
+index 34d82f8328645..73940009dc301 100644
 --- a/content/browser/child_process_host_impl.cc
 +++ b/content/browser/child_process_host_impl.cc
-@@ -37,6 +37,7 @@
+@@ -36,6 +36,7 @@
  
  #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
  #include "base/linux_util.h"
@@ -136,7 +136,7 @@ index 685af654e0832..cb2d7fb0966d1 100644
  #elif BUILDFLAG(IS_MAC)
  #include "base/apple/foundation_util.h"
  #include "content/browser/mac_helpers.h"
-@@ -62,7 +63,12 @@ base::FilePath ChildProcessHost::GetChildPath(int flags) {
+@@ -61,7 +62,12 @@ base::FilePath ChildProcessHost::GetChildPath(int flags) {
  #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
    // Use /proc/self/exe rather than our known binary path so updates
    // can't swap out the binary from underneath us.
@@ -151,7 +151,7 @@ index 685af654e0832..cb2d7fb0966d1 100644
    }
  #endif
 diff --git a/content/browser/zygote_host/zygote_host_impl_linux.cc b/content/browser/zygote_host/zygote_host_impl_linux.cc
-index 5707dd93fd5e9..c87e1248171cf 100644
+index e87329429b283..c611f34a2fca7 100644
 --- a/content/browser/zygote_host/zygote_host_impl_linux.cc
 +++ b/content/browser/zygote_host/zygote_host_impl_linux.cc
 @@ -13,6 +13,7 @@
@@ -262,10 +262,10 @@ index 8ef884a7db6f4..f441900dd6343 100644
  
    // This lock protects the |zygote_pids_| set.
 diff --git a/content/zygote/zygote_linux.cc b/content/zygote/zygote_linux.cc
-index 5a6f1c07d71a6..442398740fe99 100644
+index f157fa1359963..2caede0c7fb06 100644
 --- a/content/zygote/zygote_linux.cc
 +++ b/content/zygote/zygote_linux.cc
-@@ -123,7 +123,7 @@ bool Zygote::ProcessRequests() {
+@@ -122,7 +122,7 @@ bool Zygote::ProcessRequests() {
    PCHECK(sigaddset(&sigset, SIGCHLD) == 0);
    PCHECK(sigprocmask(SIG_BLOCK, &sigset, &orig_sigmask) == 0);
  
@@ -274,7 +274,7 @@ index 5a6f1c07d71a6..442398740fe99 100644
      // Let the ZygoteHost know we are ready to go.
      // The receiving code is in
      // content/browser/zygote_host/zygote_host_impl_linux.cc.
-@@ -228,6 +228,10 @@ bool Zygote::UsingNSSandbox() const {
+@@ -227,6 +227,10 @@ bool Zygote::UsingNSSandbox() const {
    return sandbox_flags_ & sandbox::policy::SandboxLinux::kUserNS;
  }
  
@@ -299,10 +299,10 @@ index 165b758efc899..961afa73f66f5 100644
    // ---------------------------------------------------------------------------
    // Requests from the browser...
 diff --git a/content/zygote/zygote_main_linux.cc b/content/zygote/zygote_main_linux.cc
-index c7ee91878e6dd..9c2c7a04bd968 100644
+index 7565fb0641dc4..d99a94618b72d 100644
 --- a/content/zygote/zygote_main_linux.cc
 +++ b/content/zygote/zygote_main_linux.cc
-@@ -35,6 +35,7 @@
+@@ -36,6 +36,7 @@
  #include "content/public/common/zygote/zygote_fork_delegate_linux.h"
  #include "content/zygote/zygote_linux.h"
  #include "sandbox/linux/services/credentials.h"
@@ -310,7 +310,7 @@ index c7ee91878e6dd..9c2c7a04bd968 100644
  #include "sandbox/linux/services/init_process_reaper.h"
  #include "sandbox/linux/services/libc_interceptor.h"
  #include "sandbox/linux/services/namespace_sandbox.h"
-@@ -135,6 +136,7 @@ static void EnterNamespaceSandbox(sandbox::policy::SandboxLinux* linux_sandbox,
+@@ -136,6 +137,7 @@ static void EnterNamespaceSandbox(sandbox::policy::SandboxLinux* linux_sandbox,
  
  static void EnterLayerOneSandbox(sandbox::policy::SandboxLinux* linux_sandbox,
                                   const bool using_layer1_sandbox,
@@ -318,7 +318,7 @@ index c7ee91878e6dd..9c2c7a04bd968 100644
                                   base::OnceClosure post_fork_parent_callback) {
    DCHECK(linux_sandbox);
  
-@@ -154,7 +156,8 @@ static void EnterLayerOneSandbox(sandbox::policy::SandboxLinux* linux_sandbox,
+@@ -155,7 +157,8 @@ static void EnterLayerOneSandbox(sandbox::policy::SandboxLinux* linux_sandbox,
    } else if (sandbox::NamespaceSandbox::InNewUserNamespace()) {
      EnterNamespaceSandbox(linux_sandbox, std::move(post_fork_parent_callback));
    } else {
@@ -328,7 +328,7 @@ index c7ee91878e6dd..9c2c7a04bd968 100644
    }
  }
  
-@@ -178,8 +181,11 @@ bool ZygoteMain(
+@@ -179,8 +182,11 @@ bool ZygoteMain(
        linux_sandbox->setuid_sandbox_client()->IsSuidSandboxChild();
    const bool using_namespace_sandbox =
        sandbox::NamespaceSandbox::InNewUserNamespace();
@@ -341,7 +341,7 @@ index c7ee91878e6dd..9c2c7a04bd968 100644
  
    if (using_setuid_sandbox) {
      linux_sandbox->setuid_sandbox_client()->CloseDummyFile();
-@@ -206,7 +212,7 @@ bool ZygoteMain(
+@@ -207,7 +213,7 @@ bool ZygoteMain(
  
    // Turn on the first layer of the sandbox if the configuration warrants it.
    EnterLayerOneSandbox(
@@ -350,7 +350,7 @@ index c7ee91878e6dd..9c2c7a04bd968 100644
        base::BindOnce(CloseFds, linux_sandbox->GetFileDescriptorsToClose()));
  
    const int sandbox_flags = linux_sandbox->GetStatus();
-@@ -218,6 +224,10 @@ bool ZygoteMain(
+@@ -219,6 +225,10 @@ bool ZygoteMain(
        !!(sandbox_flags & sandbox::policy::SandboxLinux::kUserNS);
    CHECK_EQ(using_namespace_sandbox, namespace_sandbox_engaged);
  
@@ -362,7 +362,7 @@ index c7ee91878e6dd..9c2c7a04bd968 100644
                  base::GlobalDescriptors::Descriptor(
                      static_cast<uint32_t>(kSandboxIPCChannel), GetSandboxFD()));
 diff --git a/sandbox/linux/BUILD.gn b/sandbox/linux/BUILD.gn
-index 478194aaf43a8..c97710907565e 100644
+index 1fe96111cefaa..9b381d90e4e43 100644
 --- a/sandbox/linux/BUILD.gn
 +++ b/sandbox/linux/BUILD.gn
 @@ -303,6 +303,10 @@ if (is_linux || is_chromeos) {
@@ -1225,7 +1225,7 @@ index 1a3c7c6cf8b15..4c1b121160df6 100644
      sources += [
        "linux/bpf_ime_policy_linux.cc",
 diff --git a/sandbox/policy/linux/sandbox_linux.cc b/sandbox/policy/linux/sandbox_linux.cc
-index 714cb2e115b84..e85a3fb68ee90 100644
+index 1d3a854bb9aa9..09c75c2ee04ce 100644
 --- a/sandbox/policy/linux/sandbox_linux.cc
 +++ b/sandbox/policy/linux/sandbox_linux.cc
 @@ -35,6 +35,7 @@
@@ -1321,5 +1321,5 @@ index 60484255e653b..797f3b9ad6cd8 100644
  }
  
 -- 
-2.51.2
+2.53.0
 

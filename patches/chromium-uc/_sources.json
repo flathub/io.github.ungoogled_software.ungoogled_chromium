@@ -4,7 +4,9 @@
     "paths": [
       "patches/chromium-uc/chromium-146-drop-unknown-clang-flag.patch",
       "patches/chromium-uc/chromium-147-revert-clang-no-lifetime-dse-flag.patch",
-      "patches/chromium-uc/disable-nightly-portable-simd-for-bytemuck.patch"
+      "patches/chromium-uc/disable-nightly-portable-simd-for-bytemuck.patch",
+      "patches/chromium-uc/chromium-148-revert-clang-fsanitize-return-flag-1.patch",
+      "patches/chromium-uc/chromium-148-revert-clang-fsanitize-return-flag-2.patch"
     ]
   }
 ]
