@@ -9,11 +9,12 @@ die() {
 # shellcheck disable=SC2034
 SED_BINARIES=(gsed sed)
 
-if [[ $# -ne 1 ]]; then
-  die "Usage: $0 <version>   (e.g. 145.0.7632.109-1)"
+if [[ $# -lt 1 || $# -gt 2 ]]; then
+  die "Usage: $0 <version> [uc-commit]   (e.g. 145.0.7632.109-1 [abcdef1234...])"
 fi
 
 VERSION="$1"
+UC_COMMIT_OVERRIDE="${2:-}"
 CHROMIUM_VERSION="${VERSION%-*}"   # strip pkgrel (-1) for tarball version
 DATE="$(date -u -I)"
 
@@ -44,17 +45,21 @@ done
 [[ -f "$METAFILE" ]] || die "Missing file: $METAFILE"
 [[ -f "$YAMLFILE"  ]] || die "Missing file: $YAMLFILE"
 
-# 1) Find the ungoogled-chromium commit for the release tag
-UC_REMOTE="https://github.com/ungoogled-software/ungoogled-chromium"
-UC_COMMIT="$(
-  git ls-remote --tags "$UC_REMOTE" "refs/tags/${VERSION}" "refs/tags/${VERSION}^{}" |
-    awk '
-      /\^\{\}$/ {print $1; found=1; exit}
-      {first=$1}
-      END { if(!found && first!="") print first }
-    '
-)"
-[[ -n "$UC_COMMIT" ]] || die "Could not find tag '${VERSION}' in $UC_REMOTE"
+# 1) Determine ungoogled-chromium commit
+if [[ -n "$UC_COMMIT_OVERRIDE" ]]; then
+  UC_COMMIT="$UC_COMMIT_OVERRIDE"
+else
+  UC_REMOTE="https://github.com/ungoogled-software/ungoogled-chromium"
+  UC_COMMIT="$(
+    git ls-remote --tags "$UC_REMOTE" "refs/tags/${VERSION}" "refs/tags/${VERSION}^{}" |
+      awk '
+        /\^\{\}$/ {print $1; found=1; exit}
+        {first=$1}
+        END { if(!found && first!="") print first }
+      '
+  )"
+  [[ -n "$UC_COMMIT" ]] || die "Could not find tag '${VERSION}' in $UC_REMOTE"
+fi
 
 # 2) Compute chromium tarball URL + sha256 from the .hashes file
 TARBALL_URL="https://commondatastorage.googleapis.com/chromium-browser-official/chromium-${CHROMIUM_VERSION}-lite.tar.xz"
