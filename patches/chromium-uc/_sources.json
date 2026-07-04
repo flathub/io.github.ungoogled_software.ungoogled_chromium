@@ -6,7 +6,9 @@
       "patches/chromium-uc/disable-nightly-portable-simd-for-bytemuck.patch",
       "patches/chromium-uc/chromium-148-revert-clang-fsanitize-return-flag-1.patch",
       "patches/chromium-uc/chromium-149-llvm-22.patch",
-      "patches/chromium-uc/chromium-149-use-of-undeclared-identifier-ERROR.patch"
+      "patches/chromium-uc/chromium-149-use-of-undeclared-identifier-ERROR.patch",
+      "patches/chromium-uc/chromium-150-fix-ar-unbundle.patch",
+      "patches/chromium-uc/chromium-150-revert-avx-flag-change.patch"
     ]
   }
 ]

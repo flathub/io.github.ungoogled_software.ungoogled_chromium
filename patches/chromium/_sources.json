@@ -7,7 +7,9 @@
       "patches/chromium/flatpak-Adjust-paths-for-the-sandbox.patch",
       "patches/chromium/Remove-the-ability-to-create-desktop-shortcuts.patch",
       "patches/chromium/Use-CHROME_WRAPPER-as-the-executable-on-restart.patch",
-      "patches/chromium/Only-check-the-Node-major-version-number.patch"
+      "patches/chromium/Only-check-the-Node-major-version-number.patch",
+      "patches/chromium/build-Always-set-rustc_nightly_capability.patch",
+      "patches/chromium/modules-Only-set-sysroot-if-sysroot-is-set.patch"
     ]
   }
 ]
