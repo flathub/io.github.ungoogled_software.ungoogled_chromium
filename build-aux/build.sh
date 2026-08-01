@@ -96,6 +96,21 @@ rm -rfv third_party/gperf/cipd/bin/
 mkdir -pv third_party/gperf/cipd/bin/
 ln -svf "${gperf_path}" third_party/gperf/cipd/bin/
 
+# Provide Go for Dawn/Tint source generation
+go_path=$(command -v go)
+if [[ -z "${go_path}" ]]; then
+	echo 'Error: go not found in PATH' >&2
+	exit 1
+fi
+case "${FLATPAK_ARCH}" in
+	x86_64) cipd_arch="amd64";;
+	aarch64) cipd_arch="arm64";;
+	*) echo >&2 "Unsupported architecture: ${FLATPAK_ARCH}"; exit 1;;
+esac
+rm -rfv "third_party/dawn/tools/golang/linux-${cipd_arch}/bin/"
+mkdir -pv "third_party/dawn/tools/golang/linux-${cipd_arch}/bin/"
+ln -svf "${go_path}" "third_party/dawn/tools/golang/linux-${cipd_arch}/bin/"
+
 # Determine the Clang toolchain version and base path
 CLANG_BASE_PATH=$(llvm-config --prefix)
 CLANG_VERSION=$(llvm-config --version | awk -F. '{print $1}')
