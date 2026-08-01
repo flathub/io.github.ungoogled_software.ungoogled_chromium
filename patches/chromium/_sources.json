@@ -9,7 +9,7 @@
       "patches/chromium/Use-CHROME_WRAPPER-as-the-executable-on-restart.patch",
       "patches/chromium/Only-check-the-Node-major-version-number.patch",
       "patches/chromium/build-Always-set-rustc_nightly_capability.patch",
-      "patches/chromium/modules-Only-set-sysroot-if-sysroot-is-set.patch"
+      "patches/chromium/don-t-depends-on-histograms.xml-if-it-is-not-git-checkout.patch"
     ]
   }
 ]

@@ -82,7 +82,7 @@ add-extensions:
     autodelete: true
 
 build-options:
-  append-path: /usr/lib/sdk/llvm22/bin:/usr/lib/sdk/rust-stable/bin
+  append-path: /usr/lib/sdk/llvm22/bin:/usr/lib/sdk/rust-stable/bin:/usr/lib/sdk/golang/bin
   append-ld-library-path: /usr/lib/sdk/rust-stable/lib
   env:
     # Use LLVM for builds
@@ -113,6 +113,7 @@ sdk-extensions:
   - org.freedesktop.Sdk.Extension.node24
   - org.freedesktop.Sdk.Extension.openjdk
   - org.freedesktop.Sdk.Extension.rust-stable
+  - org.freedesktop.Sdk.Extension.golang
 
 modules:
   - name: clang-ccache-symlink
@@ -162,22 +163,6 @@ modules:
           stable-only: true
       - patches/dconf/_sources.json
 
-  - name: kerberos
-    subdir: src
-    post-install:
-      - install -Dm644 ../krb5.conf /app/etc/krb5.conf
-    sources:
-      - type: archive
-        url: https://kerberos.org/dist/krb5/1.22/krb5-1.22.2.tar.gz
-        sha256: 3243ffbc8ea4d4ac22ddc7dd2a1dc54c57874c40648b60ff97009763554eaf13
-        x-checker-data:
-          type: html
-          url: https://kerberos.org/dist/
-          version-pattern: Kerberos V5 Release ([\d.-]+) - current release
-          url-template: https://kerberos.org/dist/krb5/$major.$minor/krb5-$version.tar.gz
-      - type: file
-        path: krb5.conf
-
   - name: chromium
     buildsystem: simple
     build-commands:
@@ -186,12 +171,12 @@ modules:
     sources:
       - type: git
         url: https://github.com/ungoogled-software/ungoogled-chromium
-        commit: fd0378e4f20fa09e21b09beca71573d435d787cf
+        commit: f2038df00b82e3afbd5cbecac37cf7b463acb42a
         dest: uc
       - patches/ungoogled-chromium/_sources.json
       - type: archive
-        url: https://commondatastorage.googleapis.com/chromium-browser-official/chromium-150.0.7871.186-lite.tar.xz
-        sha256: 4ff4b64971c8097631a4f17d2f7fb050e8ede62b1b3c0f1ef0a1fffcac11bbb7
+        url: https://commondatastorage.googleapis.com/chromium-browser-official/chromium-151.0.7922.71-lite.tar.xz
+        sha256: 185373684896f308c8585ac7772f5ec0eb0f49250d901531224f51fc92b6fc77
       - patches/chromium/_sources.json
       - patches/chromium-uc/_sources.json
       - type: file
