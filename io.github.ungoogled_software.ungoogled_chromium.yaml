@@ -1,9 +1,9 @@
 app-id: io.github.ungoogled_software.ungoogled_chromium
 runtime: org.freedesktop.Platform
-runtime-version: '25.08'
+runtime-version: '26.08'
 sdk: org.freedesktop.Sdk
 base: org.chromium.Chromium.BaseApp
-base-version: '25.08'
+base-version: '26.08'
 command: chromium
 finish-args:
   - --require-version=1.8.2
@@ -97,7 +97,7 @@ build-options:
     LIBCLANG_PATH: /usr/lib/sdk/llvm22/lib
 
     # Paths to Node.js and OpenJDK
-    NODE_HOME: /usr/lib/sdk/node24
+    NODE_HOME: /usr/lib/sdk/node26
     JAVA_HOME: /usr/lib/sdk/openjdk
 
     # Allow the use of nightly features with stable Rust compiler
@@ -110,7 +110,7 @@ build-options:
 
 sdk-extensions:
   - org.freedesktop.Sdk.Extension.llvm22
-  - org.freedesktop.Sdk.Extension.node24
+  - org.freedesktop.Sdk.Extension.node26
   - org.freedesktop.Sdk.Extension.openjdk
   - org.freedesktop.Sdk.Extension.rust-stable
   - org.freedesktop.Sdk.Extension.golang
