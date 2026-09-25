@@ -61,8 +61,8 @@ else
   [[ -n "$UC_COMMIT" ]] || die "Could not find tag '${VERSION}' in $UC_REMOTE"
 fi
 
-# 2) Compute chromium tarball URL + sha256 from the .hashes file
-TARBALL_URL="https://commondatastorage.googleapis.com/chromium-browser-official/chromium-${CHROMIUM_VERSION}-lite.tar.xz"
+# 2) Compute Chromium tarball URL + sha256 from Gentoo's release hashes
+TARBALL_URL="https://github.com/chromium-linux-tarballs/chromium-tarballs/releases/download/${CHROMIUM_VERSION}/chromium-${CHROMIUM_VERSION}-linux.tar.xz"
 HASHES_URL="${TARBALL_URL}.hashes"
 
 SHA256="$(
@@ -115,8 +115,9 @@ awk -v new_commit="$UC_COMMIT" -v new_url="$TARBALL_URL" -v new_sha="$SHA256" '
       next
     }
 
-    # Inside an archive block: update only the chromium official tarball URL
-    if (in_archive && $0 ~ /url: https:\/\/commondatastorage\.googleapis\.com\/chromium-browser-official\/chromium-.*-lite\.tar\.xz[[:space:]]*$/) {
+    # Recognize the existing official URL for migration and Gentoo URLs for subsequent updates
+    if (in_archive && ($0 ~ /url: https:\/\/commondatastorage\.googleapis\.com\/chromium-browser-official\/chromium-.*-lite\.tar\.xz[[:space:]]*$/ ||
+                       $0 ~ /url: https:\/\/github\.com\/chromium-linux-tarballs\/chromium-tarballs\/releases\/download\/[0-9.]+\/chromium-[0-9.]+-linux\.tar\.xz[[:space:]]*$/)) {
       indent=$0; sub(/url:.*/, "", indent)
       print indent "url: " new_url
       chromium_archive=1
