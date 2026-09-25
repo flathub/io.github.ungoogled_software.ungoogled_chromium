@@ -82,7 +82,7 @@ add-extensions:
     autodelete: true
 
 build-options:
-  append-path: /usr/lib/sdk/llvm22/bin:/usr/lib/sdk/rust-stable/bin:/usr/lib/sdk/golang/bin
+  append-path: /usr/lib/sdk/llvm22/bin:/usr/lib/sdk/rust-stable/bin:/usr/lib/sdk/golang/bin:/usr/lib/sdk/node26/bin
   append-ld-library-path: /usr/lib/sdk/rust-stable/lib
   env:
     # Use LLVM for builds
@@ -171,12 +171,12 @@ modules:
     sources:
       - type: git
         url: https://github.com/ungoogled-software/ungoogled-chromium
-        commit: 809f49cc180bad4e0531732eedb4e8b1670d41ce
+        commit: 800d0bb5078472e4442c1fd73373172754a60939
         dest: uc
       - patches/ungoogled-chromium/_sources.json
       - type: archive
-        url: https://commondatastorage.googleapis.com/chromium-browser-official/chromium-153.0.8010.47-lite.tar.xz
-        sha256: 282db07c88e1df77a45f367e89a0da3a02f81089536d507fa7fdbce45a82d6c4
+        url: https://github.com/chromium-linux-tarballs/chromium-tarballs/releases/download/154.0.8037.57/chromium-154.0.8037.57-linux.tar.xz
+        sha256: 2b2c55e73cbf9ce4103f8f87829d0b9ce61916152e3deb1596d451d5e291deae
       - patches/chromium/_sources.json
       - patches/chromium-uc/_sources.json
       - type: file
