@@ -1,0 +1,25 @@
+From 68bc67fe26207998b165e985a12e603536f4b8db Mon Sep 17 00:00:00 2001
+From: "re:fi.64" <hello@refi64.dev>
+Date: Fri, 11 Sep 2026 10:57:51 -0500
+Subject: [PATCH] Use the system Python 3 interpreter
+
+---
+ .gn | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/.gn b/.gn
+index 488189e60c708..6d03f1365859c 100644
+--- a/.gn
++++ b/.gn
+@@ -9,7 +9,7 @@ import("//third_party/angle/dotfile_settings.gni")
+ buildconfig = "//build/config/BUILDCONFIG.gn"
+ 
+ # The hermetic Python interpreter to use by default.
+-script_executable = "//third_party/cpython3/host/bin/python3"
++script_executable = "python3"
+ 
+ # These arguments override the default values for items in a declare_args
+ # block. "gn args" in turn can override these.
+-- 
+2.54.0
+

@@ -1,0 +1,63 @@
+From 061865f32607cd064ab944407cc863186702d6f1 Mon Sep 17 00:00:00 2001
+From: Daniel Paoliello <danpao@microsoft.com>
+Date: Fri, 21 Aug 2026 12:33:31 -0700
+Subject: [PATCH] [clang][win] Fix __global_delete breaking
+ __attribute__((used)) (#217753)
+
+The `__empty_global_delete` fallback introduced in #209585 was marked
+used via `llvm::appendToUsed()`, which creates a global named
+"llvm.used" during codegen. `CodeGenModule::emitLLVMUsed()` later
+unconditionally creates its own global of that same name at end-of-TU,
+so the name collision renamed the latter to "llvm.used.1" -- a name LLVM
+ignores. The result was that every `__attribute__((used))` global in the
+TU silently lost its used semantics whenever a `__global_delete` wrapper
+was emitted, letting those symbols be dropped.
+
+Mark the fallback used via `CodeGenModule::addUsedGlobal()` instead, so
+it joins the single llvm.used that `emitLLVMUsed()` emits.
+`emitLLVMUsed()` runs well after `emitGlobalDeleteForwardingBodies()` in
+`Release()`, so the fallback is still recorded in time.
+
+Fixes a regression reported on #209585.
+---
+ clang/lib/CodeGen/CodeGenModule.cpp             |  2 +-
+ .../CodeGenCXX/msvc-global-delete-llvm-used.cpp | 17 +++++++++++++++++
+ 2 files changed, 18 insertions(+), 1 deletion(-)
+ create mode 100644 clang/test/CodeGenCXX/msvc-global-delete-llvm-used.cpp
+
+diff --git a/clang/lib/CodeGen/CodeGenModule.cpp b/clang/lib/CodeGen/CodeGenModule.cpp
+index 48616a8365ce1..eb9c8f990d923 100644
+--- a/clang/lib/CodeGen/CodeGenModule.cpp
++++ b/clang/lib/CodeGen/CodeGenModule.cpp
+@@ -9117,7 +9117,7 @@ CodeGenModule::getOrCreateMSVCGlobalDeleteWrapper(const FunctionDecl *GlobOD) {
+     // uses ::delete that alias is replaced by a real forwarding body, leaving
+     // the empty otherwise unreferenced, so explicitly mark it used to ensure
+     // it is always emitted (matching MSVC).
+-    appendToUsed(M, {EmptyFn});
++    addUsedGlobal(EmptyFn);
+   }
+ 
+   // The wrapper defaults to a weak alias to the trapping __empty_global_delete
+diff --git a/clang/test/CodeGenCXX/msvc-global-delete-llvm-used.cpp b/clang/test/CodeGenCXX/msvc-global-delete-llvm-used.cpp
+new file mode 100644
+index 0000000000000..07811b0f8eecc
+--- /dev/null
++++ b/clang/test/CodeGenCXX/msvc-global-delete-llvm-used.cpp
+@@ -0,0 +1,17 @@
++// RUN: %clang_cc1 -emit-llvm -fms-extensions %s -triple=x86_64-pc-windows-msvc -o - \
++// RUN:   | FileCheck %s --implicit-check-not="@llvm.used.1"
++
++// The __empty_global_delete fallback is marked used so it is always emitted.
++// It must join the single llvm.used that CodeGenModule emits at end-of-TU: if
++// it creates its own llvm.used first, the one holding __attribute__((used))
++// globals gets renamed to llvm.used.1, which LLVM ignores.
++
++struct S { virtual ~S(); };
++S::~S() {}
++void del(S *s) { ::delete s; }
++
++__attribute__((used)) static void keep_me() {}
++
++// CHECK: @llvm.used = appending global
++// CHECK-SAME: @"?__empty_global_delete@@YAXPEAX_K@Z"
++// CHECK-SAME: @"?keep_me@@YAXXZ"

@@ -1,4 +1,4 @@
-From b1f28b5ea17c1751988c9ee0744f86c382be7399 Mon Sep 17 00:00:00 2001
+From 8e35288c33223cf159c781f96709c5e3662ceebd Mon Sep 17 00:00:00 2001
 From: Ryan Gonzalez <rymg19@gmail.com>
 Date: Tue, 17 Mar 2020 13:18:27 -0500
 Subject: [PATCH] flatpak: Add initial sandbox support
@@ -30,10 +30,10 @@ Subject: [PATCH] flatpak: Add initial sandbox support
  create mode 100644 sandbox/linux/services/flatpak_sandbox.h
 
 diff --git a/.gitignore b/.gitignore
-index 8ef6e8a38aa51..1ea2cf3fdc110 100644
+index 63b0d36754709..d6f51feb7ff9a 100644
 --- a/.gitignore
 +++ b/.gitignore
-@@ -75,6 +75,7 @@ vs-chromium-project.txt
+@@ -79,6 +79,7 @@ vs-chromium-project.txt
  /.android_emulator_cipd_cache/
  /.clangd/
  /.clangd-index/
@@ -42,10 +42,10 @@ index 8ef6e8a38aa51..1ea2cf3fdc110 100644
  /.externalToolBuilders/
  /.settings/
 diff --git a/base/threading/thread_restrictions.h b/base/threading/thread_restrictions.h
-index 71f651ae10d84..e90a98a7e0eff 100644
+index b901cc0ee2065..df58a876c8063 100644
 --- a/base/threading/thread_restrictions.h
 +++ b/base/threading/thread_restrictions.h
-@@ -418,6 +418,9 @@ class ScopedAllowThreadJoinForWebRtcTransport;
+@@ -422,6 +422,9 @@ class ScopedAllowThreadJoinForWebRtcTransport;
  namespace rlz_lib {
  class FinancialPing;
  }
@@ -55,7 +55,7 @@ index 71f651ae10d84..e90a98a7e0eff 100644
  namespace service_manager {
  class ServiceProcessLauncher;
  }
-@@ -654,6 +657,7 @@ class BASE_EXPORT ScopedAllowBlocking {
+@@ -659,6 +662,7 @@ class BASE_EXPORT ScopedAllowBlocking {
    friend class remoting::
        ScopedBypassIOThreadRestrictions;  // http://crbug.com/1144161
    friend class remoting::ScopedAllowBlockingForCrashReporting;
@@ -63,7 +63,7 @@ index 71f651ae10d84..e90a98a7e0eff 100644
    friend class ui::DrmDisplayHostManager;
    friend class ui::ScopedAllowBlockingForGbmSurface;
    friend class ui::SelectFileDialogLinux;
-@@ -799,6 +803,7 @@ class BASE_EXPORT ScopedAllowBaseSyncPrimitives {
+@@ -805,6 +809,7 @@ class BASE_EXPORT ScopedAllowBaseSyncPrimitives {
    friend class rlz_lib::FinancialPing;
    friend class shell_integration_linux::
        LaunchXdgUtilityScopedAllowBaseSyncPrimitives;
@@ -125,10 +125,10 @@ index 1174a704b8126..e7fd738b705fb 100644
                       status & sandbox::policy::SandboxLinux::kNetNS;
    // A second-layer sandbox is also required to be adequately sandboxed.
 diff --git a/content/browser/child_process_host_impl.cc b/content/browser/child_process_host_impl.cc
-index 34d82f8328645..73940009dc301 100644
+index 6374969dc0241..9c1ea34b8f844 100644
 --- a/content/browser/child_process_host_impl.cc
 +++ b/content/browser/child_process_host_impl.cc
-@@ -36,6 +36,7 @@
+@@ -38,6 +38,7 @@
  
  #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
  #include "base/linux_util.h"
@@ -136,7 +136,7 @@ index 34d82f8328645..73940009dc301 100644
  #elif BUILDFLAG(IS_MAC)
  #include "base/apple/foundation_util.h"
  #include "content/browser/mac_helpers.h"
-@@ -61,7 +62,12 @@ base::FilePath ChildProcessHost::GetChildPath(int flags) {
+@@ -63,7 +64,12 @@ base::FilePath ChildProcessHost::GetChildPath(int flags) {
  #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
    // Use /proc/self/exe rather than our known binary path so updates
    // can't swap out the binary from underneath us.
@@ -151,7 +151,7 @@ index 34d82f8328645..73940009dc301 100644
    }
  #endif
 diff --git a/content/browser/zygote_host/zygote_host_impl_linux.cc b/content/browser/zygote_host/zygote_host_impl_linux.cc
-index e87329429b283..c611f34a2fca7 100644
+index 72ad2dedfe2e0..a3945ff88abb5 100644
 --- a/content/browser/zygote_host/zygote_host_impl_linux.cc
 +++ b/content/browser/zygote_host/zygote_host_impl_linux.cc
 @@ -13,6 +13,7 @@
@@ -161,8 +161,8 @@ index e87329429b283..c611f34a2fca7 100644
 +#include "base/process/launch.h"
  #include "base/process/memory.h"
  #include "base/strings/string_number_conversions.h"
- #include "base/types/fixed_array.h"
-@@ -22,6 +23,7 @@
+ #include "base/time/time.h"
+@@ -23,6 +24,7 @@
  #include "content/common/zygote/zygote_handle_impl_linux.h"
  #include "content/public/common/zygote/zygote_handle.h"
  #include "sandbox/linux/services/credentials.h"
@@ -170,7 +170,7 @@ index e87329429b283..c611f34a2fca7 100644
  #include "sandbox/linux/services/namespace_sandbox.h"
  #include "sandbox/linux/suid/client/setuid_sandbox_host.h"
  #include "sandbox/linux/suid/common/sandbox.h"
-@@ -72,6 +74,7 @@ ZygoteHostImpl::ZygoteHostImpl()
+@@ -73,6 +75,7 @@ ZygoteHostImpl::ZygoteHostImpl()
      : use_namespace_sandbox_(false),
        use_suid_sandbox_(false),
        use_suid_sandbox_for_adj_oom_score_(false),
@@ -178,7 +178,7 @@ index e87329429b283..c611f34a2fca7 100644
        sandbox_binary_(),
        zygote_pids_lock_(),
        zygote_pids_() {}
-@@ -110,9 +113,12 @@ void ZygoteHostImpl::Init(const base::CommandLine& command_line) {
+@@ -111,9 +114,12 @@ void ZygoteHostImpl::Init(const base::CommandLine& command_line) {
      sandbox_binary_ = setuid_sandbox_host->GetSandboxBinaryPath().value();
    }
  
@@ -194,7 +194,7 @@ index e87329429b283..c611f34a2fca7 100644
      use_namespace_sandbox_ = true;
    } else if (!command_line.HasSwitch(
                   sandbox::policy::switches::kDisableSetuidSandbox) &&
-@@ -183,10 +189,16 @@ pid_t ZygoteHostImpl::LaunchZygote(
+@@ -184,10 +190,16 @@ pid_t ZygoteHostImpl::LaunchZygote(
      sandbox_host->SetupLaunchEnvironment();
    }
  
@@ -215,7 +215,7 @@ index e87329429b283..c611f34a2fca7 100644
    CHECK(process.IsValid()) << "Failed to launch zygote process";
  
    dummy_fd.reset();
-@@ -195,7 +207,8 @@ pid_t ZygoteHostImpl::LaunchZygote(
+@@ -196,7 +208,8 @@ pid_t ZygoteHostImpl::LaunchZygote(
  
    pid_t pid = process.Pid();
  
@@ -225,7 +225,7 @@ index e87329429b283..c611f34a2fca7 100644
      // The namespace and SUID sandbox will execute the zygote in a new
      // PID namespace, and the main zygote process will then fork from
      // there. Watch now our elaborate dance to find and validate the
-@@ -223,7 +236,11 @@ pid_t ZygoteHostImpl::LaunchZygote(
+@@ -244,7 +257,11 @@ pid_t ZygoteHostImpl::LaunchZygote(
  
      if (real_pid != pid) {
        // Reap the sandbox.
@@ -238,7 +238,7 @@ index e87329429b283..c611f34a2fca7 100644
      }
      pid = real_pid;
    }
-@@ -274,6 +291,10 @@ void ZygoteHostImpl::AdjustRendererOOMScore(base::ProcessHandle pid,
+@@ -295,6 +312,10 @@ void ZygoteHostImpl::AdjustRendererOOMScore(base::ProcessHandle pid,
      selinux_valid = true;
    }
  
@@ -1211,10 +1211,10 @@ index 0000000000000..167bbc85945ad
 +
 +#endif  // SANDBOX_LINUX_SERVICES_FLATPAK_SANDBOX_H_
 diff --git a/sandbox/policy/BUILD.gn b/sandbox/policy/BUILD.gn
-index 86637095300f4..8538322c94a0f 100644
+index 490b4581e3338..afacd15499a05 100644
 --- a/sandbox/policy/BUILD.gn
 +++ b/sandbox/policy/BUILD.gn
-@@ -118,6 +118,9 @@ component("policy") {
+@@ -116,6 +116,9 @@ component("policy") {
        "//sandbox/linux:suid_sandbox_client",
      ]
    }

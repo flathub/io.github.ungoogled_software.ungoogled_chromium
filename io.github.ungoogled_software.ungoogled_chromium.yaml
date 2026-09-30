@@ -82,48 +82,16 @@ add-extensions:
     autodelete: true
 
 build-options:
-  append-path: /usr/lib/sdk/llvm22/bin:/usr/lib/sdk/rust-stable/bin:/usr/lib/sdk/golang/bin
-  append-ld-library-path: /usr/lib/sdk/rust-stable/lib
   env:
-    # Use LLVM for builds
-    AR: llvm-ar
-    CC: clang
-    CXX: clang++
-    NM: llvm-nm
-    RANLIB: llvm-ranlib
-    STRIP: llvm-strip
-
-    # Point bindgen to LLVM's libclang
-    LIBCLANG_PATH: /usr/lib/sdk/llvm22/lib
-
-    # Paths to Node.js and OpenJDK
-    NODE_HOME: /usr/lib/sdk/node26
-    JAVA_HOME: /usr/lib/sdk/openjdk
-
-    # Allow the use of nightly features with stable Rust compiler
-    # https://github.com/ungoogled-software/ungoogled-chromium/pull/2696#issuecomment-1918173198
-    RUSTC_BOOTSTRAP: '1'
-
     # Configure CCACHE for faster builds
     CCACHE_NOHASHDIR: 'true'
     CCACHE_SLOPPINESS: time_macros,include_file_ctime,include_file_mtime
 
-sdk-extensions:
-  - org.freedesktop.Sdk.Extension.llvm22
-  - org.freedesktop.Sdk.Extension.node26
-  - org.freedesktop.Sdk.Extension.openjdk
-  - org.freedesktop.Sdk.Extension.rust-stable
-  - org.freedesktop.Sdk.Extension.golang
-
 modules:
-  - name: clang-ccache-symlink
-    buildsystem: simple
-    build-commands:
-      - |
-        set -euxo pipefail
-        [[ "${CCACHE_DIR}" = "/run/ccache" ]] || exit 0
-        ln -svf /usr/bin/ccache /run/ccache/bin/clang
-        ln -svf /usr/bin/ccache /run/ccache/bin/clang++
+  - toolchains/google.json
+  - toolchains/llvm.json
+  - toolchains/rust.json
+  - toolchains/build-tools.json
 
   - name: readelf-symlink
     only-arches: [aarch64]
@@ -166,17 +134,17 @@ modules:
   - name: chromium
     buildsystem: simple
     build-commands:
-      - ./build.sh
-      - ./install.sh
+      - bash build-steps/build.sh
+      - bash build-steps/0070-install.sh
     sources:
       - type: git
         url: https://github.com/ungoogled-software/ungoogled-chromium
-        commit: e71b91c6e336d0f25cfc6b9ef09298a9d2506e24
+        commit: 800d0bb5078472e4442c1fd73373172754a60939
         dest: uc
       - patches/ungoogled-chromium/_sources.json
       - type: archive
-        url: https://commondatastorage.googleapis.com/chromium-browser-official/chromium-152.0.7977.82-lite.tar.xz
-        sha256: 67ac37f365dfdac763c428862e5e460e5948940b3d6f856374da2ce219981417
+        url: https://github.com/chromium-linux-tarballs/chromium-tarballs/releases/download/154.0.8037.57/chromium-154.0.8037.57-linux.tar.xz
+        sha256: 2b2c55e73cbf9ce4103f8f87829d0b9ce61916152e3deb1596d451d5e291deae
       - patches/chromium/_sources.json
       - patches/chromium-uc/_sources.json
       - type: file
@@ -188,6 +156,7 @@ modules:
       - type: file
         path: cobalt.ini
       - type: dir
-        path: build-aux
+        path: build-steps/chromium
+        dest: build-steps
       - type: dir
         path: branding/to_copy
