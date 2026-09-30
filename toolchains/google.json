@@ -1,0 +1,45 @@
+{
+  "name": "google-toolchains",
+  "only-arches": [
+    "x86_64"
+  ],
+  "buildsystem": "simple",
+  "build-commands": [
+    "mkdir -p /app/toolchains",
+    "cp -a llvm rust libclang /app/toolchains/",
+    "printf \"%s\\n\" \"llvmorg-24-init-3796-g20e97c4b-27\" > /app/toolchains/llvm/cr_build_revision"
+  ],
+  "cleanup": [
+    "/toolchains"
+  ],
+  "sources": [
+    {
+      "type": "archive",
+      "url": "https://commondatastorage.googleapis.com/chromium-browser-clang/Linux_x64/clang-llvmorg-24-init-3796-g20e97c4b-27.tar.xz",
+      "sha256": "968195fa0b49958e066695df2c7c985d169a20fa06eedb8fcef900a6030edcb0",
+      "dest": "llvm",
+      "strip-components": 0
+    },
+    {
+      "type": "archive",
+      "url": "https://commondatastorage.googleapis.com/chromium-browser-clang/Linux_x64/llvmobjdump-llvmorg-24-init-3796-g20e97c4b-27.tar.xz",
+      "sha256": "a3cb375c86dd2149277110fe402b6c8d308ccfde16c4c9bfe6a2e2995d4c35ac",
+      "dest": "llvm",
+      "strip-components": 0
+    },
+    {
+      "type": "archive",
+      "url": "https://commondatastorage.googleapis.com/chromium-browser-clang/Linux_x64/rust-toolchain-0913b18e489ac1011b580e31fa5559654be12bfc-2-llvmorg-24-init-3796-g20e97c4b.tar.xz",
+      "sha256": "4b131e81d157a97bcf454ad0fbb71bc2063b2a3708c858410c04201ef06134e5",
+      "dest": "rust",
+      "strip-components": 0
+    },
+    {
+      "type": "archive",
+      "url": "https://commondatastorage.googleapis.com/chromium-browser-clang/Linux_x64/rust-libclang-0913b18e489ac1011b580e31fa5559654be12bfc-2-llvmorg-24-init-3796-g20e97c4b.tar.xz",
+      "sha256": "a36afcfb09b2b096cd7d17b6008beb1993c3962d780a7ccc0aa4c5f544447429",
+      "dest": "libclang",
+      "strip-components": 0
+    }
+  ]
+}

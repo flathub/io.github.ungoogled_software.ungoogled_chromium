@@ -38,7 +38,7 @@ choose_and_run() {
   die "No suitable binary found for: ${binaries[*]}"
 }
 
-for cmd in git curl awk; do
+for cmd in git curl awk python3; do
   command -v "$cmd" &>/dev/null || die "Missing required command: $cmd"
 done
 
@@ -62,7 +62,7 @@ else
 fi
 
 # 2) Compute chromium tarball URL + sha256 from the .hashes file
-TARBALL_URL="https://commondatastorage.googleapis.com/chromium-browser-official/chromium-${CHROMIUM_VERSION}-lite.tar.xz"
+TARBALL_URL="https://github.com/chromium-linux-tarballs/chromium-tarballs/releases/download/${CHROMIUM_VERSION}/chromium-${CHROMIUM_VERSION}-linux.tar.xz"
 HASHES_URL="${TARBALL_URL}.hashes"
 
 SHA256="$(
@@ -70,6 +70,9 @@ SHA256="$(
     awk '$1=="sha256" {print $2; exit}'
 )"
 [[ -n "$SHA256" ]] || die "Could not extract sha256 from: $HASHES_URL"
+
+# Resolve all compiler pins before changing the release manifest.
+python3 toolchains/update.py "${CHROMIUM_VERSION}"
 
 # 3) Update metainfo.xml (insert new <release .../> right after <releases>)
 choose_and_run SED_BINARIES -i "/<releases>/a \\
@@ -115,8 +118,8 @@ awk -v new_commit="$UC_COMMIT" -v new_url="$TARBALL_URL" -v new_sha="$SHA256" '
       next
     }
 
-    # Inside an archive block: update only the chromium official tarball URL
-    if (in_archive && $0 ~ /url: https:\/\/commondatastorage\.googleapis\.com\/chromium-browser-official\/chromium-.*-lite\.tar\.xz[[:space:]]*$/) {
+    # Inside an archive block: update only the chromium Linux tarball URL
+    if (in_archive && $0 ~ /url: https:\/\/github\.com\/chromium-linux-tarballs\/chromium-tarballs\/releases\/download\/[^\/]+\/chromium-.*-linux\.tar\.xz[[:space:]]*$/) {
       indent=$0; sub(/url:.*/, "", indent)
       print indent "url: " new_url
       chromium_archive=1
@@ -137,5 +140,5 @@ awk -v new_commit="$UC_COMMIT" -v new_url="$TARBALL_URL" -v new_sha="$SHA256" '
 ' "$YAMLFILE" >"$tmp"
 mv "$tmp" "$YAMLFILE"
 
-git add "$METAFILE" "$YAMLFILE"
+git add "$METAFILE" "$YAMLFILE" toolchains/
 git commit -sm "$COMMIT_MSG"

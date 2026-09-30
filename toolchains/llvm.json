@@ -1,0 +1,47 @@
+{
+  "name": "native-llvm",
+  "only-arches": [
+    "aarch64"
+  ],
+  "buildsystem": "simple",
+  "build-commands": [
+    "bash 0010-build.sh"
+  ],
+  "cleanup": [
+    "/toolchains"
+  ],
+  "sources": [
+    {
+      "type": "archive",
+      "archive-type": "tar-gzip",
+      "url": "https://codeload.github.com/llvm/llvm-project/tar.gz/20e97c4b113b79586c29ac57738548939a34d22e",
+      "sha256": "402868bfcf3489629d8bf0aa607c6141df4d28803e7aafb1e46d87cec0cf9fab",
+      "dest": "llvm"
+    },
+    {
+      "type": "patch",
+      "path": "llvm-061865f32607cd064ab944407cc863186702d6f1.patch",
+      "options": [
+        "-d",
+        "llvm"
+      ]
+    },
+    {
+      "type": "patch",
+      "path": "llvm-b8007a8e4020b8bca2b12e941660e10bf5bf6716.patch",
+      "options": [
+        "-d",
+        "llvm"
+      ]
+    },
+    {
+      "type": "file",
+      "path": "../build-steps/llvm/0010-build.sh"
+    },
+    {
+      "type": "inline",
+      "dest-filename": "clang-revision",
+      "contents": "llvmorg-24-init-3796-g20e97c4b-27\n"
+    }
+  ]
+}

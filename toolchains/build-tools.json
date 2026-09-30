@@ -1,0 +1,172 @@
+{
+  "name": "chromium-build-tools",
+  "only-arches": [
+    "x86_64",
+    "aarch64"
+  ],
+  "buildsystem": "simple",
+  "build-commands": [
+    "mkdir -p /app/toolchains",
+    "if [ \"$FLATPAK_ARCH\" = x86_64 ]; then install -Dm755 clang-format /app/toolchains/clang-format; else ln -s llvm/bin/clang-format /app/toolchains/clang-format; fi",
+    "if [ \"$FLATPAK_ARCH\" = aarch64 ]; then mv jdk/bin/java jdk/bin/java.chromium; install -m755 jdk-java-wrapper jdk/bin/java; fi",
+    "if [ \"$FLATPAK_ARCH\" = aarch64 ]; then install -m755 typescript-arm64/lib/tsc typescript/lib/tsc; fi",
+    "cp -a node go jdk typescript esbuild rollup_libs node-version go-version jdk-version /app/toolchains/",
+    "chmod -R u+w /app/toolchains/node /app/toolchains/go /app/toolchains/jdk /app/toolchains/typescript /app/toolchains/esbuild /app/toolchains/rollup_libs"
+  ],
+  "cleanup": [
+    "/toolchains"
+  ],
+  "sources": [
+    {
+      "type": "archive",
+      "archive-type": "tar-gzip",
+      "url": "https://commondatastorage.googleapis.com/chromium-nodejs/744e6926ffdd4a4fb2080ae2b9ce4575490261e7",
+      "sha256": "bdea62a6857735d62165ec97242d79a693564c72d551890c4d009d2355abf14c",
+      "dest": "node",
+      "only-arches": [
+        "x86_64"
+      ]
+    },
+    {
+      "type": "archive",
+      "url": "https://nodejs.org/dist/v24.12.0/node-v24.12.0-linux-arm64.tar.xz",
+      "sha256": "a06d42807fb500f7459e5f3fa6cb431447352826ee6f07e14adfeec58a1b3210",
+      "dest": "node",
+      "only-arches": [
+        "aarch64"
+      ]
+    },
+    {
+      "type": "archive",
+      "archive-type": "zip",
+      "url": "https://chrome-infra-packages.appspot.com/dl/infra/3pp/tools/go/linux-amd64/+/version:3@1.26.6",
+      "sha256": "31fd0d71f24489775a444b7d0c1c94f483fdb297c4948539a923e39bc400ffe7",
+      "strip-components": 0,
+      "dest": "go",
+      "only-arches": [
+        "x86_64"
+      ]
+    },
+    {
+      "type": "archive",
+      "archive-type": "zip",
+      "url": "https://chrome-infra-packages.appspot.com/dl/infra/3pp/tools/go/linux-arm64/+/version:3@1.26.6",
+      "sha256": "9c3845d63b08be6b81bd602d44b56dce1b3f95043c4356c79abbcb865772bc33",
+      "strip-components": 0,
+      "dest": "go",
+      "only-arches": [
+        "aarch64"
+      ]
+    },
+    {
+      "type": "inline",
+      "dest-filename": "node-version",
+      "contents": "v24.12.0\n"
+    },
+    {
+      "type": "inline",
+      "dest-filename": "go-version",
+      "contents": "go1.26.6\n"
+    },
+    {
+      "type": "archive",
+      "archive-type": "zip",
+      "url": "https://chrome-infra-packages.appspot.com/dl/chromium/third_party/jdk/linux-amd64/+/0McmveI3ccFWIEryZk0owg3Hq-vL21F6YZEWtP-3f4AC",
+      "sha256": "d0c726bde23771c156204af2664d28c20dc7abebcbdb517a619116b4ffb77f80",
+      "strip-components": 0,
+      "dest": "jdk",
+      "only-arches": [
+        "x86_64"
+      ]
+    },
+    {
+      "type": "archive",
+      "url": "https://github.com/adoptium/temurin25-binaries/releases/download/jdk-25.0.4.1%2B1/OpenJDK25U-jdk_aarch64_linux_hotspot_25.0.4.1_1.tar.gz",
+      "sha256": "69df11a02cfa3ef7d7ca645e03edce6778ec090e100f6ae2b42097865730ac52",
+      "dest": "jdk",
+      "only-arches": [
+        "aarch64"
+      ]
+    },
+    {
+      "type": "inline",
+      "dest-filename": "jdk-java-wrapper",
+      "contents": "#!/bin/sh\n\n# https://crbug.com/1441023\nexec \"$0.chromium\" -XX:+PerfDisableSharedMem \"$@\"\n\n"
+    },
+    {
+      "type": "inline",
+      "dest-filename": "jdk-version",
+      "contents": "25.0.4.1+1\n"
+    },
+    {
+      "type": "archive",
+      "archive-type": "zip",
+      "url": "https://chrome-infra-packages.appspot.com/dl/chromium/third_party/typescript/linux-amd64/+/version:2@7.0.2",
+      "sha256": "848c8198d586273d0cd6f21c66d52510c27bdecd03954d9acc5a0c95894a0a71",
+      "strip-components": 0,
+      "dest": "typescript"
+    },
+    {
+      "type": "archive",
+      "url": "https://registry.npmjs.org/@typescript/typescript-linux-arm64/-/typescript-linux-arm64-7.0.2.tgz",
+      "sha256": "c83d931ac9dd7549cde6e71246aa9d6a9812843023df3e277fe3b5dcf41dd0ea",
+      "dest": "typescript-arm64",
+      "only-arches": [
+        "aarch64"
+      ]
+    },
+    {
+      "type": "archive",
+      "archive-type": "zip",
+      "url": "https://chrome-infra-packages.appspot.com/dl/infra/3pp/tools/esbuild/linux-amd64/+/version:3@0.25.1.chromium.2",
+      "sha256": "520554b1c0ad045201310582a01ef7a0ba9b5d033d8f03a709c369c52f81d9c9",
+      "strip-components": 0,
+      "dest": "esbuild",
+      "only-arches": [
+        "x86_64"
+      ]
+    },
+    {
+      "type": "archive",
+      "archive-type": "zip",
+      "url": "https://chrome-infra-packages.appspot.com/dl/infra/3pp/tools/esbuild/linux-arm64/+/version:3@0.25.1.chromium.2",
+      "sha256": "fc47145defe33d4fd5d6e09d999ce113a179c3fef4188da0a54cecc0ca295e1c",
+      "strip-components": 0,
+      "dest": "esbuild",
+      "only-arches": [
+        "aarch64"
+      ]
+    },
+    {
+      "type": "archive",
+      "archive-type": "zip",
+      "url": "https://chrome-infra-packages.appspot.com/dl/infra/3pp/tools/rollup_libs/linux-amd64/+/version:3@4.60.4",
+      "sha256": "e83320a4e35f3ba985ebd782a0448ca72301b0c9a8ff8168b623ff655784d40c",
+      "strip-components": 0,
+      "dest": "rollup_libs",
+      "only-arches": [
+        "x86_64"
+      ]
+    },
+    {
+      "type": "archive",
+      "archive-type": "zip",
+      "url": "https://chrome-infra-packages.appspot.com/dl/infra/3pp/tools/rollup_libs/linux-arm64/+/version:3@4.60.4",
+      "sha256": "c158cc7fdd58ff60485726200f2cb47af95e808000c78ab84cc273ba0dbf9be1",
+      "strip-components": 0,
+      "dest": "rollup_libs",
+      "only-arches": [
+        "aarch64"
+      ]
+    },
+    {
+      "type": "file",
+      "url": "https://commondatastorage.googleapis.com/chromium-clang-format/f5485c39451137ee943021a0fb63738b306c5026",
+      "sha256": "5d384f2a3e72f01c5c61dd07e3a2577723cfa20c8c019131467f00fb6da8a75c",
+      "dest-filename": "clang-format",
+      "only-arches": [
+        "x86_64"
+      ]
+    }
+  ]
+}
