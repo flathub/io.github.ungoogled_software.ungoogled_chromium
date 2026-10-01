@@ -139,12 +139,12 @@ modules:
     sources:
       - type: git
         url: https://github.com/ungoogled-software/ungoogled-chromium
-        commit: 800d0bb5078472e4442c1fd73373172754a60939
+        commit: dfd7c50244e82b8e306350bfa1353cb152c5d037
         dest: uc
       - patches/ungoogled-chromium/_sources.json
       - type: archive
-        url: https://github.com/chromium-linux-tarballs/chromium-tarballs/releases/download/154.0.8037.57/chromium-154.0.8037.57-linux.tar.xz
-        sha256: 2b2c55e73cbf9ce4103f8f87829d0b9ce61916152e3deb1596d451d5e291deae
+        url: https://github.com/chromium-linux-tarballs/chromium-tarballs/releases/download/154.0.8037.92/chromium-154.0.8037.92-linux.tar.xz
+        sha256: 5c21ef0ab5829a54bf62c39c6cef7a816c9edf55a2442b623a161ec6fa336e37
       - patches/chromium/_sources.json
       - patches/chromium-uc/_sources.json
       - type: file
