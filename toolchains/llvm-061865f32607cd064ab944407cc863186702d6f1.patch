@@ -26,7 +26,7 @@ Fixes a regression reported on #209585.
  create mode 100644 clang/test/CodeGenCXX/msvc-global-delete-llvm-used.cpp
 
 diff --git a/clang/lib/CodeGen/CodeGenModule.cpp b/clang/lib/CodeGen/CodeGenModule.cpp
-index 48616a8365ce1..eb9c8f990d923 100644
+index 48616a8365ce19..eb9c8f990d923c 100644
 --- a/clang/lib/CodeGen/CodeGenModule.cpp
 +++ b/clang/lib/CodeGen/CodeGenModule.cpp
 @@ -9117,7 +9117,7 @@ CodeGenModule::getOrCreateMSVCGlobalDeleteWrapper(const FunctionDecl *GlobOD) {
@@ -40,7 +40,7 @@ index 48616a8365ce1..eb9c8f990d923 100644
    // The wrapper defaults to a weak alias to the trapping __empty_global_delete
 diff --git a/clang/test/CodeGenCXX/msvc-global-delete-llvm-used.cpp b/clang/test/CodeGenCXX/msvc-global-delete-llvm-used.cpp
 new file mode 100644
-index 0000000000000..07811b0f8eecc
+index 00000000000000..07811b0f8eeccc
 --- /dev/null
 +++ b/clang/test/CodeGenCXX/msvc-global-delete-llvm-used.cpp
 @@ -0,0 +1,17 @@

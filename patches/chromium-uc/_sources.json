@@ -1,8 +1,0 @@
-[
-  {
-    "type": "patch",
-    "paths": [
-      "patches/chromium-uc/chromium-149-use-of-undeclared-identifier-ERROR.patch"
-    ]
-  }
-]

@@ -2,6 +2,8 @@ app-id: io.github.ungoogled_software.ungoogled_chromium
 runtime: org.freedesktop.Platform
 runtime-version: '26.08'
 sdk: org.freedesktop.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.llvm22
 base: org.chromium.Chromium.BaseApp
 base-version: '26.08'
 command: chromium
@@ -83,22 +85,79 @@ add-extensions:
 
 build-options:
   env:
-    # Configure CCACHE for faster builds
-    CCACHE_NOHASHDIR: 'true'
-    CCACHE_SLOPPINESS: time_macros,include_file_ctime,include_file_mtime
+    # flatpak-builder mounts its persistent cache here, including without --ccache.
+    SCCACHE_DIR: /run/ccache/sccache
+    # Flathub drops caches above 18 GiB. sccache 0.18 budgets the object and
+    # preprocessor caches separately: 7 GiB each leaves 4 GiB of headroom.
+    SCCACHE_CACHE_SIZE: 7G
+    # Do not let Flatpak's optional ccache shims refill the legacy cache.
+    CCACHE_DISABLE: '1'
+    RUSTC_WRAPPER: /app/libexec/sccache
+    CARGO_INCREMENTAL: '0'
+    CMAKE_C_COMPILER_LAUNCHER: /app/bin/sccache
+    CMAKE_CXX_COMPILER_LAUNCHER: /app/bin/sccache
+    CC: /app/bin/cc
+    CXX: /app/bin/c++
 
 modules:
+  - name: sccache
+    buildsystem: simple
+    build-commands:
+      - install -Dm755 sccache /app/libexec/sccache-bin/sccache
+      - install -Dm755 sccache.sh /app/bin/sccache
+      - install -Dm755 rustc-sysroot-cache.py /app/libexec/sccache
+      - install -Dm755 compiler-cache.sh /app/libexec/compiler-cache
+      - for compiler in cc c++ gcc g++ clang clang++; do ln -s ../libexec/compiler-cache /app/bin/$compiler; done
+      - /app/bin/sccache --show-stats
+    cleanup:
+      - /bin/sccache
+      - /bin/cc
+      - /bin/c++
+      - /bin/gcc
+      - /bin/g++
+      - /bin/clang
+      - /bin/clang++
+      - /libexec/compiler-cache
+      - /libexec/sccache
+      - /libexec/sccache-bin
+    sources:
+      - type: archive
+        url: https://github.com/mozilla/sccache/releases/download/v0.18.0/sccache-v0.18.0-x86_64-unknown-linux-musl.tar.gz
+        sha256: 45f1447fbe231e3037bde351ef70677dd212216c8d62ae7ca409fecc4d6acc89
+        only-arches:
+          - x86_64
+        x-checker-data:
+          type: json
+          url: https://api.github.com/repos/mozilla/sccache/releases/latest
+          version-query: .tag_name | sub("^v"; "")
+          url-query: >-
+            .assets[] | select(.name == "sccache-v" + $version + "-x86_64-unknown-linux-musl.tar.gz")
+            | .browser_download_url
+          timestamp-query: .published_at
+      - type: archive
+        url: https://github.com/mozilla/sccache/releases/download/v0.18.0/sccache-v0.18.0-aarch64-unknown-linux-musl.tar.gz
+        sha256: 2b3284d5da3b46a47dc4229e75bb7b88ac4aa99c8d754fb7d2f84997e5a4354a
+        only-arches:
+          - aarch64
+        x-checker-data:
+          type: json
+          url: https://api.github.com/repos/mozilla/sccache/releases/latest
+          version-query: .tag_name | sub("^v"; "")
+          url-query: >-
+            .assets[] | select(.name == "sccache-v" + $version + "-aarch64-unknown-linux-musl.tar.gz")
+            | .browser_download_url
+          timestamp-query: .published_at
+      - type: file
+        path: build-steps/compiler-cache.sh
+      - type: file
+        path: build-steps/rustc-sysroot-cache.py
+      - type: file
+        path: build-steps/sccache.sh
+
   - toolchains/google.json
   - toolchains/llvm.json
   - toolchains/rust.json
   - toolchains/build-tools.json
-
-  - name: readelf-symlink
-    only-arches: [aarch64]
-    buildsystem: simple
-    build-commands:
-      # Chromium expects to find readelf with its full toolprefix on arm64
-      - ln -sfv /usr/bin/readelf "${FLATPAK_DEST}/bin/aarch64-linux-gnu-readelf"
 
   - name: extensions
     buildsystem: simple
@@ -146,7 +205,7 @@ modules:
         url: https://github.com/chromium-linux-tarballs/chromium-tarballs/releases/download/154.0.8037.92/chromium-154.0.8037.92-linux.tar.xz
         sha256: 5c21ef0ab5829a54bf62c39c6cef7a816c9edf55a2442b623a161ec6fa336e37
       - patches/chromium/_sources.json
-      - patches/chromium-uc/_sources.json
+      - patches/chromium-local/_sources.json
       - type: file
         path: io.github.ungoogled_software.ungoogled_chromium.desktop
       - type: file

@@ -7,11 +7,13 @@
   "buildsystem": "simple",
   "build-commands": [
     "mkdir -p /app/toolchains",
+    "if [ \"$FLATPAK_ARCH\" = aarch64 ]; then (cd gperf-src && _3PP_VERSION=\"$(cat ../gperf-version)\" bash 3pp/install.sh \"${PWD}/../gperf\"); fi",
     "if [ \"$FLATPAK_ARCH\" = x86_64 ]; then install -Dm755 clang-format /app/toolchains/clang-format; else ln -s llvm/bin/clang-format /app/toolchains/clang-format; fi",
     "if [ \"$FLATPAK_ARCH\" = aarch64 ]; then mv jdk/bin/java jdk/bin/java.chromium; install -m755 jdk-java-wrapper jdk/bin/java; fi",
     "if [ \"$FLATPAK_ARCH\" = aarch64 ]; then install -m755 typescript-arm64/lib/tsc typescript/lib/tsc; fi",
-    "cp -a node go jdk typescript esbuild rollup_libs node-version go-version jdk-version /app/toolchains/",
-    "chmod -R u+w /app/toolchains/node /app/toolchains/go /app/toolchains/jdk /app/toolchains/typescript /app/toolchains/esbuild /app/toolchains/rollup_libs"
+    "if [ \"$FLATPAK_ARCH\" = aarch64 ]; then rm -rf node/bin/npm node/bin/npx node/bin/corepack node/lib/node_modules/npm node/lib/node_modules/corepack; fi",
+    "cp -a node go jdk typescript esbuild rollup_libs gperf node-version go-version jdk-version /app/toolchains/",
+    "chmod -R u+w /app/toolchains/node /app/toolchains/go /app/toolchains/jdk /app/toolchains/typescript /app/toolchains/esbuild /app/toolchains/rollup_libs /app/toolchains/gperf"
   ],
   "cleanup": [
     "/toolchains"
@@ -158,6 +160,49 @@
       "only-arches": [
         "aarch64"
       ]
+    },
+    {
+      "type": "archive",
+      "archive-type": "zip",
+      "url": "https://chrome-infra-packages.appspot.com/dl/infra/3pp/tools/gperf/linux-amd64/+/version:3@3.2",
+      "sha256": "a2dad151e1d0afdce5c6d4f8b097d226ab29cad056afd2243eb859f1b1689676",
+      "strip-components": 0,
+      "dest": "gperf",
+      "only-arches": [
+        "x86_64"
+      ]
+    },
+    {
+      "type": "archive",
+      "url": "https://ftp.gnu.org/gnu/gperf/gperf-3.2.tar.gz",
+      "sha256": "e0ddadebb396906a3e3e4cac2f697c8d6ab92dffa5d365a5bc23c7d41d30ef62",
+      "dest": "gperf-src",
+      "only-arches": [
+        "aarch64"
+      ]
+    },
+    {
+      "type": "inline",
+      "dest-filename": "install.sh",
+      "contents": "#!/bin/bash\n# Copyright 2023 The Chromium Authors\n# Use of this source code is governed by a BSD-style license that can be\n# found in the LICENSE file.\n\nset -e # Exit immediately if a command exits with a non-zero status.\nset -x # Print commands and their arguments as they are executed.\nset -o pipefail\n\nPREFIX=\"$1\"\n\n./configure --prefix=\"${PREFIX}\"\nmake install -j$(nproc)\n\n# Add README.chromium file to the package after substituting the version with\n# $_3PP_VERSION.\nTHIS_DIR=$(dirname \"$0\")\nsed 's/$_3PP_VERSION/'\"$_3PP_VERSION\"'/' \\\n\"$THIS_DIR/README.chromium\" > \"$PREFIX/README.chromium\"\n\n# Copy the license file into the package.\ncp \"COPYING\" \"$PREFIX\"\n",
+      "dest": "gperf-src/3pp",
+      "only-arches": [
+        "aarch64"
+      ]
+    },
+    {
+      "type": "inline",
+      "dest-filename": "README.chromium",
+      "contents": "Name: GNU perf\nShort Name: gperf\nURL: https://ftp.gnu.org/gnu/gperf\nVersion: $_3PP_VERSION\nRevision: DEPS\nUpdate Mechanism: Manual\nLicense: GPL-3.0\nLicense File: COPYING\nShipped: no\nSecurity Critical: no\n\nDescription:\nGNU 'gperf' generates perfect hash functions.\n\nLocal Modifications:\nAdded README.chromium metadata file.\n",
+      "dest": "gperf-src/3pp",
+      "only-arches": [
+        "aarch64"
+      ]
+    },
+    {
+      "type": "inline",
+      "dest-filename": "gperf-version",
+      "contents": "3.2\n"
     },
     {
       "type": "file",

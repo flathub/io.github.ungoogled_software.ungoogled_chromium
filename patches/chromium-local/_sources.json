@@ -1,0 +1,9 @@
+[
+  {
+    "type": "patch",
+    "paths": [
+      "patches/chromium-local/sccache-rust-wrapper.patch",
+      "patches/chromium-local/chromium-149-use-of-undeclared-identifier-ERROR.patch"
+    ]
+  }
+]
