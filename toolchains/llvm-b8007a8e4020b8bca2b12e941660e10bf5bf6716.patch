@@ -26,7 +26,7 @@ This is needed to link mac binaries against the macOS 27 SDK.
 
 diff --git a/lld/test/MachO/arm64-x1.s b/lld/test/MachO/arm64-x1.s
 new file mode 100644
-index 0000000000000..67b7debc47132
+index 00000000000000..67b7debc471327
 --- /dev/null
 +++ b/lld/test/MachO/arm64-x1.s
 @@ -0,0 +1,20 @@
@@ -51,7 +51,7 @@ index 0000000000000..67b7debc47132
 +current-version:  0001.001.1
 +...
 diff --git a/llvm/include/llvm/BinaryFormat/MachO.h b/llvm/include/llvm/BinaryFormat/MachO.h
-index aedf7d15e9612..0c80b5d458dbc 100644
+index aedf7d15e96124..0c80b5d458dbc5 100644
 --- a/llvm/include/llvm/BinaryFormat/MachO.h
 +++ b/llvm/include/llvm/BinaryFormat/MachO.h
 @@ -1715,6 +1715,7 @@ enum CPUSubTypeARM64 : uint32_t {
@@ -63,7 +63,7 @@ index aedf7d15e9612..0c80b5d458dbc 100644
    // arm64e uses the capability bits to encode ptrauth ABI information.
    // Bit 63 marks the binary as Versioned.
 diff --git a/llvm/include/llvm/TargetParser/Triple.h b/llvm/include/llvm/TargetParser/Triple.h
-index fd6483fd120df..90e2ce8e37a51 100644
+index fd6483fd120df6..90e2ce8e37a519 100644
 --- a/llvm/include/llvm/TargetParser/Triple.h
 +++ b/llvm/include/llvm/TargetParser/Triple.h
 @@ -157,6 +157,7 @@ class Triple {
@@ -87,7 +87,7 @@ index fd6483fd120df..90e2ce8e37a51 100644
    bool isABIN32() const {
      EnvironmentType Env = getEnvironment();
 diff --git a/llvm/include/llvm/TextAPI/Architecture.def b/llvm/include/llvm/TextAPI/Architecture.def
-index 0caf58e1825d9..33d549035ee65 100644
+index 0caf58e1825d99..33d549035ee657 100644
 --- a/llvm/include/llvm/TextAPI/Architecture.def
 +++ b/llvm/include/llvm/TextAPI/Architecture.def
 @@ -39,7 +39,7 @@ ARCHINFO(armv8_1m_main, armv8.1m.main, MachO::CPU_TYPE_ARM, MachO::CPU_SUBTYPE_A
@@ -100,7 +100,7 @@ index 0caf58e1825d9..33d549035ee65 100644
  ///
  /// ARM64_32 architectures sorted by cpu sub type id
 diff --git a/llvm/lib/BinaryFormat/MachO.cpp b/llvm/lib/BinaryFormat/MachO.cpp
-index 046a79bbd7c5f..923ae478f31d1 100644
+index 046a79bbd7c5f6..923ae478f31d1e 100644
 --- a/llvm/lib/BinaryFormat/MachO.cpp
 +++ b/llvm/lib/BinaryFormat/MachO.cpp
 @@ -66,6 +66,8 @@ static MachO::CPUSubTypeARM64 getARM64SubType(const Triple &T) {
@@ -113,7 +113,7 @@ index 046a79bbd7c5f..923ae478f31d1 100644
    return MachO::CPU_SUBTYPE_ARM64_ALL;
  }
 diff --git a/llvm/lib/Object/MachOObjectFile.cpp b/llvm/lib/Object/MachOObjectFile.cpp
-index 3d48d18668f02..c926159ce04df 100644
+index 3d48d18668f02d..c926159ce04df2 100644
 --- a/llvm/lib/Object/MachOObjectFile.cpp
 +++ b/llvm/lib/Object/MachOObjectFile.cpp
 @@ -2919,6 +2919,12 @@ Triple MachOObjectFile::getArchTriple(uint32_t CPUType, uint32_t CPUSubType,
@@ -130,7 +130,7 @@ index 3d48d18668f02..c926159ce04df 100644
        return Triple();
      }
 diff --git a/llvm/lib/TargetParser/Triple.cpp b/llvm/lib/TargetParser/Triple.cpp
-index 7d67961256f92..dd52c182b8f1f 100644
+index 7d67961256f92b..dd52c182b8f1f2 100644
 --- a/llvm/lib/TargetParser/Triple.cpp
 +++ b/llvm/lib/TargetParser/Triple.cpp
 @@ -191,6 +191,8 @@ StringRef Triple::getArchName(ArchType Kind, SubArchType SubArch) {
@@ -160,7 +160,7 @@ index 7d67961256f92..dd52c182b8f1f 100644
    if (SubArchName == "arm64ec")
      return Triple::AArch64SubArch_arm64ec;
 diff --git a/llvm/test/tools/llvm-readobj/MachO/file-headers-arm64.test b/llvm/test/tools/llvm-readobj/MachO/file-headers-arm64.test
-index 5d97647b6654f..e68ea3994dcd4 100644
+index 5d97647b6654f3..e68ea3994dcd41 100644
 --- a/llvm/test/tools/llvm-readobj/MachO/file-headers-arm64.test
 +++ b/llvm/test/tools/llvm-readobj/MachO/file-headers-arm64.test
 @@ -13,6 +13,11 @@
@@ -177,7 +177,7 @@ index 5d97647b6654f..e68ea3994dcd4 100644
  # ARM64-NEXT:Arch: aarch64
 diff --git a/llvm/test/tools/llvm-readobj/macho-arm64e_x1.test b/llvm/test/tools/llvm-readobj/macho-arm64e_x1.test
 new file mode 100644
-index 0000000000000..d6ea66911b7eb
+index 00000000000000..d6ea66911b7eb1
 --- /dev/null
 +++ b/llvm/test/tools/llvm-readobj/macho-arm64e_x1.test
 @@ -0,0 +1,17 @@
@@ -199,7 +199,7 @@ index 0000000000000..d6ea66911b7eb
 +  flags:           0x00000000
 +  reserved:        0x00000000
 diff --git a/llvm/tools/llvm-objdump/MachODump.cpp b/llvm/tools/llvm-objdump/MachODump.cpp
-index d2f8cb4856498..40b4b52198407 100644
+index d2f8cb48564989..40b4b521984072 100644
 --- a/llvm/tools/llvm-objdump/MachODump.cpp
 +++ b/llvm/tools/llvm-objdump/MachODump.cpp
 @@ -2344,6 +2344,10 @@ static void printCPUType(uint32_t cputype, uint32_t cpusubtype) {
@@ -224,7 +224,7 @@ index d2f8cb4856498..40b4b52198407 100644
          outs() << format(" %10d", cpusubtype & ~MachO::CPU_SUBTYPE_MASK);
          break;
 diff --git a/llvm/tools/llvm-readobj/MachODumper.cpp b/llvm/tools/llvm-readobj/MachODumper.cpp
-index 5a0bcf040b304..28d2c03c8ddd8 100644
+index 5a0bcf040b304e..28d2c03c8ddd89 100644
 --- a/llvm/tools/llvm-readobj/MachODumper.cpp
 +++ b/llvm/tools/llvm-readobj/MachODumper.cpp
 @@ -190,6 +190,7 @@ constexpr EnumStringDef<uint32_t> MachOHeaderCpuSubtypesARM64Defs[] = {
@@ -236,7 +236,7 @@ index 5a0bcf040b304..28d2c03c8ddd8 100644
  constexpr auto MachOHeaderCpuSubtypesARM64 =
      BUILD_ENUM_STRINGS(MachOHeaderCpuSubtypesARM64Defs);
 diff --git a/llvm/unittests/BinaryFormat/MachOTest.cpp b/llvm/unittests/BinaryFormat/MachOTest.cpp
-index 91558f7838016..01545da18454e 100644
+index 91558f78380165..01545da18454e9 100644
 --- a/llvm/unittests/BinaryFormat/MachOTest.cpp
 +++ b/llvm/unittests/BinaryFormat/MachOTest.cpp
 @@ -66,6 +66,7 @@ TEST(MachOTest, CPUType) {

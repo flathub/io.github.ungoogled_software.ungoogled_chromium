@@ -1,0 +1,14 @@
+--- a/build/rust/gni_impl/rustc_wrapper.py
++++ b/build/rust/gni_impl/rustc_wrapper.py
+@@ -432,7 +432,10 @@
+             args.rustc,
+             shlex.join(rustc_args),
+         )
+-    r = subprocess.run([args.rustc, *rustc_args], env=rustenv, check=False)
++    command = [args.rustc, *rustc_args]
++    if wrapper := rustenv.get("RUSTC_WRAPPER"):
++        command.insert(0, wrapper)
++    r = subprocess.run(command, env=rustenv, check=False)
+     HandleReturnCode(r, args.dump_rustc_env_and_flags)
+ 
+     final_depfile_lines = []

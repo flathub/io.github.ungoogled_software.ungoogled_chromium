@@ -20,9 +20,9 @@
 -            }
 -        }
 -        let cargo_manifests = paths_to_vendor
-+        // This offline Chromium toolchain builds only the root, library and
-+        // bootstrap workspaces. Other distribution tools are not shipped.
-+        let cargo_manifests = ["Cargo.toml", "library/Cargo.toml", "src/bootstrap/Cargo.toml"]
++        // Include the offline compiler, library, bootstrap and Cargo workspaces.
++        // Other distribution tools are not shipped.
++        let cargo_manifests = ["Cargo.toml", "library/Cargo.toml", "src/bootstrap/Cargo.toml", "src/tools/cargo/Cargo.toml"]
              .into_iter()
 -            .map(|(path, _submodules)| path.to_str().unwrap().to_string())
 +            .map(|path| builder.src.join(path).to_str().unwrap().to_string())

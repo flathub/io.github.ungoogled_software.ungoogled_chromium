@@ -17,7 +17,8 @@ directory = "{vendor}"
 [net]
 offline = true
 '''.format(vendor=Path('vendor').resolve())
-for root in (Path('rust'), Path('rust/library'), Path('bindgen')):
+for root in (Path('rust'), Path('rust/library'), Path('rust/src/tools/cargo'),
+             Path('bindgen'), Path('crubit')):
     (root / '.cargo').mkdir(exist_ok=True)
     (root / '.cargo/config.toml').write_text(config)
 

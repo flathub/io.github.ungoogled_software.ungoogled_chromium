@@ -15,7 +15,7 @@
       "type": "archive",
       "archive-type": "tar-gzip",
       "url": "https://codeload.github.com/llvm/llvm-project/tar.gz/20e97c4b113b79586c29ac57738548939a34d22e",
-      "sha256": "402868bfcf3489629d8bf0aa607c6141df4d28803e7aafb1e46d87cec0cf9fab",
+      "sha256": "1a59b599c431bc83382e00e3ca3a49522d9865f4740afe84961959026ee0c03f",
       "dest": "llvm"
     },
     {
@@ -42,6 +42,11 @@
       "type": "inline",
       "dest-filename": "clang-revision",
       "contents": "llvmorg-24-init-3796-g20e97c4b-27\n"
+    },
+    {
+      "type": "inline",
+      "dest-filename": "clang-commit",
+      "contents": "20e97c4b113b79586c29ac57738548939a34d22e\n"
     }
   ]
 }

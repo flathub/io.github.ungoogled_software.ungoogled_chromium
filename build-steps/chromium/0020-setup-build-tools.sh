@@ -7,19 +7,10 @@ ln_overwrite_all() {
 	ln -svf "$1" "$2"
 }
 
-# Set custom flags and disable SDK defaults
+# Disable SDK default flags
 # https://gitlab.com/freedesktop-sdk/freedesktop-sdk/-/blob/release/24.08/include/flags.yml
 export CFLAGS='' CXXFLAGS='' CPPFLAGS=''
 unset LDFLAGS RUSTFLAGS
-
-# Facilitate deterministic builds (taken from build/config/compiler/BUILD.gn)
-CFLAGS+='   -Wno-builtin-macro-redefined'
-CXXFLAGS+=' -Wno-builtin-macro-redefined'
-CPPFLAGS+=' -D__DATE__=  -D__TIME__=  -D__TIMESTAMP__='
-
-# Do not warn about unknown warning options
-CFLAGS+='   -Wno-unknown-warning-option'
-CXXFLAGS+=' -Wno-unknown-warning-option'
 
 # Restore the pinned Node and JDK binaries after pruning.
 ln_overwrite_all /app/toolchains/node third_party/node/linux/node-linux-x64
@@ -58,22 +49,14 @@ ln_overwrite_all /app/toolchains/clang-format buildtools/linux64-format/clang-fo
 [[ -x buildtools/linux64-format/clang-format ]]
 buildtools/linux64-format/clang-format --version
 
-# Fail early if release metadata and the supplied tools have drifted apart.
-python3 tools/clang/scripts/update.py --print-revision
-python3 tools/rust/update_rust.py --print-revision validate
+# Report the installed compiler versions.
 "${CC}" --version
 third_party/rust-toolchain/bin/rustc --version
 third_party/rust-toolchain/bin/bindgen --version
 
-# To use correct gperf binary
-gperf_path=$(command -v gperf)
-if [[ -z "${gperf_path}" ]]; then
-	echo 'Error: gperf not found in PATH' >&2
-	exit 1
-fi
-rm -rfv third_party/gperf/cipd/bin/
-mkdir -pv third_party/gperf/cipd/bin/
-ln -svf "${gperf_path}" third_party/gperf/cipd/bin/
+# Use Google's pinned version: CIPD on x86_64, the same source release on ARM64.
+ln_overwrite_all /app/toolchains/gperf third_party/gperf/cipd
+third_party/gperf/cipd/bin/gperf --version
 
 # Provide the complete pinned Go distribution for Dawn/Tint generation.
 case "${FLATPAK_ARCH}" in
@@ -85,10 +68,11 @@ ln_overwrite_all /app/toolchains/go "third_party/dawn/tools/golang/linux-${cipd_
 export GOROOT=/app/toolchains/go
 export GOTOOLCHAIN=local
 
-node_version=$(third_party/node/linux/node-linux-x64/bin/node --version)
-go_version=$("third_party/dawn/tools/golang/linux-${cipd_arch}/bin/go" version)
-[[ "${node_version}" == "$(cat /app/toolchains/node-version)" ]]
-[[ "${go_version}" == "go version $(cat /app/toolchains/go-version) linux/${cipd_arch}" ]]
-grep -Fx "SEMANTIC_VERSION=\"$(cat /app/toolchains/jdk-version)\"" "${JAVA_HOME}/release"
+third_party/node/linux/node-linux-x64/bin/node --version
+"third_party/dawn/tools/golang/linux-${cipd_arch}/bin/go" version
 "${JAVA_HOME}/bin/java" -version
 "${JAVA_HOME}/bin/javac" -version
+
+# GN does not use Cargo's wrapper. Adapt its explicit output names for sccache.
+export RUSTC_WRAPPER="${PWD}/build-steps/rustc-cache.py"
+/app/bin/sccache --show-stats

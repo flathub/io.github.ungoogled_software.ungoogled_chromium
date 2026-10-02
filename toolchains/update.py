@@ -10,17 +10,114 @@ import base64
 import hashlib
 import io
 import json
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import re
 import subprocess
 import tarfile
 import tempfile
 import tomllib
 from urllib.parse import quote
+from urllib.error import HTTPError
 from urllib.request import urlopen
 import zipfile
 
 ROOT = Path(__file__).resolve().parent
+# Infrastructure revision supplying the gperf source-build recipe.
+GPERF_INFRA_REVISION = '15fb2e2eae990f900bd8f3c0e9b4612cd0b407bf'
+UPSTREAM_RECIPES = (
+    'tools/clang/scripts/update.py',
+    'tools/clang/scripts/build.py',
+    'tools/rust/update_rust.py',
+    'tools/rust/build_rust.py',
+    'tools/rust/build_bindgen.py',
+    'tools/rust/config.toml.template',
+    'third_party/node/update_node_binaries',
+)
+
+
+def cherry_picks(source, directory, repo):
+    """Read supported cherry-pick calls from the upstream build recipe."""
+    revisions = []
+    calls = sorted((node for node in ast.walk(ast.parse(source))
+                    if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)),
+                   key=lambda node: (node.lineno, node.col_offset))
+    for call in calls:
+        if call.func.id in ('GitRevert', 'GitMoveSubmoduleBranch'):
+            raise ValueError(f'Unimplemented upstream source operation: {call.func.id}')
+        if call.func.id != 'GitCherryPick':
+            continue
+        if (not 2 <= len(call.args) <= 3 or call.keywords
+                or not isinstance(call.args[0], ast.Name)
+                or call.args[0].id != directory):
+            raise ValueError('Unrecognized upstream GitCherryPick call')
+        revision = ast.literal_eval(call.args[1])
+        if not isinstance(revision, str) or not re.fullmatch(r'[0-9a-f]{40}', revision):
+            raise ValueError('Expected a full cherry-pick commit')
+        if len(call.args) == 3 and ast.literal_eval(call.args[2]) != f'https://github.com/{repo}.git':
+            raise ValueError('Unexpected cherry-pick repository')
+        revisions.append(revision)
+    return revisions
+
+
+def submodule(repo, revision, path, expected_repo):
+    metadata = json.loads(fetch(f'https://api.github.com/repos/{repo}/contents/{path}?ref={revision}'))
+    if (metadata.get('submodule_git_url') != f'https://github.com/{expected_repo}.git'
+            or not re.fullmatch(r'[0-9a-f]{40}', metadata['sha'])):
+        raise ValueError(f'Unexpected submodule: {path}')
+    return metadata['sha']
+
+
+def verified_stage0(source, rust_update):
+    if hashlib.sha256(source).hexdigest() != constant(rust_update, 'STAGE0_JSON_SHA256'):
+        raise ValueError("Rust src/stage0 disagrees with Chromium's expected hash")
+    return dict(line.split('=', 1) for line in source.decode().splitlines()
+                if line and not line.startswith('#'))
+
+
+def prepare_patches(repo, base, revisions, prefix, dest):
+    """Replay text patches in order, retaining edited lockfiles for vendoring."""
+    patches, sources, files = {}, [], {}
+    with tempfile.TemporaryDirectory() as directory:
+        checkout = Path(directory)
+        loaded = set()
+        for revision in revisions:
+            comparison = json.loads(fetch(
+                f'https://api.github.com/repos/{repo}/compare/{revision}...{base}'))
+            if comparison['status'] in ('ahead', 'identical'):
+                continue
+            patch = fetch(f'https://github.com/{repo}/commit/{revision}.patch')
+            old_paths = set(re.findall(rb'^--- a/(.+)$', patch, re.M))
+            new_paths = set(re.findall(rb'^\+\+\+ b/(.+)$', patch, re.M))
+            if not (old_paths | new_paths) or b'GIT binary patch' in patch:
+                raise ValueError(f'Unsupported source patch: {revision}')
+            for raw in old_paths | new_paths:
+                path = raw.decode()
+                if PurePosixPath(path).is_absolute() or '..' in PurePosixPath(path).parts:
+                    raise ValueError(f'Unsafe patch path: {path}')
+                target = checkout / path
+                if path not in loaded:
+                    loaded.add(path)
+                    try:
+                        contents = github(repo, base, path)
+                    except HTTPError as error:
+                        if error.code != 404 or raw in old_paths:
+                            raise
+                    else:
+                        target.parent.mkdir(parents=True, exist_ok=True)
+                        target.write_bytes(contents)
+            # Rebased fixes can already be present without commit ancestry.
+            if subprocess.run(['git', 'apply', '--reverse', '--check', '-'],
+                              input=patch, cwd=checkout, capture_output=True).returncode == 0:
+                continue
+            subprocess.run(['git', 'apply', '--check', '-'], input=patch, cwd=checkout, check=True)
+            subprocess.run(['git', 'apply', '-'], input=patch, cwd=checkout, check=True)
+            filename = f'{prefix}-{revision}.patch'
+            patches[filename] = patch
+            sources.append({'type': 'patch', 'path': filename, 'options': ['-d', dest]})
+        for path in loaded:
+            target = checkout / path
+            files[path] = target.read_bytes() if target.exists() else None
+    return patches, sources, files
 
 
 def fetch(url):
@@ -131,8 +228,15 @@ def typescript_binaries(deps):
         if manifest['package_name'] != name or 'lib/tsc' not in archive.namelist():
             raise ValueError('Unexpected TypeScript package layout')
         version = json.loads(archive.read('package.json'))['version']
+        google_compiler = archive.read('lib/tsc')
     if package['version'].rsplit('@', 1)[-1] != version:
         raise ValueError('TypeScript archive disagrees with Chromium\'s expected version')
+    # Prove that replacing the executable preserves the vendor compiler choice:
+    # Google's x64 executable must be exactly npm's corresponding executable.
+    x64_url = f'https://registry.npmjs.org/@typescript/typescript-linux-x64/-/typescript-linux-x64-{version}.tgz'
+    with tarfile.open(fileobj=io.BytesIO(fetch(x64_url)), mode='r:gz') as archive:
+        if archive.extractfile('package/lib/tsc').read() != google_compiler:
+            raise ValueError('Chromium patches the TypeScript executable; review the ARM64 substitution')
     arm_url = f'https://registry.npmjs.org/@typescript/typescript-linux-arm64/-/typescript-linux-arm64-{version}.tgz'
     arm_binary = fetch(arm_url)
     with tarfile.open(fileobj=io.BytesIO(arm_binary), mode='r:gz') as archive:
@@ -176,6 +280,45 @@ def devtools_binaries(deps):
                 'sha256': hashlib.sha256(binary).hexdigest(), 'strip-components': 0,
                 'dest': tool, 'only-arches': [arch],
             })
+    return sources
+
+
+def gperf_sources(deps):
+    package, = deps_value(deps, 'src/third_party/gperf/cipd')['packages']
+    if package['package'] != 'infra/3pp/tools/gperf/${{platform}}':
+        raise ValueError('Unexpected gperf package')
+    name = 'infra/3pp/tools/gperf/linux-amd64'
+    url = f'https://chrome-infra-packages.appspot.com/dl/{name}/+/{package["version"]}'
+    binary = fetch(url)
+    with zipfile.ZipFile(io.BytesIO(binary)) as archive:
+        if (json.loads(archive.read('.cipdpkg/manifest.json'))['package_name'] != name
+                or 'bin/gperf' not in archive.namelist()):
+            raise ValueError(f'Unexpected gperf package: {name}')
+    sources = [{
+        'type': 'archive', 'archive-type': 'zip', 'url': url,
+        'sha256': hashlib.sha256(binary).hexdigest(), 'strip-components': 0,
+        'dest': 'gperf', 'only-arches': ['x86_64'],
+    }]
+    recipes = {}
+    for path in ('3pp/gperf/3pp.pb', '3pp/gperf/install.sh', '3pp/gperf/README.chromium'):
+        recipe = base64.b64decode(fetch(
+            'https://chromium.googlesource.com/infra/infra/+/'
+            + GPERF_INFRA_REVISION + '/' + path + '?format=TEXT'))
+        recipes[path] = recipe.decode()
+    specification = recipes['3pp/gperf/3pp.pb']
+    source_url, = re.findall(r'download_url: "([^"]+)"', specification)
+    version, = re.findall(r'(?m)^      version: "([^"]+)"', specification)
+    if package['version'] != 'version:3@' + version:
+        raise ValueError('gperf source does not match Chromium package version')
+    source_sha256 = hashlib.sha256(fetch(source_url)).hexdigest()
+    sources.append({
+        'type': 'archive', 'url': source_url, 'sha256': source_sha256,
+        'dest': 'gperf-src', 'only-arches': ['aarch64'],
+    })
+    for path in ('3pp/gperf/install.sh', '3pp/gperf/README.chromium'):
+        sources.append({**inline(Path(path).name, recipes[path]),
+                        'dest': 'gperf-src/3pp', 'only-arches': ['aarch64']})
+    sources.append(inline('gperf-version', version + '\n'))
     return sources
 
 
@@ -240,6 +383,7 @@ def build_tools(deps, node_update):
     sources.extend(jdk_binaries(deps))
     sources.extend(typescript_binaries(deps))
     sources.extend(devtools_binaries(deps))
+    sources.extend(gperf_sources(deps))
     formatter, = gcs_objects(deps, 'src/buildtools/linux64-format')
     sources.append({
         'type': 'file',
@@ -251,13 +395,16 @@ def build_tools(deps, node_update):
         'name': 'chromium-build-tools', 'only-arches': ['x86_64', 'aarch64'],
         'buildsystem': 'simple', 'build-commands': [
             'mkdir -p /app/toolchains',
+            'if [ "$FLATPAK_ARCH" = aarch64 ]; then (cd gperf-src && _3PP_VERSION="$(cat ../gperf-version)" bash 3pp/install.sh "${PWD}/../gperf"); fi',
             'if [ "$FLATPAK_ARCH" = x86_64 ]; then install -Dm755 clang-format /app/toolchains/clang-format; else ln -s llvm/bin/clang-format /app/toolchains/clang-format; fi',
             'if [ "$FLATPAK_ARCH" = aarch64 ]; then mv jdk/bin/java jdk/bin/java.chromium; install -m755 jdk-java-wrapper jdk/bin/java; fi',
             # Keep Chromium's patched declarations; replace only the native compiler.
             'if [ "$FLATPAK_ARCH" = aarch64 ]; then install -m755 typescript-arm64/lib/tsc typescript/lib/tsc; fi',
-            'cp -a node go jdk typescript esbuild rollup_libs node-version go-version jdk-version /app/toolchains/',
+            # Match update_node_binaries: Chromium removes the package managers.
+            'if [ "$FLATPAK_ARCH" = aarch64 ]; then rm -rf node/bin/npm node/bin/npx node/bin/corepack node/lib/node_modules/npm node/lib/node_modules/corepack; fi',
+            'cp -a node go jdk typescript esbuild rollup_libs gperf node-version go-version jdk-version /app/toolchains/',
             # CIPD archives contain read-only binaries; eu-strip needs write access.
-            'chmod -R u+w /app/toolchains/node /app/toolchains/go /app/toolchains/jdk /app/toolchains/typescript /app/toolchains/esbuild /app/toolchains/rollup_libs',
+            'chmod -R u+w /app/toolchains/node /app/toolchains/go /app/toolchains/jdk /app/toolchains/typescript /app/toolchains/esbuild /app/toolchains/rollup_libs /app/toolchains/gperf',
         ], 'cleanup': ['/toolchains'], 'sources': sources,
     }
 
@@ -273,9 +420,10 @@ def inline(filename, contents):
 
 def github_archive(repo, commit, dest):
     url = f'https://codeload.github.com/{repo}/tar.gz/{commit}'
+    checksum = hashlib.sha256(fetch(url)).hexdigest()
     return {
         'type': 'archive', 'archive-type': 'tar-gzip', 'url': url,
-        'sha256': hashlib.sha256(fetch(url)).hexdigest(), 'dest': dest,
+        'sha256': checksum, 'dest': dest,
     }
 
 
@@ -283,19 +431,22 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('version', help='Chromium version, without the UC package release')
     args = parser.parse_args()
-    clang_update = github('chromium/chromium', args.version, 'tools/clang/scripts/update.py')
-    clang_build = github('chromium/chromium', args.version, 'tools/clang/scripts/build.py')
-    rust_update = github('chromium/chromium', args.version, 'tools/rust/update_rust.py')
-    rust_build = github('chromium/chromium', args.version, 'tools/rust/build_rust.py')
-    bindgen_build = github('chromium/chromium', args.version, 'tools/rust/build_bindgen.py')
+    recipes = {path: github('chromium/chromium', args.version, path)
+               for path in UPSTREAM_RECIPES}
+    clang_update = recipes['tools/clang/scripts/update.py']
+    clang_build = recipes['tools/clang/scripts/build.py']
+    rust_update = recipes['tools/rust/update_rust.py']
+    rust_build = recipes['tools/rust/build_rust.py']
+    bindgen_build = recipes['tools/rust/build_bindgen.py']
     deps = github('chromium/chromium', args.version, 'DEPS')
-    node_update = github('chromium/chromium', args.version, 'third_party/node/update_node_binaries')
-    tools = build_tools(deps, node_update)
+    node_update = recipes['third_party/node/update_node_binaries']
     clang_revision = constant(clang_update, 'CLANG_REVISION')
     clang_package = f'{clang_revision}-{constant(clang_update, "CLANG_SUB_REVISION")}'
     rust_revision = constant(rust_update, 'RUST_REVISION')
     rust_package = f'{rust_revision}-{constant(rust_update, "RUST_SUB_REVISION")}-{clang_revision}'
     bindgen_revision = constant(bindgen_build, 'BINDGEN_GIT_VERSION')
+    crubit_revision = constant(rust_update, 'CRUBIT_REVISION')
+    stage0 = verified_stage0(github('rust-lang/rust', rust_revision, 'src/stage0'), rust_update)
 
     # Use upstream's SHA256s, rather than trusting an unchecked hook download.
     binary_sources = []
@@ -329,18 +480,14 @@ def main():
         f'https://api.github.com/repos/llvm/llvm-project/commits/{llvm_short}'
     ))['sha']
     llvm_sources = [github_archive('llvm/llvm-project', llvm_commit, 'llvm')]
-    llvm_patches = set()
-    # Match the downstream fixes applied by Chromium's own build.py.
-    for revision in re.findall(rb"GitCherryPick\(LLVM_DIR, '([0-9a-f]+)'\)", clang_build):
-        revision = revision.decode()
-        patch = fetch(f'https://github.com/llvm/llvm-project/commit/{revision}.patch')
-        filename = f'llvm-{revision}.patch'
-        (ROOT / filename).write_bytes(patch)
-        llvm_patches.add(filename)
-        llvm_sources.append({'type': 'patch', 'path': filename, 'options': ['-d', 'llvm']})
+    llvm_patches, patch_sources, _ = prepare_patches(
+        'llvm/llvm-project', llvm_commit,
+        cherry_picks(clang_build, 'LLVM_DIR', 'llvm/llvm-project'), 'llvm', 'llvm')
+    llvm_sources.extend(patch_sources)
     llvm_sources.extend([
         file_source('build-steps/llvm/0010-build.sh'),
         inline('clang-revision', clang_package + '\n'),
+        inline('clang-commit', llvm_commit + '\n'),
     ])
     llvm = {
         'name': 'native-llvm', 'only-arches': ['aarch64'],
@@ -348,71 +495,28 @@ def main():
         'cleanup': ['/toolchains'], 'sources': llvm_sources,
     }
 
-    rust_tree = json.loads(fetch(
-        f'https://api.github.com/repos/rust-lang/rust/git/trees/{rust_revision}'
-    ))
-    library = next(item['sha'] for item in rust_tree['tree'] if item['path'] == 'library')
-    library_tree = json.loads(fetch(
-        f'https://api.github.com/repos/rust-lang/rust/git/trees/{library}'
-    ))
-    backtrace = next(item['sha'] for item in library_tree['tree'] if item['path'] == 'backtrace')
-    stage0 = dict(
-        line.split('=', 1) for line in
-        github('rust-lang/rust', rust_revision, 'src/stage0').decode().splitlines()
-        if line and not line.startswith('#')
-    )
+    backtrace = submodule('rust-lang/rust', rust_revision, 'library/backtrace', 'rust-lang/backtrace-rs')
+    rust_llvm = submodule('rust-lang/rust', rust_revision, 'src/llvm-project', 'rust-lang/llvm-project')
+    cargo_revision = submodule('rust-lang/rust', rust_revision, 'src/tools/cargo', 'rust-lang/cargo')
     sources = [
         github_archive('rust-lang/rust', rust_revision, 'rust'),
         github_archive('rust-lang/backtrace-rs', backtrace, 'rust/library/backtrace'),
+        github_archive('rust-lang/llvm-project', rust_llvm, 'rust/src/llvm-project'),
+        github_archive('rust-lang/cargo', cargo_revision, 'rust/src/tools/cargo'),
         github_archive('rust-lang/rust-bindgen', bindgen_revision, 'bindgen'),
+        github_archive('google/crubit', crubit_revision, 'crubit'),
     ]
-    rust_patches = set()
-    # The revision alone does not include Google's downstream Rust fixes.
-    for revision in re.findall(rb"GitCherryPick\(RUST_SRC_DIR, '([0-9a-f]+)'", rust_build):
-        revision = revision.decode()
-        filename = f'rust-{revision}.patch'
-        comparison = json.loads(fetch(
-            f'https://api.github.com/repos/rust-lang/rust/compare/{revision}...{rust_revision}'
-        ))
-        if comparison['status'] in ('ahead', 'identical'):
-            continue
-        patch = fetch(
-            f'https://github.com/rust-lang/rust/commit/{revision}.patch'
-        )
-        # Chromium's list can retain already-landed fixes (including rebased
-        # commits). Check the actual pinned files, not just commit ancestry.
-        with tempfile.TemporaryDirectory() as directory:
-            checkout = Path(directory)
-            for path in re.findall(rb'^--- a/(.+)$', patch, re.M):
-                path = path.decode()
-                target = checkout / path
-                target.parent.mkdir(parents=True, exist_ok=True)
-                target.write_bytes(github('rust-lang/rust', rust_revision, path))
-            applied = subprocess.run(
-                ['git', 'apply', '--reverse', '--check', '-'], input=patch,
-                cwd=checkout, capture_output=True,
-            )
-            if applied.returncode == 0:
-                continue
-            subprocess.run(
-                ['git', 'apply', '--check', '-'], input=patch,
-                cwd=checkout, check=True,
-            )
-        (ROOT / filename).write_bytes(patch)
-        rust_patches.add(filename)
-        sources.append({'type': 'patch', 'path': filename, 'options': ['-d', 'rust']})
+    rust_patches, patch_sources, patched_rust_files = prepare_patches(
+        'rust-lang/rust', rust_revision,
+        cherry_picks(rust_build, 'RUST_SRC_DIR', 'rust-lang/rust'), 'rust', 'rust')
+    sources.extend(patch_sources)
     # Scope copyright metadata to the workspaces used by our offline build.
     sources.append({
         'type': 'patch', 'path': 'offline-rust-copyright.patch',
         'options': ['-d', 'rust'],
     })
-    # External llvm-config does not supply sources for optimized builtins or
-    # profiler support. Reuse Chromium's pinned, patched LLVM source tree.
-    for source in llvm_sources:
-        if source['type'] == 'archive':
-            sources.append({**source, 'dest': 'rust/src/llvm-project'})
-        elif source['type'] == 'patch':
-            sources.append({**source, 'options': ['-d', 'rust/src/llvm-project']})
+    # Rust's own LLVM submodule supplies builtins/profiler sources. The compiler
+    # backend still links the separately built Chromium LLVM via llvm-config.
     # Rust bootstrap reads this metadata when building from a source tarball.
     rust_commit = json.loads(fetch(
         f'https://api.github.com/repos/rust-lang/rust/commits/{rust_revision}'
@@ -429,20 +533,27 @@ def main():
             'sha256': stage0[archive], 'dest': f'bootstrap-{component}',
         })
 
-    # Compiler, bootstrap, stdlib and bindgen are separate Cargo workspaces.
+    # Compiler, bootstrap, stdlib, bindgen and Crubit are separate Cargo workspaces.
     crates = {}
     coordinates = {}
     for repo, revision, lock in (
         ('rust-lang/rust', rust_revision, 'Cargo.lock'),
         ('rust-lang/rust', rust_revision, 'src/bootstrap/Cargo.lock'),
         ('rust-lang/rust', rust_revision, 'library/Cargo.lock'),
+        ('rust-lang/cargo', cargo_revision, 'Cargo.lock'),
         ('rust-lang/rust-bindgen', bindgen_revision, 'Cargo.lock'),
+        ('google/crubit', crubit_revision, 'Cargo.lock'),
     ):
-        for package in tomllib.loads(github(repo, revision, lock).decode())['package']:
+        contents = (patched_rust_files[lock]
+                    if repo == 'rust-lang/rust' and lock in patched_rust_files
+                    else github(repo, revision, lock))
+        if contents is None:
+            raise ValueError(f'Upstream patch removed required lockfile: {lock}')
+        for package in tomllib.loads(contents.decode())['package']:
             if 'source' not in package:
                 continue
             if package['source'] != 'registry+https://github.com/rust-lang/crates.io-index':
-                raise ValueError(f'Unreviewed Cargo source: {package["source"]}')
+                raise ValueError(f'Unsupported Cargo source: {package["source"]}')
             directory = f'{package["name"]}-{package["version"]}'
             checksum = package['checksum']
             if directory in crates and crates[directory] != checksum:
@@ -459,20 +570,28 @@ def main():
     sources.extend([
         file_source('build-steps/rust/0010-install-bootstrap.sh'),
         file_source('build-steps/rust/0020-prepare-vendor.py'),
+        file_source('build-steps/rust/0025-configure.py'),
         file_source('build-steps/rust/0030-build.sh'),
+        file_source('build-steps/rust/0040-build-crubit.sh'),
         inline('crate-checksums.json', json.dumps(crates, sort_keys=True) + '\n'),
         inline('rust-revision', rust_package + '\n'),
         inline('rust-commit', rust_revision + '\n'),
+        inline('config.toml.template', recipes['tools/rust/config.toml.template'].decode()),
     ])
     rust = {
         'name': 'native-rust', 'only-arches': ['aarch64'],
         'buildsystem': 'simple', 'build-commands': [
             'bash 0010-install-bootstrap.sh',
             'python3 0020-prepare-vendor.py',
+            'python3 0025-configure.py',
             'bash 0030-build.sh',
+            'bash 0040-build-crubit.sh',
         ],
         'cleanup': ['/toolchains'], 'sources': sources,
     }
+    tools = build_tools(deps, node_update)
+    for filename, patch in (llvm_patches | rust_patches).items():
+        (ROOT / filename).write_bytes(patch)
     for filename, module in (
         ('google.json', prebuilt), ('llvm.json', llvm), ('rust.json', rust),
         ('build-tools.json', tools),
