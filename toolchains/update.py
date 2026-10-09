@@ -261,25 +261,24 @@ def typescript_binaries(deps):
 def devtools_binaries(deps):
     revision = deps_value(deps, 'devtools_frontend_revision')
     devtools_deps = github('ChromeDevTools/devtools-frontend', revision, 'DEPS')
+    # Chromium 155 switched DevTools from Rollup to esbuild alone.
+    package, = deps_value(devtools_deps, 'third_party/esbuild')['packages']
+    if package['package'] != 'infra/3pp/tools/esbuild/${{platform}}':
+        raise ValueError('Unexpected DevTools esbuild package')
     sources = []
-    for tool in ('esbuild', 'rollup_libs'):
-        package, = deps_value(devtools_deps, 'third_party/' + tool)['packages']
-        if package['package'] != f'infra/3pp/tools/{tool}/${{{{platform}}}}':
-            raise ValueError(f'Unexpected DevTools package: {tool}')
-        for arch, platform in (('x86_64', 'linux-amd64'), ('aarch64', 'linux-arm64')):
-            name = package['package'].replace('${{platform}}', platform)
-            url = f'https://chrome-infra-packages.appspot.com/dl/{name}/+/{package["version"]}'
-            binary = fetch(url)
-            expected = 'esbuild' if tool == 'esbuild' else f'rollup.linux-{"x64" if arch == "x86_64" else "arm64"}-gnu.node'
-            with zipfile.ZipFile(io.BytesIO(binary)) as archive:
-                manifest = json.loads(archive.read('.cipdpkg/manifest.json'))
-                if manifest['package_name'] != name or expected not in archive.namelist():
-                    raise ValueError(f'Unexpected DevTools archive layout: {name}')
-            sources.append({
-                'type': 'archive', 'archive-type': 'zip', 'url': url,
-                'sha256': hashlib.sha256(binary).hexdigest(), 'strip-components': 0,
-                'dest': tool, 'only-arches': [arch],
-            })
+    for arch, platform in (('x86_64', 'linux-amd64'), ('aarch64', 'linux-arm64')):
+        name = package['package'].replace('${{platform}}', platform)
+        url = f'https://chrome-infra-packages.appspot.com/dl/{name}/+/{package["version"]}'
+        binary = fetch(url)
+        with zipfile.ZipFile(io.BytesIO(binary)) as archive:
+            manifest = json.loads(archive.read('.cipdpkg/manifest.json'))
+            if manifest['package_name'] != name or 'esbuild' not in archive.namelist():
+                raise ValueError(f'Unexpected DevTools archive layout: {name}')
+        sources.append({
+            'type': 'archive', 'archive-type': 'zip', 'url': url,
+            'sha256': hashlib.sha256(binary).hexdigest(), 'strip-components': 0,
+            'dest': 'esbuild', 'only-arches': [arch],
+        })
     return sources
 
 
@@ -402,9 +401,9 @@ def build_tools(deps, node_update):
             'if [ "$FLATPAK_ARCH" = aarch64 ]; then install -m755 typescript-arm64/lib/tsc typescript/lib/tsc; fi',
             # Match update_node_binaries: Chromium removes the package managers.
             'if [ "$FLATPAK_ARCH" = aarch64 ]; then rm -rf node/bin/npm node/bin/npx node/bin/corepack node/lib/node_modules/npm node/lib/node_modules/corepack; fi',
-            'cp -a node go jdk typescript esbuild rollup_libs gperf node-version go-version jdk-version /app/toolchains/',
+            'cp -a node go jdk typescript esbuild gperf node-version go-version jdk-version /app/toolchains/',
             # CIPD archives contain read-only binaries; eu-strip needs write access.
-            'chmod -R u+w /app/toolchains/node /app/toolchains/go /app/toolchains/jdk /app/toolchains/typescript /app/toolchains/esbuild /app/toolchains/rollup_libs /app/toolchains/gperf',
+            'chmod -R u+w /app/toolchains/node /app/toolchains/go /app/toolchains/jdk /app/toolchains/typescript /app/toolchains/esbuild /app/toolchains/gperf',
         ], 'cleanup': ['/toolchains'], 'sources': sources,
     }
 

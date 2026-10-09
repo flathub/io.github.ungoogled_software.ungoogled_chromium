@@ -24,7 +24,7 @@ index 00000000..43622323
 ++     <li>Linux (non-Flatpak): <code>~/.config/chromium/Dictionaries/</code><br></li>
 ++     <li><b>Linux (Flatpak):</b> <code>~/.var/app/io.github.ungoogled_software.ungoogled_chromium/config/chromium/Dictionaries/</code><br></li>
 +      <li>Mac: <code>~/Library/Application Support/Chromium/Dictionaries/</code><br></li>
-+      <li>Windows: <code>%LOCALAPPDATA%\Chromium\User Data\Dictionaries\</code><br></li>
++      <li>Windows: <code>%LOCALAPPDATA%\Chromium\Application\Dictionaries\</code><br></li>
 +     </ul>
 diff --git a/utils/patches.py b/utils/patches.py
 index 4aa29d38..436bf9bc 100755

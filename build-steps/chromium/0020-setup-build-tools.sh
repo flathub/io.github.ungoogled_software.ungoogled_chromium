@@ -26,11 +26,9 @@ mkdir -pv third_party/typescript/linux-amd64/src
 cp -a /app/toolchains/typescript/. third_party/typescript/linux-amd64/src/
 [[ -x third_party/typescript/linux-amd64/src/lib/tsc ]]
 
-# DevTools bundles JS with esbuild and loads Rollup's native Node addon.
+# DevTools bundles JavaScript with esbuild.
 devtools_dir=third_party/devtools-frontend/src
 ln_overwrite_all /app/toolchains/esbuild "${devtools_dir}/third_party/esbuild"
-ln_overwrite_all /app/toolchains/rollup_libs "${devtools_dir}/third_party/rollup_libs"
-(cd "${devtools_dir}" && python3 scripts/deps/sync_rollup_libs.py)
 [[ -x "${devtools_dir}/third_party/esbuild/esbuild" ]]
 
 # Install build-only toolchains after pruning, which removes bundled binaries.
@@ -38,6 +36,9 @@ ln_overwrite_all /app/toolchains/llvm third_party/llvm-build/Release+Asserts
 ln_overwrite_all /app/toolchains/rust third_party/rust-toolchain
 if [[ "${FLATPAK_ARCH}" == "x86_64" ]]; then
 	ln_overwrite_all /app/toolchains/libclang third_party/llvm-libclang
+else
+	# The native Rust toolchain carries the matching libclang built with LLVM.
+	ln_overwrite_all /app/toolchains/rust/lib/libclang.so third_party/llvm-libclang/lib/libclang.so
 fi
 export PATH="${PWD}/third_party/llvm-build/Release+Asserts/bin:${PWD}/third_party/rust-toolchain/bin:/app/toolchains/node/bin:/app/toolchains/go/bin:${JAVA_HOME}/bin:${PATH}"
 export CC="${PWD}/third_party/llvm-build/Release+Asserts/bin/clang"

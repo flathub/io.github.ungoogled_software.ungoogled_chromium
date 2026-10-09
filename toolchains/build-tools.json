@@ -12,8 +12,8 @@
     "if [ \"$FLATPAK_ARCH\" = aarch64 ]; then mv jdk/bin/java jdk/bin/java.chromium; install -m755 jdk-java-wrapper jdk/bin/java; fi",
     "if [ \"$FLATPAK_ARCH\" = aarch64 ]; then install -m755 typescript-arm64/lib/tsc typescript/lib/tsc; fi",
     "if [ \"$FLATPAK_ARCH\" = aarch64 ]; then rm -rf node/bin/npm node/bin/npx node/bin/corepack node/lib/node_modules/npm node/lib/node_modules/corepack; fi",
-    "cp -a node go jdk typescript esbuild rollup_libs gperf node-version go-version jdk-version /app/toolchains/",
-    "chmod -R u+w /app/toolchains/node /app/toolchains/go /app/toolchains/jdk /app/toolchains/typescript /app/toolchains/esbuild /app/toolchains/rollup_libs /app/toolchains/gperf"
+    "cp -a node go jdk typescript esbuild gperf node-version go-version jdk-version /app/toolchains/",
+    "chmod -R u+w /app/toolchains/node /app/toolchains/go /app/toolchains/jdk /app/toolchains/typescript /app/toolchains/esbuild /app/toolchains/gperf"
   ],
   "cleanup": [
     "/toolchains"
@@ -120,8 +120,8 @@
     {
       "type": "archive",
       "archive-type": "zip",
-      "url": "https://chrome-infra-packages.appspot.com/dl/infra/3pp/tools/esbuild/linux-amd64/+/version:3@0.25.1.chromium.2",
-      "sha256": "520554b1c0ad045201310582a01ef7a0ba9b5d033d8f03a709c369c52f81d9c9",
+      "url": "https://chrome-infra-packages.appspot.com/dl/infra/3pp/tools/esbuild/linux-amd64/+/version:3@0.28.2.chromium.2",
+      "sha256": "784005c61a32e54c03514434e95e00816ad293fdaf88bd52f7b3bc916183bd08",
       "strip-components": 0,
       "dest": "esbuild",
       "only-arches": [
@@ -131,32 +131,10 @@
     {
       "type": "archive",
       "archive-type": "zip",
-      "url": "https://chrome-infra-packages.appspot.com/dl/infra/3pp/tools/esbuild/linux-arm64/+/version:3@0.25.1.chromium.2",
-      "sha256": "fc47145defe33d4fd5d6e09d999ce113a179c3fef4188da0a54cecc0ca295e1c",
+      "url": "https://chrome-infra-packages.appspot.com/dl/infra/3pp/tools/esbuild/linux-arm64/+/version:3@0.28.2.chromium.2",
+      "sha256": "458a932e89229d9f48dea5ccf117fde862fa8e4e6a59a4a5891bf856f6c445cf",
       "strip-components": 0,
       "dest": "esbuild",
-      "only-arches": [
-        "aarch64"
-      ]
-    },
-    {
-      "type": "archive",
-      "archive-type": "zip",
-      "url": "https://chrome-infra-packages.appspot.com/dl/infra/3pp/tools/rollup_libs/linux-amd64/+/version:3@4.60.4",
-      "sha256": "e83320a4e35f3ba985ebd782a0448ca72301b0c9a8ff8168b623ff655784d40c",
-      "strip-components": 0,
-      "dest": "rollup_libs",
-      "only-arches": [
-        "x86_64"
-      ]
-    },
-    {
-      "type": "archive",
-      "archive-type": "zip",
-      "url": "https://chrome-infra-packages.appspot.com/dl/infra/3pp/tools/rollup_libs/linux-arm64/+/version:3@4.60.4",
-      "sha256": "c158cc7fdd58ff60485726200f2cb47af95e808000c78ab84cc273ba0dbf9be1",
-      "strip-components": 0,
-      "dest": "rollup_libs",
       "only-arches": [
         "aarch64"
       ]

@@ -16,7 +16,7 @@
 -        let paths_to_vendor = default_paths_to_vendor(builder);
 -        for (_, submodules) in &paths_to_vendor {
 -            for submodule in submodules {
--                builder.build.require_submodule(submodule, None);
+-                builder.sess.require_submodule(submodule, None);
 -            }
 -        }
 -        let cargo_manifests = paths_to_vendor
