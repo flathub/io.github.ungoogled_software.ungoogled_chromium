@@ -14,17 +14,9 @@
     {
       "type": "archive",
       "archive-type": "tar-gzip",
-      "url": "https://codeload.github.com/llvm/llvm-project/tar.gz/20e97c4b113b79586c29ac57738548939a34d22e",
-      "sha256": "1a59b599c431bc83382e00e3ca3a49522d9865f4740afe84961959026ee0c03f",
+      "url": "https://codeload.github.com/llvm/llvm-project/tar.gz/62397f8b3c3986f54187ce08f00b3448ea1f8880",
+      "sha256": "d5a3470ca3a05be52114f71f1026ac1c0bb72ba180a725cd65cdaa78d5416a63",
       "dest": "llvm"
-    },
-    {
-      "type": "patch",
-      "path": "llvm-061865f32607cd064ab944407cc863186702d6f1.patch",
-      "options": [
-        "-d",
-        "llvm"
-      ]
     },
     {
       "type": "patch",
@@ -41,12 +33,12 @@
     {
       "type": "inline",
       "dest-filename": "clang-revision",
-      "contents": "llvmorg-24-init-3796-g20e97c4b-27\n"
+      "contents": "llvmorg-24-init-7747-g62397f8b-27\n"
     },
     {
       "type": "inline",
       "dest-filename": "clang-commit",
-      "contents": "20e97c4b113b79586c29ac57738548939a34d22e\n"
+      "contents": "62397f8b3c3986f54187ce08f00b3448ea1f8880\n"
     }
   ]
 }
