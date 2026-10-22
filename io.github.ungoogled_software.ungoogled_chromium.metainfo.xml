@@ -70,101 +70,291 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="155.0.8059.79-1" date="2026-10-14" />
-    <release version="155.0.8059.39-1" date="2026-10-09" />
-    <release version="154.0.8037.97-1" date="2026-10-03" />
-    <release version="154.0.8037.92-1" date="2026-10-01" />
-    <release version="154.0.8037.57-1" date="2026-09-30" />
-    <release version="152.0.7977.82-1" date="2026-09-04" />
-    <release version="152.0.7977.75-1" date="2026-09-02" />
-    <release version="151.0.7922.173-1" date="2026-08-21" />
-    <release version="151.0.7922.169-1" date="2026-08-21" />
-    <release version="151.0.7922.137-1" date="2026-08-12" />
-    <release version="151.0.7922.108-1" date="2026-08-07" />
-    <release version="151.0.7922.75-1" date="2026-08-06" />
-    <release version="151.0.7922.71-1" date="2026-07-31" />
-    <release version="150.0.7871.186-1" date="2026-07-24" />
-    <release version="150.0.7871.181-1" date="2026-07-23" />
-    <release version="150.0.7871.128-1" date="2026-07-17" />
-    <release version="150.0.7871.124-1" date="2026-07-16" />
-    <release version="150.0.7871.114-1" date="2026-07-09" />
-    <release version="150.0.7871.100-1" date="2026-07-08" />
-    <release version="150.0.7871.46-1" date="2026-07-04" />
-    <release version="149.0.7827.196-1" date="2026-06-25" />
-    <release version="149.0.7827.155-1" date="2026-06-17" />
-    <release version="149.0.7827.114-1" date="2026-06-12" />
-    <release version="149.0.7827.102-1" date="2026-06-12" />
-    <release version="149.0.7827.53-1" date="2026-06-03" />
-    <release version="148.0.7778.215-1" date="2026-05-28" />
-    <release version="148.0.7778.178-1" date="2026-05-20" />
-    <release version="148.0.7778.167-1" date="2026-05-13" />
-    <release version="148.0.7778.96-1" date="2026-05-08" />
-    <release version="147.0.7727.137-1" date="2026-05-02" />
-    <release version="147.0.7727.116-1" date="2026-04-24" />
-    <release version="147.0.7727.101-1" date="2026-04-16" />
-    <release version="147.0.7727.55-1" date="2026-04-09" />
-    <release version="146.0.7680.177-1" date="2026-04-01" />
-    <release version="146.0.7680.164-1" date="2026-03-25" />
-    <release version="146.0.7680.153-1" date="2026-03-20" />
-    <release version="146.0.7680.80-1" date="2026-03-14" />
-    <release version="146.0.7680.75-1" date="2026-03-14" />
-    <release version="146.0.7680.71-1" date="2026-03-13" />
-    <release version="145.0.7632.159-1" date="2026-03-05" />
-    <release version="145.0.7632.116-1" date="2026-02-24" />
-    <release version="145.0.7632.109-1" date="2026-02-20" />
-    <release version="145.0.7632.75-1" date="2026-02-14" />
-    <release version="145.0.7632.45-1" date="2026-02-11" />
-    <release version="144.0.7559.132-1" date="2026-02-04" />
-    <release version="144.0.7559.109-1" date="2026-01-28" />
-    <release version="144.0.7559.96-1" date="2026-01-22" />
-    <release version="144.0.7559.59-1" date="2026-01-14" />
-    <release version="143.0.7499.192-1" date="2026-01-08" />
-    <release version="143.0.7499.169-1" date="2025-12-19" />
-    <release version="143.0.7499.146-1" date="2025-12-18" />
-    <release version="143.0.7499.109-1" date="2025-12-12" />
-    <release version="143.0.7499.40-1" date="2025-12-04" />
-    <release version="142.0.7444.175-1" date="2025-11-22" />
-    <release version="142.0.7444.162-1" date="2025-11-12" />
-    <release version="142.0.7444.134-1" date="2025-11-06" />
-    <release version="142.0.7444.59-2" date="2025-11-03" />
-    <release version="142.0.7444.59-1" date="2025-10-30" />
-    <release version="141.0.7390.122-1" date="2025-10-22" />
-    <release version="141.0.7390.107-1" date="2025-10-16" />
-    <release version="141.0.7390.76-1" date="2025-10-10" />
-    <release version="141.0.7390.65-1" date="2025-10-09" />
-    <release version="141.0.7390.54-1" date="2025-10-02" />
-    <release version="140.0.7339.207-1" date="2025-09-25" />
-    <release version="140.0.7339.185-1" date="2025-09-18" />
-    <release version="140.0.7339.127-1" date="2025-09-12" />
-    <release version="140.0.7339.80-1" date="2025-09-08" />
-    <release version="140.0.7339.41-1" date="2025-08-28" />
-    <release version="139.0.7258.154-1" date="2025-08-28" />
-    <release version="139.0.7258.138-1" date="2025-08-20" />
-    <release version="139.0.7258.127-1" date="2025-08-13" />
-    <release version="139.0.7258.66-1" date="2025-08-06" />
-    <release version="138.0.7204.183-1" date="2025-08-02" />
-    <release version="138.0.7204.168-1" date="2025-07-24" />
-    <release version="138.0.7204.157-1" date="2025-07-18" />
-    <release version="138.0.7204.100-1" date="2025-07-10" />
-    <release version="138.0.7204.96-1" date="2025-07-01" />
-    <release version="138.0.7204.49-1" date="2025-06-24" />
-    <release version="138.0.7204.35-1" date="2025-06-24" />
-    <release version="137.0.7151.119-1" date="2025-06-18" />
-    <release version="137.0.7151.103-1" date="2025-06-11" />
-    <release version="137.0.7151.68-1" date="2025-06-04" />
-    <release version="137.0.7151.55-1" date="2025-05-28" />
-    <release version="137.0.7151.40-1" date="2025-05-27" />
-    <release version="136.0.7103.113-1" date="2025-05-15" />
-    <release version="136.0.7103.92-1" date="2025-05-08" />
-    <release version="136.0.7103.59-1" date="2025-04-30" />
-    <release version="135.0.7049.114-1" date="2025-04-24" />
-    <release version="135.0.7049.95-1" date="2025-04-16" />
-    <release version="135.0.7049.84-1" date="2025-04-09" />
-    <release version="135.0.7049.52-1" date="2025-04-02" />
-    <release version="134.0.6998.177-1" date="2025-03-27" />
-    <release version="134.0.6998.165-1" date="2025-03-23" />
-    <release version="134.0.6998.117-1" date="2025-03-21" />
-    <release version="134.0.6998.88-1" date="2025-03-13" />
+    <release version="155.0.8059.79-1" date="2026-10-14">
+      <description/>
+    </release>
+    <release version="155.0.8059.39-1" date="2026-10-09">
+      <description/>
+    </release>
+    <release version="154.0.8037.97-1" date="2026-10-03">
+      <description/>
+    </release>
+    <release version="154.0.8037.92-1" date="2026-10-01">
+      <description/>
+    </release>
+    <release version="154.0.8037.57-1" date="2026-09-30">
+      <description/>
+    </release>
+    <release version="152.0.7977.82-1" date="2026-09-04">
+      <description/>
+    </release>
+    <release version="152.0.7977.75-1" date="2026-09-02">
+      <description/>
+    </release>
+    <release version="151.0.7922.173-1" date="2026-08-21">
+      <description/>
+    </release>
+    <release version="151.0.7922.169-1" date="2026-08-21">
+      <description/>
+    </release>
+    <release version="151.0.7922.137-1" date="2026-08-12">
+      <description/>
+    </release>
+    <release version="151.0.7922.108-1" date="2026-08-07">
+      <description/>
+    </release>
+    <release version="151.0.7922.75-1" date="2026-08-06">
+      <description/>
+    </release>
+    <release version="151.0.7922.71-1" date="2026-07-31">
+      <description/>
+    </release>
+    <release version="150.0.7871.186-1" date="2026-07-24">
+      <description/>
+    </release>
+    <release version="150.0.7871.181-1" date="2026-07-23">
+      <description/>
+    </release>
+    <release version="150.0.7871.128-1" date="2026-07-17">
+      <description/>
+    </release>
+    <release version="150.0.7871.124-1" date="2026-07-16">
+      <description/>
+    </release>
+    <release version="150.0.7871.114-1" date="2026-07-09">
+      <description/>
+    </release>
+    <release version="150.0.7871.100-1" date="2026-07-08">
+      <description/>
+    </release>
+    <release version="150.0.7871.46-1" date="2026-07-04">
+      <description/>
+    </release>
+    <release version="149.0.7827.196-1" date="2026-06-25">
+      <description/>
+    </release>
+    <release version="149.0.7827.155-1" date="2026-06-17">
+      <description/>
+    </release>
+    <release version="149.0.7827.114-1" date="2026-06-12">
+      <description/>
+    </release>
+    <release version="149.0.7827.102-1" date="2026-06-12">
+      <description/>
+    </release>
+    <release version="149.0.7827.53-1" date="2026-06-03">
+      <description/>
+    </release>
+    <release version="148.0.7778.215-1" date="2026-05-28">
+      <description/>
+    </release>
+    <release version="148.0.7778.178-1" date="2026-05-20">
+      <description/>
+    </release>
+    <release version="148.0.7778.167-1" date="2026-05-13">
+      <description/>
+    </release>
+    <release version="148.0.7778.96-1" date="2026-05-08">
+      <description/>
+    </release>
+    <release version="147.0.7727.137-1" date="2026-05-02">
+      <description/>
+    </release>
+    <release version="147.0.7727.116-1" date="2026-04-24">
+      <description/>
+    </release>
+    <release version="147.0.7727.101-1" date="2026-04-16">
+      <description/>
+    </release>
+    <release version="147.0.7727.55-1" date="2026-04-09">
+      <description/>
+    </release>
+    <release version="146.0.7680.177-1" date="2026-04-01">
+      <description/>
+    </release>
+    <release version="146.0.7680.164-1" date="2026-03-25">
+      <description/>
+    </release>
+    <release version="146.0.7680.153-1" date="2026-03-20">
+      <description/>
+    </release>
+    <release version="146.0.7680.80-1" date="2026-03-14">
+      <description/>
+    </release>
+    <release version="146.0.7680.75-1" date="2026-03-14">
+      <description/>
+    </release>
+    <release version="146.0.7680.71-1" date="2026-03-13">
+      <description/>
+    </release>
+    <release version="145.0.7632.159-1" date="2026-03-05">
+      <description/>
+    </release>
+    <release version="145.0.7632.116-1" date="2026-02-24">
+      <description/>
+    </release>
+    <release version="145.0.7632.109-1" date="2026-02-20">
+      <description/>
+    </release>
+    <release version="145.0.7632.75-1" date="2026-02-14">
+      <description/>
+    </release>
+    <release version="145.0.7632.45-1" date="2026-02-11">
+      <description/>
+    </release>
+    <release version="144.0.7559.132-1" date="2026-02-04">
+      <description/>
+    </release>
+    <release version="144.0.7559.109-1" date="2026-01-28">
+      <description/>
+    </release>
+    <release version="144.0.7559.96-1" date="2026-01-22">
+      <description/>
+    </release>
+    <release version="144.0.7559.59-1" date="2026-01-14">
+      <description/>
+    </release>
+    <release version="143.0.7499.192-1" date="2026-01-08">
+      <description/>
+    </release>
+    <release version="143.0.7499.169-1" date="2025-12-19">
+      <description/>
+    </release>
+    <release version="143.0.7499.146-1" date="2025-12-18">
+      <description/>
+    </release>
+    <release version="143.0.7499.109-1" date="2025-12-12">
+      <description/>
+    </release>
+    <release version="143.0.7499.40-1" date="2025-12-04">
+      <description/>
+    </release>
+    <release version="142.0.7444.175-1" date="2025-11-22">
+      <description/>
+    </release>
+    <release version="142.0.7444.162-1" date="2025-11-12">
+      <description/>
+    </release>
+    <release version="142.0.7444.134-1" date="2025-11-06">
+      <description/>
+    </release>
+    <release version="142.0.7444.59-2" date="2025-11-03">
+      <description/>
+    </release>
+    <release version="142.0.7444.59-1" date="2025-10-30">
+      <description/>
+    </release>
+    <release version="141.0.7390.122-1" date="2025-10-22">
+      <description/>
+    </release>
+    <release version="141.0.7390.107-1" date="2025-10-16">
+      <description/>
+    </release>
+    <release version="141.0.7390.76-1" date="2025-10-10">
+      <description/>
+    </release>
+    <release version="141.0.7390.65-1" date="2025-10-09">
+      <description/>
+    </release>
+    <release version="141.0.7390.54-1" date="2025-10-02">
+      <description/>
+    </release>
+    <release version="140.0.7339.207-1" date="2025-09-25">
+      <description/>
+    </release>
+    <release version="140.0.7339.185-1" date="2025-09-18">
+      <description/>
+    </release>
+    <release version="140.0.7339.127-1" date="2025-09-12">
+      <description/>
+    </release>
+    <release version="140.0.7339.80-1" date="2025-09-08">
+      <description/>
+    </release>
+    <release version="140.0.7339.41-1" date="2025-08-28">
+      <description/>
+    </release>
+    <release version="139.0.7258.154-1" date="2025-08-28">
+      <description/>
+    </release>
+    <release version="139.0.7258.138-1" date="2025-08-20">
+      <description/>
+    </release>
+    <release version="139.0.7258.127-1" date="2025-08-13">
+      <description/>
+    </release>
+    <release version="139.0.7258.66-1" date="2025-08-06">
+      <description/>
+    </release>
+    <release version="138.0.7204.183-1" date="2025-08-02">
+      <description/>
+    </release>
+    <release version="138.0.7204.168-1" date="2025-07-24">
+      <description/>
+    </release>
+    <release version="138.0.7204.157-1" date="2025-07-18">
+      <description/>
+    </release>
+    <release version="138.0.7204.100-1" date="2025-07-10">
+      <description/>
+    </release>
+    <release version="138.0.7204.96-1" date="2025-07-01">
+      <description/>
+    </release>
+    <release version="138.0.7204.49-1" date="2025-06-24">
+      <description/>
+    </release>
+    <release version="138.0.7204.35-1" date="2025-06-24">
+      <description/>
+    </release>
+    <release version="137.0.7151.119-1" date="2025-06-18">
+      <description/>
+    </release>
+    <release version="137.0.7151.103-1" date="2025-06-11">
+      <description/>
+    </release>
+    <release version="137.0.7151.68-1" date="2025-06-04">
+      <description/>
+    </release>
+    <release version="137.0.7151.55-1" date="2025-05-28">
+      <description/>
+    </release>
+    <release version="137.0.7151.40-1" date="2025-05-27">
+      <description/>
+    </release>
+    <release version="136.0.7103.113-1" date="2025-05-15">
+      <description/>
+    </release>
+    <release version="136.0.7103.92-1" date="2025-05-08">
+      <description/>
+    </release>
+    <release version="136.0.7103.59-1" date="2025-04-30">
+      <description/>
+    </release>
+    <release version="135.0.7049.114-1" date="2025-04-24">
+      <description/>
+    </release>
+    <release version="135.0.7049.95-1" date="2025-04-16">
+      <description/>
+    </release>
+    <release version="135.0.7049.84-1" date="2025-04-09">
+      <description/>
+    </release>
+    <release version="135.0.7049.52-1" date="2025-04-02">
+      <description/>
+    </release>
+    <release version="134.0.6998.177-1" date="2025-03-27">
+      <description/>
+    </release>
+    <release version="134.0.6998.165-1" date="2025-03-23">
+      <description/>
+    </release>
+    <release version="134.0.6998.117-1" date="2025-03-21">
+      <description/>
+    </release>
+    <release version="134.0.6998.88-1" date="2025-03-13">
+      <description/>
+    </release>
   </releases>
   <content_rating type="oars-1.1" />
   <update_contact>https://github.com/ungoogled-software/ungoogled-chromium-flatpak/issues</update_contact>
