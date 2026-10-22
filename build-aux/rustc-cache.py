@@ -13,6 +13,8 @@ import tempfile
 
 
 SCCACHE = '/app/bin/sccache'
+STAGING_SUFFIX = '.sccache'
+TEMP_PREFIX = '.rustc-cache-'
 
 
 def expand_response_files(arguments):
@@ -58,7 +60,7 @@ def cache_command(arguments):
     # A stable, per-output directory avoids collisions between crates with the
     # same name and permits reuse after flatpak-builder recreates the source tree.
     output = Path(options.o)
-    directory = output.parent / (output.name + '.sccache')
+    directory = output.parent / (output.name + STAGING_SUFFIX)
     stem = options.crate_name + extra
     suffix = '.rlib' if options.crate_type == 'rlib' else '.a'
     outputs = {directory / ('lib' + stem + suffix): output,
@@ -102,13 +104,24 @@ def file_digest(path, memo):
     return value
 
 
+def is_transient(name):
+    # Staging directories and temporary files of concurrent wrapper invocations
+    # appear and disappear while the sysroot is being populated. Chromium builds
+    # its own stdlib into local_rustc_sysroot, so sibling jobs share this tree.
+    return name.endswith(STAGING_SUFFIX) or name.startswith(TEMP_PREFIX)
+
+
 def tree_digest(root, memo):
     digest = hashlib.sha256()
     visited = set()
     for directory, dirs, files in os.walk(root, followlinks=True):
         # Follow library directory symlinks, but never revisit a directory:
         # Chromium sysroots may contain links back into the build tree.
-        stat = Path(directory).stat()
+        try:
+            stat = Path(directory).stat()
+        except FileNotFoundError:
+            dirs.clear()
+            continue
         identity = (stat.st_dev, stat.st_ino)
         if identity in visited:
             dirs.clear()
@@ -116,12 +129,21 @@ def tree_digest(root, memo):
         visited.add(identity)
         # Source files are tracked by rustc/sccache, not implicit binary deps.
         # rustc-src points to the source tree, which contains this sysroot.
-        dirs[:] = sorted(name for name in dirs if name not in ('src', 'rustc-src'))
+        dirs[:] = sorted(name for name in dirs
+                         if name not in ('src', 'rustc-src') and not is_transient(name))
         for name in sorted(files):
+            if is_transient(name):
+                continue
             path = Path(directory) / name
-            if path.is_file():
-                digest.update(str(path.relative_to(root)).encode() + b'\0')
-                digest.update(file_digest(path, memo).encode())
+            try:
+                if not path.is_file():
+                    continue
+                entry = file_digest(path, memo)
+            except FileNotFoundError:
+                # Removed by a concurrent job between listing and hashing.
+                continue
+            digest.update(str(path.relative_to(root)).encode() + b'\0')
+            digest.update(entry.encode())
     return digest.hexdigest()
 
 
@@ -202,7 +224,13 @@ def main():
         return status
     for source, destination in outputs.items():
         destination.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(source, destination)
+        # Publish atomically: concurrent jobs digest this directory and must
+        # never observe a partially written library.
+        with tempfile.NamedTemporaryFile(prefix=TEMP_PREFIX, dir=destination.parent,
+                                         delete=False) as stream:
+            pass
+        shutil.copy(source, stream.name)
+        os.replace(stream.name, destination)
     # rustc names the translated outputs in its Make depfile. Restore Ninja's
     # declared targets before Chromium normalizes/validates the dependencies.
     dependency_text = depfile.read_text()
