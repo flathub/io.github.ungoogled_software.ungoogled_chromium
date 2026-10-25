@@ -27,6 +27,15 @@ def expand_response_files(arguments):
     return result
 
 
+OMIT_D_TARGET = 'dep-info-omit-d-target'
+
+
+def omits_d_target(value):
+    # rustc accepts -Zdep-info-omit-d-target with an optional boolean value.
+    name, _, setting = value.partition('=')
+    return name == OMIT_D_TARGET and setting in ('', 'y', 'yes', 'on', 'true')
+
+
 def cache_command(arguments):
     """Return cacheable arguments and output mappings, or None for link steps."""
     parser = argparse.ArgumentParser(add_help=False, allow_abbrev=False)
@@ -69,17 +78,30 @@ def cache_command(arguments):
         outputs[directory / ('lib' + stem + '.rmeta')] = Path(emits['metadata'])
 
     # Retain every compiler option except the output paths being translated.
+    # Chromium passes -Zdep-info-omit-d-target so the depfile only names Ninja's
+    # declared outputs. sccache derives the depfile from a dep-info-only rustc
+    # run, which that option leaves without any rule, so sccache (0.19+) rejects
+    # it. Let rustc write the usual rules and omit the depfile's own rule below.
     translated = []
+    omit_d_target = False
     arguments = iter(arguments)
     for argument in arguments:
         if argument in ('-o', '--emit'):
             next(arguments)
         elif argument.startswith('--emit=') or (argument.startswith('-o') and argument != '-o'):
             continue
+        elif argument == '-Z':
+            value = next(arguments)
+            if omits_d_target(value):
+                omit_d_target = True
+            else:
+                translated += [argument, value]
+        elif argument.startswith('-Z') and omits_d_target(argument[2:]):
+            omit_d_target = True
         else:
             translated.append(argument)
     translated += ['--out-dir', str(directory), '--emit', ','.join(emits)]
-    return translated, outputs, Path(emits['dep-info'])
+    return translated, outputs, Path(emits['dep-info']), omit_d_target
 
 
 def file_digest(path, memo):
@@ -205,6 +227,32 @@ def prepare(compiler, arguments, scratch):
     return str(wrapper), filtered, env
 
 
+def translate_depfile(text, outputs, depfile, primary, omit_d_target):
+    """Rename rustc's translated targets back to Ninja's declared outputs.
+
+    rustc (and sccache, which writes the depfile itself on cache hits) name the
+    staged outputs. Ninja requires the first rule to name the edge's first
+    output and every rule to name a declared output, so the -o output's rule is
+    emitted first and, when -Zdep-info-omit-d-target was requested, the rule
+    for the depfile itself is dropped. The remaining text is kept verbatim.
+    """
+    def target(path):
+        return str(path).replace(' ', '\\ ') + ':'
+
+    primary_rules, rules, rest = [], [], []
+    for line in text.splitlines(keepends=True):
+        for source, destination in outputs.items():
+            if line.startswith(target(source)):
+                if omit_d_target and destination == depfile:
+                    break
+                renamed = target(destination) + line[len(target(source)):]
+                (primary_rules if destination == primary else rules).append(renamed)
+                break
+        else:
+            rest.append(line)
+    return ''.join(primary_rules + rules + rest)
+
+
 def main():
     compiler, *original = sys.argv[1:]
     arguments = expand_response_files(original)
@@ -212,7 +260,7 @@ def main():
     if command is None:
         # Uncacheable invocations use sccache directly for fallback and statistics.
         return subprocess.call([SCCACHE, compiler, *original])
-    translated, outputs, depfile = command
+    translated, outputs, depfile, omit_d_target = command
     directory = next(iter(outputs)).parent
     directory.mkdir(parents=True, exist_ok=True)
     # Chromium uses explicit stdlib sysroots even with prebuilt compilers.
@@ -231,17 +279,10 @@ def main():
             pass
         shutil.copy(source, stream.name)
         os.replace(stream.name, destination)
-    # rustc names the translated outputs in its Make depfile. Restore Ninja's
-    # declared targets before Chromium normalizes/validates the dependencies.
-    dependency_text = depfile.read_text()
-    for source, destination in outputs.items():
-        source_target = str(source).replace(' ', '\\ ') + ':'
-        destination_target = str(destination).replace(' ', '\\ ') + ':'
-        dependency_text = ''.join(
-            destination_target + line[len(source_target):]
-            if line.startswith(source_target) else line
-            for line in dependency_text.splitlines(keepends=True))
-    depfile.write_text(dependency_text)
+    # The first mapping is the -o output, which Ninja declares first.
+    primary = next(iter(outputs.values()))
+    depfile.write_text(translate_depfile(depfile.read_text(), outputs, depfile,
+                                         primary, omit_d_target))
     shutil.rmtree(directory)
     return 0
 
