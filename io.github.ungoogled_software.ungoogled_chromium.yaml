@@ -127,8 +127,8 @@ modules:
       - /bin/sccache
     sources:
       - type: archive
-        url: https://github.com/mozilla/sccache/releases/download/v0.20.0/sccache-v0.20.0-x86_64-unknown-linux-musl.tar.gz
-        sha256: c3c5db9cd7e3be12b7bab350d8fe8ae7dcfb7269d5432b269e0dffa1a87c6ed2
+        url: https://github.com/mozilla/sccache/releases/download/v0.20.1/sccache-v0.20.1-x86_64-unknown-linux-musl.tar.gz
+        sha256: c9f6c5a3ae84d9da0956b28c357a365827bda33f3383647fc0b67484c74a5ea9
         only-arches: [x86_64]
         x-checker-data:
           type: json
@@ -139,8 +139,8 @@ modules:
             | .browser_download_url
           timestamp-query: .published_at
       - type: archive
-        url: https://github.com/mozilla/sccache/releases/download/v0.20.0/sccache-v0.20.0-aarch64-unknown-linux-musl.tar.gz
-        sha256: 1bd78037804baeb9655f6baf8791f99c43388fae6d6b16944d3d93542fa5711a
+        url: https://github.com/mozilla/sccache/releases/download/v0.20.1/sccache-v0.20.1-aarch64-unknown-linux-musl.tar.gz
+        sha256: 505324daad5fcbb1a3cab5d57d26ef42baf4d10b236df7de93a008196f1f2230
         only-arches: [aarch64]
         x-checker-data:
           type: json
